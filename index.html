@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skull King Franco</title>
+  <link rel="icon" type="image/png" href="archivos/iconos/icon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="estilos.css">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body class="selection:bg-amber-500 selection:text-black">
+
+  <div id="app" class="max-w-md mx-auto min-h-screen flex flex-col justify-between p-4">
+    
+    <!-- ================= PANTALLA 1: INICIO (CON LOGO / TAPA ANCHA) ================= -->
+    <div v-if="pantallaActual === 'inicio'" class="flex flex-col items-center justify-center my-auto text-center py-6">
+      
+      <!-- LOGO O TAPA DEL JUEGO (Ancho ajustado al estilo de los botones) -->
+      <img src="archivos/iconos/tapa.png" alt="Skull King Portada" 
+           class="w-full max-w-xs h-auto mb-6 rounded-2xl shadow-2xl border border-amber-500/30 object-contain drop-shadow-[0_10px_15px_rgba(245,158,11,0.25)]" 
+           onerror="this.style.display='none'">
+
+      <h1 class="text-4xl font-extrabold tracking-wider text-white drop-shadow-md mb-1">
+        SKULL KING FRANCO
+      </h1>
+      <p class="text-xs uppercase tracking-widest text-amber-300 font-bold mb-8">
+        Contador de Puntos y Manual
+      </p>
+
+      <div class="w-full flex flex-col gap-4">
+        <button @click="irANuevaPartida" class="w-full py-4 btn-blanco-marron text-lg rounded-2xl">
+          Nueva Partida
+        </button>
+        <button v-if="hayPartidaGuardada" @click="pantallaActual = 'partida'" class="w-full py-4 btn-marron-oscuro text-lg rounded-2xl">
+          Continuar Partida
+        </button>
+        <button @click="pantallaActual = 'historial'" class="w-full py-4 btn-marron-oscuro text-lg rounded-2xl">
+          📜 Historial de Partidas
+        </button>
+        <button @click="pantallaActual = 'reglas'" class="w-full py-4 btn-marron-oscuro text-lg rounded-2xl">
+          Reglas, Cartas y Expansión
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= PANTALLA 2: NUEVA PARTIDA ================= -->
+    <div v-else-if="pantallaActual === 'nueva_partida'" class="py-6 flex flex-col gap-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-white">Configurar Mesa</h2>
+        <button @click="pantallaActual = 'inicio'" class="text-sm text-amber-300 hover:text-white font-bold">✕ Cancelar</button>
+      </div>
+
+      <div>
+        <label class="block text-sm text-slate-200 mb-2 font-semibold">¿Cuántos piratas juegan? (2 a 9)</label>
+        <div class="grid grid-cols-4 gap-2">
+          <button v-for="num in [2,3,4,5,6,7,8,9]" :key="num" 
+                  @click="cambiarCantidadJugadores(num)"
+                  :class="['py-3 font-bold rounded-xl border', cantidadJugadores === num ? 'btn-blanco-marron' : 'btn-marron-oscuro']">
+            {{ num }}
+          </button>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <!-- Regla Franco -->
+        <div class="p-4 tarjeta-marron">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold text-sm text-white">¿Regla Franco: Comodines Blancos?</span>
+            <button @click="usarReglaFranco = !usarReglaFranco"
+                    :class="['px-4 py-1.5 rounded-full text-xs font-bold', usarReglaFranco ? 'btn-blanco-marron' : 'btn-marron-oscuro']">
+              {{ usarReglaFranco ? 'SÍ (Activa)' : 'NO' }}
+            </button>
+          </div>
+          <p v-if="usarReglaFranco" class="text-xs text-slate-300 leading-relaxed mt-2 border-t border-amber-900/50 pt-2">
+            🃏 Hay 8 cartas blancas. Si al repartir te toca una, avisá, apartala y robá otra. Al final de la ronda 10 suman: <strong>1 = +10 pts | 2 = +20 pts | 3 = +50 pts | 4+ = +100 pts</strong>.
+          </p>
+        </div>
+
+        <!-- Modo Bribón -->
+        <div class="p-4 tarjeta-marron">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold text-sm text-white">¿Reglas del Bribón Opcionales?</span>
+            <button @click="usarModoBribon = !usarModoBribon"
+                    :class="['px-4 py-1.5 rounded-full text-xs font-bold', usarModoBribon ? 'btn-blanco-marron' : 'btn-marron-oscuro']">
+              {{ usarModoBribon ? 'SÍ (Activo)' : 'NO' }}
+            </button>
+          </div>
+          <p v-if="usarModoBribon" class="text-xs text-slate-300 leading-relaxed mt-2 border-t border-amber-900/50 pt-2">
+            🏴‍☠️ Permite elegir entre <strong>Metralla (Mano abierta)</strong> para asegurar puntos o <strong>Bala de cañón (Puño cerrado)</strong> para arriesgar por más recompensa al envidar.
+          </p>
+        </div>
+
+        <!-- Habilidades de Piratas -->
+        <div class="p-4 tarjeta-marron">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold text-sm text-white">¿Habilidades de Piratas?</span>
+            <button @click="usarHabilidadesPiratas = !usarHabilidadesPiratas"
+                    :class="['px-4 py-1.5 rounded-full text-xs font-bold', usarHabilidadesPiratas ? 'btn-blanco-marron' : 'btn-marron-oscuro']">
+              {{ usarHabilidadesPiratas ? 'SÍ (Activas)' : 'NO' }}
+            </button>
+          </div>
+          <p v-if="usarHabilidadesPiratas" class="text-xs text-slate-300 leading-relaxed mt-2 border-t border-amber-900/50 pt-2">
+            🏴‍☠️ Permite usar habilidades especiales como <strong>Rascal</strong> (cambiar tu apuesta ±1 baza en la ronda) o <strong>Rosie (La Bendita)</strong> (apostar +10/+20 puntos extras a que acertás tu apuesta).
+          </p>
+        </div>
+      </div>
+
+      <!-- ORDEN DE MESA CON FLECHAS -->
+      <div class="flex flex-col gap-3">
+        <label class="block text-sm text-slate-200 font-semibold">Orden en la mesa (sentido horario, usá las flechas para mover):</label>
+        <div v-for="(nombre, index) in nombresJugadores" :key="index" class="flex items-center gap-2">
+          <span class="w-6 text-sm text-amber-300 font-bold">{{ index + 1 }}.</span>
+          <input v-model="nombresJugadores[index]" 
+                 type="text" 
+                 :placeholder="'Pirata ' + (index + 1)"
+                 class="w-full rounded-xl px-4 py-3 text-white">
+          <button @click="moverJugador(index, -1)" :disabled="index === 0" 
+                  class="px-3 py-3 bg-slate-800 rounded-xl text-slate-300 disabled:opacity-30 font-bold">▲</button>
+          <button @click="moverJugador(index, 1)" :disabled="index === nombresJugadores.length - 1" 
+                  class="px-3 py-3 bg-slate-800 rounded-xl text-slate-300 disabled:opacity-30 font-bold">▼</button>
+        </div>
+      </div>
+
+      <button @click="comenzarPartida" class="w-full mt-4 py-4 btn-blanco-marron text-lg rounded-2xl">
+        Empezar Partida
+      </button>
+    </div>
+
+    <!-- ================= PANTALLA 3: PARTIDA EN JUEGO ================= -->
+    <div v-else-if="pantallaActual === 'partida'" class="py-4 flex flex-col h-full">
+      
+      <div class="border-b border-amber-900/60 pb-3 mb-3">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <span class="text-xs uppercase tracking-widest text-amber-300 font-bold">Ronda {{ rondaActual }} de 10</span>
+            <h2 class="text-xl font-bold text-white">Se reparten {{ rondaActual }} carta{{ rondaActual > 1 ? 's' : '' }}</h2>
+          </div>
+          <div class="flex gap-2">
+            <button @click="mostrarPodio = true" class="text-xs btn-blanco-marron px-3 py-2 rounded-lg font-bold">🏆 Podio</button>
+            <button @click="descartarPartidaActual" class="text-xs bg-red-950/80 border border-red-800 text-red-200 px-3 py-2 rounded-lg font-bold">🗑️ Descartar</button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between tarjeta-marron p-2.5 text-xs">
+          <div class="text-amber-300 font-semibold">
+            🎲 Arranca: <strong class="text-white">{{ jugadorInicial.nombre }}</strong>
+          </div>
+          <div class="text-slate-300">
+            🃏 Reparte: <strong class="text-white">{{ jugadorReparte.nombre }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pestañas de Jugadores -->
+      <div class="flex gap-2 overflow-x-auto pb-2 border-b border-amber-900/60 scroll-oculto">
+        <button v-for="(jugador, index) in jugadores" :key="index"
+                @click="jugadorSeleccionadoIdx = index"
+                :class="['px-4 py-2 rounded-xl font-bold whitespace-nowrap text-sm', jugadorSeleccionadoIdx === index ? 'btn-blanco-marron' : 'btn-marron-oscuro']">
+          {{ jugador.nombre }}
+          <span v-if="jugador.apuesta !== undefined" class="ml-1 text-[10px] opacity-80">(Ap: {{jugador.apuesta}})</span>
+        </button>
+      </div>
+
+      <!-- FICHA DEL JUGADOR ACTUAL -->
+      <div v-if="jugadorActual" class="mt-4 flex flex-col gap-5">
+        
+        <div class="tarjeta-marron p-4 flex justify-between items-center">
+          <div>
+            <h3 class="text-2xl font-bold text-white">{{ jugadorActual.nombre }}</h3>
+            <p class="text-xs text-slate-300">Puntaje acumulado total</p>
+          </div>
+          <div class="text-right">
+            <span class="text-3xl font-extrabold text-amber-300">{{ jugadorActual.puntos }} pts</span>
+            <p class="text-xs text-emerald-400 font-bold">Esta ronda: {{ puntajeProyectadoActual >= 0 ? '+' : '' }}{{ puntajeProyectadoActual }}</p>
+          </div>
+        </div>
+
+        <!-- REGLA FRANCO: COMODINES -->
+        <div v-if="usarReglaFranco" class="p-3 bg-amber-950/40 border border-amber-700/50 rounded-xl flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold text-amber-300 uppercase block">🃏 Regla Franco: Comodines Blancos</span>
+            <p class="text-xs text-slate-300">Guardadas (máx 8): <strong class="text-white">+{{ calcularBonoBlancas(jugadorActual.cartasBlancas) }} pts al final</strong></p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button @click="jugadorActual.cartasBlancas = Math.max(0, jugadorActual.cartasBlancas - 1)" 
+                    class="w-8 h-8 btn-marron-oscuro rounded-lg font-bold">-</button>
+            <span class="text-lg font-bold text-white px-1">{{ jugadorActual.cartasBlancas }}</span>
+            <button @click="jugadorActual.cartasBlancas = Math.min(8, jugadorActual.cartasBlancas + 1)" 
+                    class="w-8 h-8 btn-blanco-marron rounded-lg font-bold">+</button>
+          </div>
+        </div>
+
+        <!-- REGLAS DEL BRIBÓN OPCIONALES -->
+        <div v-if="usarModoBribon" class="tarjeta-marron p-3">
+          <label class="block text-xs uppercase tracking-wider text-amber-300 font-bold mb-2">
+            🏴‍☠️ Envite del Bribón (Opcional)
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <button @click="jugadorActual.modoEnvite = 'metralla'"
+                    :class="['py-2.5 px-3 rounded-xl font-bold text-xs border', jugadorActual.modoEnvite === 'metralla' ? 'btn-blanco-marron' : 'btn-marron-oscuro']">
+              ✋ Metralla (Mano abierta)
+            </button>
+            <button @click="jugadorActual.modoEnvite = 'bala'"
+                    :class="['py-2.5 px-3 rounded-xl font-bold text-xs border', jugadorActual.modoEnvite === 'bala' ? 'btn-blanco-marron' : 'btn-marron-oscuro']">
+              ✊ Bala de cañón (Puño cerrado)
+            </button>
+          </div>
+        </div>
+
+        <!-- APUESTA -->
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-slate-300 mb-2 font-bold">
+            1. ¿Cuántas bazas apostó ganar?
+          </label>
+          <div class="flex flex-wrap gap-2">
+            <button v-for="num in (rondaActual + 1)" :key="'apuesta-'+(num-1)"
+                    @click="jugadorActual.apuesta = (num - 1)"
+                    :class="['flex-1 py-3 px-4 font-bold rounded-xl border text-lg', jugadorActual.apuesta === (num - 1) ? 'btn-blanco-marron' : 'btn-marron-oscuro']">
+              {{ num - 1 }}
+            </button>
+          </div>
+        </div>
+
+        <!-- GANADAS -->
+        <div>
+          <label class="block text-xs uppercase tracking-wider text-slate-300 mb-2 font-bold">
+            2. ¿Cuántas bazas ganó realmente?
+          </label>
+          <div class="flex flex-wrap gap-2">
+            <button v-for="num in (rondaActual + 1)" :key="'ganada-'+(num-1)"
+                    @click="jugadorActual.ganadas = (num - 1)"
+                    :class="['flex-1 py-3 px-4 font-bold rounded-xl border text-lg', jugadorActual.ganadas === (num - 1) ? 'bg-emerald-700 text-white border-emerald-500' : 'btn-marron-oscuro']">
+              {{ num - 1 }}
+            </button>
+          </div>
+        </div>
+
+        <!-- BONIFICACIONES ACUMULATIVAS Y CON LÍMITES ESTRICTOS -->
+        <div :class="['p-3 rounded-2xl transition-all', jugadorActual.apuesta !== jugadorActual.ganadas && !usarModoBribon ? 'bg-red-950/30 border border-red-800/80' : 'tarjeta-marron']">
+          <div class="flex justify-between items-center mb-3">
+            <label class="block text-xs uppercase tracking-wider text-amber-300 font-bold">
+              3. Cantidad de Eventos en Baza
+            </label>
+            <span v-if="jugadorActual.apuesta !== jugadorActual.ganadas && !usarModoBribon" class="text-xs font-bold text-red-400">
+              ⚠️ Apuesta fallada (No se cobran bonos)
+            </span>
+          </div>
+          
+          <div class="flex flex-col gap-2">
+            <div v-for="evento in catalogoEventosBono" :key="evento.id"
+                 class="bg-slate-900/80 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between text-xs">
+              <span class="font-semibold text-slate-200">
+                {{ evento.etiqueta }}
+                <span class="text-[10px] text-slate-400 block">(Máx disp: {{ obtenerMaximoDisponible(evento.id) }})</span>
+              </span>
+              <div class="flex items-center gap-2">
+                <button @click="cambiarCantidadBono(evento.id, -1)" 
+                        :disabled="obtenerCantidadBono(evento.id) === 0"
+                        class="w-7 h-7 bg-slate-800 text-white rounded-lg font-bold disabled:opacity-30">-</button>
+                <span class="w-6 text-center font-bold text-amber-300 text-sm">{{ obtenerCantidadBono(evento.id) }}</span>
+                <button @click="cambiarCantidadBono(evento.id, 1)" 
+                        :disabled="obtenerMaximoDisponible(evento.id) <= 0"
+                        class="w-7 h-7 btn-blanco-marron rounded-lg font-bold text-black disabled:opacity-30 disabled:bg-slate-800 disabled:border-slate-700 disabled:text-slate-500">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTÓN AVANZAR JUGADOR / RONDA -->
+        <div class="mt-4 pt-4 border-t border-amber-900/60">
+          <button @click="guardarJugadorYContinuar" class="w-full py-4 btn-blanco-marron text-lg rounded-2xl shadow-lg">
+            {{ jugadorSeleccionadoIdx < jugadores.length - 1 ? 'Guardar e Ir al Siguiente Jugador ➔' : (rondaActual < 10 ? 'Guardar e Ir a Siguiente Ronda ➔' : '🏁 Guardar y Finalizar Partida') }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= PANTALLA 4: REGLAS Y MANUAL ================= -->
+    <div v-else-if="pantallaActual === 'reglas'" class="py-6 overflow-y-auto">
+      <button @click="pantallaActual = 'inicio'" class="mb-4 text-sm text-amber-300 font-bold">← Volver al menú</button>
+      <h2 class="text-2xl font-bold mb-1 text-white">Manual y Jerarquía</h2>
+      <p class="text-xs text-slate-300 mb-4">Secciones organizadas por categoría para navegar rápido. Tocá cada título para abrir.</p>
+      
+      <div class="flex flex-col gap-2.5">
+        
+        <div class="border border-slate-800 rounded-xl overflow-hidden">
+          <button @click="toggleAcordeon('general')" class="w-full p-3.5 bg-slate-900 flex justify-between items-center font-bold text-amber-300 text-sm">
+            <span>1. Reglas Generales y Puntuación Base</span>
+            <span>{{ acordeonAbierto === 'general' ? '▲' : '▼' }}</span>
+          </button>
+          <div v-if="acordeonAbierto === 'general'" class="p-4 bg-slate-950 text-xs text-slate-300 flex flex-col gap-3 border-t border-slate-800">
+            <div v-for="reg in reglasGenerales" :key="reg.titulo" class="border-b border-slate-800/60 pb-2 last:border-none last:pb-0">
+              <strong class="text-white block mb-0.5">{{ reg.titulo }}</strong>
+              <p class="leading-relaxed whitespace-pre-line">{{ reg.texto }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PALOS EN COLUMNA VERTICAL -->
+        <div class="border border-slate-800 rounded-xl overflow-hidden">
+          <button @click="toggleAcordeon('palos')" class="w-full p-3.5 bg-slate-900 flex justify-between items-center font-bold text-amber-300 text-sm">
+            <span>2. Palos (Colores, Triunfo Negro y Monito 15)</span>
+            <span>{{ acordeonAbierto === 'palos' ? '▲' : '▼' }}</span>
+          </button>
+          <div v-if="acordeonAbierto === 'palos'" class="p-4 bg-slate-950 text-xs text-slate-300 flex flex-col gap-4 border-t border-slate-800">
+            <div v-for="carta in cartasPorGrupo.palos" :key="carta.id" class="flex items-start gap-3 border-b border-slate-800/60 pb-3 last:border-none last:pb-0">
+              
+              <div v-if="Array.isArray(carta.imagen)" class="flex flex-col gap-2 shrink-0">
+                <img v-for="(imgSrc, idx) in carta.imagen" :key="idx" :src="imgSrc" :alt="carta.nombre" class="w-16 h-22 object-cover rounded border border-slate-700 bg-slate-900" onerror="this.style.display='none'">
+              </div>
+              <img v-else :src="carta.imagen" :alt="carta.nombre" class="w-16 h-22 object-cover rounded border border-slate-700 bg-slate-900 shrink-0" onerror="this.style.display='none'">
+
+              <div>
+                <strong class="text-white block text-sm mb-1">{{ carta.nombre }}</strong>
+                <p class="leading-relaxed">{{ carta.descripcion }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border border-slate-800 rounded-xl overflow-hidden">
+          <button @click="toggleAcordeon('especiales')" class="w-full p-3.5 bg-slate-900 flex justify-between items-center font-bold text-amber-300 text-sm">
+            <span>3. Cartas Especiales (Skull King, Sirenas y Kon)</span>
+            <span>{{ acordeonAbierto === 'especiales' ? '▲' : '▼' }}</span>
+          </button>
+          <div v-if="acordeonAbierto === 'especiales'" class="p-4 bg-slate-950 text-xs text-slate-300 flex flex-col gap-4 border-t border-slate-800">
+            <div v-for="carta in cartasPorGrupo.especiales" :key="carta.id" class="flex items-start gap-3 border-b border-slate-800/60 pb-3 last:border-none last:pb-0">
+              <img :src="carta.imagen" :alt="carta.nombre" class="w-14 h-20 object-cover rounded border border-slate-700 bg-slate-900 shrink-0" onerror="this.style.display='none'">
+              <div>
+                <strong class="text-white block text-sm mb-1">{{ carta.nombre }}</strong>
+                <p class="leading-relaxed">{{ carta.descripcion }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border border-slate-800 rounded-xl overflow-hidden">
+          <button @click="toggleAcordeon('piratas')" class="w-full p-3.5 bg-slate-900 flex justify-between items-center font-bold text-amber-300 text-sm">
+            <span>4. Los 7 Piratas y sus Habilidades</span>
+            <span>{{ acordeonAbierto === 'piratas' ? '▲' : '▼' }}</span>
+          </button>
+          <div v-if="acordeonAbierto === 'piratas'" class="p-4 bg-slate-950 text-xs text-slate-300 flex flex-col gap-4 border-t border-slate-800">
+            <p class="text-amber-300/90 font-semibold mb-1">Los Piratas vencen a números y Sirenas (+20 pts por Sirena capturada). Pierden ante el Skull King. Si se juegan varios piratas, gana el primero jugado.</p>
+            
+            <div v-for="pirata in cartasPorGrupo.piratasLista" :key="pirata.nombre" class="flex items-center gap-3 border-t border-slate-800/80 pt-3">
+              <img :src="pirata.imagen" :alt="pirata.nombre" class="w-12 h-16 object-cover rounded bg-slate-900 shrink-0" onerror="this.style.display='none'">
+              <div>
+                <strong class="text-white block mb-0.5">{{ pirata.nombre }}</strong>
+                <p class="text-slate-300 leading-relaxed">{{ pirata.habilidad }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border border-slate-800 rounded-xl overflow-hidden">
+          <button @click="toggleAcordeon('monstruos')" class="w-full p-3.5 bg-slate-900 flex justify-between items-center font-bold text-amber-300 text-sm">
+            <span>5. Monstruos Marinos y Davy Jones</span>
+            <span>{{ acordeonAbierto === 'monstruos' ? '▲' : '▼' }}</span>
+          </button>
+          <div v-if="acordeonAbierto === 'monstruos'" class="p-4 bg-slate-950 text-xs text-slate-300 flex flex-col gap-4 border-t border-slate-800">
+            <div v-for="carta in cartasPorGrupo.monstruos" :key="carta.id" class="flex items-start gap-3 border-b border-slate-800/60 pb-3 last:border-none last:pb-0">
+              <img :src="carta.imagen" :alt="carta.nombre" class="w-14 h-20 object-cover rounded border border-slate-700 bg-slate-900 shrink-0" onerror="this.style.display='none'">
+              <div>
+                <strong class="text-white block text-sm mb-1">{{ carta.nombre }}</strong>
+                <p class="leading-relaxed">{{ carta.descripcion }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border border-slate-800 rounded-xl overflow-hidden">
+          <button @click="toggleAcordeon('accion')" class="w-full p-3.5 bg-slate-900 flex justify-between items-center font-bold text-amber-300 text-sm">
+            <span>6. Cartas de Acción y Botín</span>
+            <span>{{ acordeonAbierto === 'accion' ? '▲' : '▼' }}</span>
+          </button>
+          <div v-if="acordeonAbierto === 'accion'" class="p-4 bg-slate-950 text-xs text-slate-300 flex flex-col gap-4 border-t border-slate-800">
+            <div v-for="carta in cartasPorGrupo.accion" :key="carta.id" class="flex items-start gap-3 border-b border-slate-800/60 pb-3 last:border-none last:pb-0">
+              <img :src="carta.imagen" :alt="carta.nombre" class="w-14 h-20 object-cover rounded border border-slate-700 bg-slate-900 shrink-0" onerror="this.style.display='none'">
+              <div>
+                <strong class="text-white block text-sm mb-1">{{ carta.nombre }}</strong>
+                <p class="leading-relaxed">{{ carta.descripcion }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border border-slate-800 rounded-xl overflow-hidden">
+          <button @click="toggleAcordeon('franco')" class="w-full p-3.5 bg-amber-500/20 flex justify-between items-center font-bold text-amber-300 text-sm">
+            <span>7. Regla de Casa: Comodines Blancos (Franco)</span>
+            <span>{{ acordeonAbierto === 'franco' ? '▲' : '▼' }}</span>
+          </button>
+          <div v-if="acordeonAbierto === 'franco'" class="p-4 bg-slate-950 text-xs text-slate-300 flex flex-col gap-3 border-t border-slate-800">
+            <div v-for="carta in cartasPorGrupo.franco" :key="carta.id" class="flex items-start gap-3">
+              <img :src="carta.imagen" :alt="carta.nombre" class="w-16 h-22 object-cover rounded border border-amber-500/40 bg-slate-900 shrink-0" onerror="this.style.display='none'">
+              <div>
+                <strong class="text-amber-300 block text-sm mb-1">{{ carta.nombre }}</strong>
+                <p class="leading-relaxed mb-2">{{ carta.descripcion }}</p>
+                <div class="grid grid-cols-4 gap-1 text-center font-bold text-amber-300 bg-slate-900 py-1.5 rounded-lg border border-slate-800">
+                  <span>1 = +10 pts</span>
+                  <span>2 = +20 pts</span>
+                  <span>3 = +50 pts</span>
+                  <span>4+ = +100 pts</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= PANTALLA 5: HISTORIAL ================= -->
+    <div v-else-if="pantallaActual === 'historial'" class="py-6 overflow-y-auto">
+      <button @click="pantallaActual = 'inicio'" class="mb-4 text-sm text-amber-300 font-bold">← Volver al menú</button>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-white">Historial de Partidas</h2>
+        <button v-if="historialPartidas.length > 0" @click="borrarTodoElHistorial" class="text-xs bg-red-900/60 hover:bg-red-900 border border-red-800 text-red-200 px-3 py-1.5 rounded-xl font-bold">
+          Borrar Historial
+        </button>
+      </div>
+
+      <div v-if="historialPartidas.length === 0" class="tarjeta-marron p-8 text-center text-slate-300 text-sm">
+        Todavía no hay partidas guardadas en el historial. ¡Jugá una partida completa y al finalizar aparecerá acá!
+      </div>
+
+      <div v-else class="flex flex-col gap-4">
+        <div v-for="(item, hIndex) in historialPartidas" :key="hIndex" class="tarjeta-marron p-4 flex flex-col gap-3">
+          <div class="flex justify-between items-center border-b border-amber-900/50 pb-2">
+            <span class="text-xs font-bold text-amber-300">{{ item.fecha }}</span>
+            <button @click="eliminarPartidaHistorial(hIndex)" class="text-xs text-slate-400 hover:text-red-400 font-bold">✕ Eliminar</button>
+          </div>
+          
+          <div class="flex flex-col gap-1.5">
+            <div v-for="(jug, jIndex) in item.ranking" :key="jIndex"
+                 :class="['flex justify-between items-center px-3 py-2 rounded-xl text-sm font-semibold', jIndex === 0 ? 'btn-blanco-marron' : 'bg-amber-950/40 text-slate-200']">
+              <span>{{ jIndex === 0 ? '🥇' : jIndex === 1 ? '🥈' : jIndex === 2 ? '🥉' : (jIndex+1)+'.' }} {{ jug.nombre }}</span>
+              <span class="font-extrabold text-amber-300">{{ jug.puntos }} pts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= MODAL: TABLERO GENERAL / PODIO FINAL ================= -->
+    <div v-if="mostrarPodio" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+      <div class="tarjeta-marron p-6 w-full max-w-sm flex flex-col gap-4">
+        <div class="flex justify-between items-center border-b border-amber-900/60 pb-3">
+          <h3 class="text-xl font-bold text-amber-300">🏆 Resultados Finales</h3>
+          <button @click="cerrarPodio" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
+        </div>
+
+        <div class="flex flex-col gap-2 my-2">
+          <div v-for="(jugador, index) in tablaGeneralOrdenada" :key="jugador.nombre"
+               :class="['flex items-center justify-between p-3 rounded-xl border', index === 0 ? 'btn-blanco-marron' : 'btn-marron-oscuro']">
+            <div class="flex items-center gap-3">
+              <span class="font-bold text-lg w-6">{{ index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index+1)+'.' }}</span>
+              <div>
+                <span class="font-bold block">{{ jugador.nombre }}</span>
+                <span v-if="usarReglaFranco && jugador.cartasBlancas > 0" class="text-[10px] text-amber-300">
+                  🃏 {{ jugador.cartasBlancas }} comodín(es) guardados
+                </span>
+              </div>
+            </div>
+            <span class="font-extrabold text-xl text-amber-300">{{ jugador.puntos }} pts</span>
+          </div>
+        </div>
+
+        <button @click="cerrarPodio" class="w-full py-3 btn-blanco-marron text-lg rounded-2xl">
+          Cerrar y Volver al Inicio
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
