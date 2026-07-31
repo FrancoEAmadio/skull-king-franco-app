@@ -1,0 +1,128 @@
+/* estilos.css - Tema Deep Sea / Midnight Pirate (Moderno y Elegante) */
+
+:root {
+  --bg-dark: #090d16;
+  --bg-card: rgba(17, 24, 39, 0.88);
+  --border-card: rgba(55, 65, 81, 0.75);
+  --accent-gold: #f59e0b;
+  --accent-gold-hover: #fbbf24;
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: radial-gradient(circle at top center, #131c2e 0%, var(--bg-dark) 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+/* EFECTOS TÁCTILES SUAVES */
+button {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+/* BOTÓN PRINCIPAL: DORADO Y MARRÓN */
+.btn-blanco-marron {
+  background-color: var(--accent-gold);
+  color: #1a1002;
+  font-weight: 800;
+  border: 1px solid #d97706;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+}
+.btn-blanco-marron:hover:not(:disabled) {
+  background-color: var(--accent-gold-hover);
+  box-shadow: 0 6px 25px -2px rgba(245, 158, 11, 0.55);
+}
+
+/* BOTÓN SECUNDARIO: OSCURO ELEGANTE */
+.btn-marron-oscuro {
+  background-color: #1f2937;
+  color: var(--text-main);
+  font-weight: 700;
+  border: 1px solid #374151;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.btn-marron-oscuro:hover:not(:disabled) {
+  background-color: #374151;
+  border-color: #4b5563;
+}
+
+/* TARJETAS CON VIDRIO ESMALTADO */
+.tarjeta-marron {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.65);
+}
+
+/* INPUTS Y FORMULARIOS */
+input[type="text"],
+input[type="number"] {
+  background-color: #111827;
+  border: 1px solid #374151;
+  color: #f3f4f6;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+input[type="text"]:focus,
+input[type="number"]:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3);
+}
+
+/* ==========================================================
+   SWITCHES DE CONFIGURACIÓN (Punto 2 requerido)
+   ========================================================== */
+.switch-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background-color: #111827;
+  border: 1px solid #374151;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.switch-label:hover {
+  border-color: #4b5563;
+}
+.switch-track {
+  width: 48px;
+  height: 26px;
+  background-color: #374151;
+  border-radius: 9999px;
+  position: relative;
+  transition: background-color 0.25s ease-in-out;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+.switch-thumb {
+  width: 22px;
+  height: 22px;
+  background-color: #e5e7eb;
+  border-radius: 50%;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+/* Estado Encendido (🟡 ON) */
+.switch-input:checked + .switch-track {
+  background-color: var(--accent-gold);
+}
+.switch-input:checked + .switch-track .switch-thumb {
+  transform: translateX(22px);
+  background-color: #1f2937;
+}
