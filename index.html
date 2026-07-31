@@ -61,7 +61,7 @@
         </label>
         <div class="flex flex-col gap-2">
           <button v-for="modo in ['base', 'avanzado', 'expansion']" :key="modo"
-                  @click="configuracionMesa.modoContenido = modo"
+                  @click="cambiarModoContenido(modo)"
                   :class="['p-3 rounded-xl font-bold text-left text-xs border flex items-center justify-between transition-all', configuracionMesa.modoContenido === modo ? 'btn-blanco-marron' : 'btn-marron-oscuro']">
             <span>
               {{ modo === 'base' ? '🟢 Juego Base' : modo === 'avanzado' ? '🟣 Reglas Avanzadas' : '🟠 Expansión' }}
@@ -122,6 +122,9 @@
               <div class="w-11 h-6 bg-slate-800 border border-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
             </div>
           </label>
+          <p v-if="configuracionMesa.usarHabilidadesPiratas" class="text-xs text-slate-300 leading-relaxed mt-2 border-t border-amber-900/50 pt-2">
+            🏴‍☠️ Activa las habilidades individuales de los piratas en juego, incluyendo el envite extra opcional (+0, +10 o +20 pts) del <strong>Bribón de Roatán</strong>.
+          </p>
         </div>
       </section>
 
@@ -325,6 +328,98 @@
           </div>
         </div>
 
+        <div v-if="configuracionMesa.modoContenido !== 'base'" class="tarjeta-marron p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-amber-300 uppercase block">
+              🤝 Registrar Alianza de Botín (Máx. 2 por ronda)
+            </span>
+            <span class="text-[10px] text-gray-400 font-semibold">
+              {{ alianzasBotinRonda.length }}/2 en juego
+            </span>
+          </div>
+
+          <div v-if="alianzasBotinRonda.length < 2" class="flex flex-col gap-2 bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <label class="block text-[10px] text-gray-400 mb-1 font-bold">Jugó el Botín:</label>
+                <select v-model.number="idxBotinJugadorA" class="w-full bg-gray-900 border border-gray-700 text-xs rounded-xl p-2 text-white font-semibold">
+                  <option v-for="(j, idx) in jugadores" :key="'botinA-'+idx" :value="idx">
+                    {{ j.nombre }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[10px] text-gray-400 mb-1 font-bold">Ganó la baza:</label>
+                <select v-model.number="idxBotinJugadorB" class="w-full bg-gray-900 border border-gray-700 text-xs rounded-xl p-2 text-white font-semibold">
+                  <option v-for="(j, idx) in jugadores" :key="'botinB-'+idx" :value="idx">
+                    {{ j.nombre }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <button type="button" 
+                    @click="agregarAlianzaBotin(idxBotinJugadorA, idxBotinJugadorB)"
+                    :disabled="idxBotinJugadorA === idxBotinJugadorB"
+                    class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs rounded-xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              + Registrar Alianza de Botín
+            </button>
+          </div>
+
+          <div v-if="alianzasBotinRonda.length > 0" class="flex flex-col gap-2 mt-3">
+            <div v-for="(alianza, index) in alianzasBotinRonda" :key="index"
+                 class="flex items-center justify-between p-2.5 bg-gray-900/90 border border-amber-500/40 rounded-xl text-xs">
+              <span class="font-bold text-amber-300">
+                🤝 {{ alianza.nombreA }} ↔ {{ alianza.nombreB }}
+              </span>
+              <button type="button" @click="eliminarAlianzaBotin(index)" class="text-xs text-red-400 hover:text-red-300 font-bold px-2 py-0.5 rounded bg-slate-800">
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="configuracionMesa.usarHabilidadesPiratas" class="tarjeta-marron p-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-amber-300 uppercase block">
+              🏴‍☠️ Habilidad: Bribón de Roatán (Único en partida)
+            </span>
+            <span v-if="bribonHabilidadOcupadoPorOtro" class="text-[10px] text-red-400 font-bold">
+              🔒 Usado en esta ronda por {{ bribonHabilidadOcupadoPorOtro }}
+            </span>
+          </div>
+
+          <div v-if="!bribonHabilidadOcupadoPorOtro" class="grid grid-cols-4 gap-1.5 mt-2">
+            <button type="button"
+                    @click="seleccionarBribonHabilidad(null)"
+                    :class="['py-2.5 rounded-xl font-bold text-xs border transition-all',
+                      jugadorActual.bribonHabilidadPts === null || jugadorActual.bribonHabilidadPts === undefined ? 'btn-blanco-marron' : 'btn-marron-oscuro text-gray-300'
+                    ]">
+              No usado
+            </button>
+            <button v-for="pts in [0, 10, 20]" :key="'bribon-hab-'+pts"
+                    type="button"
+                    @click="seleccionarBribonHabilidad(pts)"
+                    :class="['py-2.5 rounded-xl font-bold text-xs border transition-all',
+                      jugadorActual.bribonHabilidadPts === pts ? 'btn-blanco-marron' : 'btn-marron-oscuro text-gray-300'
+                    ]">
+              Apostó {{ pts }} pts
+            </button>
+          </div>
+
+          <div v-else class="mt-2 flex flex-col gap-2 bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+            <p class="text-xs text-slate-300">
+              El Bribón de Roatán ya fue utilizado por <strong class="text-white">{{ bribonHabilidadOcupadoPorOtro }}</strong>. 
+              Si jugaste al <strong>Primer Oficial Kong</strong> y querés copiar su habilidad, podés transferirlo a este jugador:
+            </p>
+            <button type="button"
+                    @click="reclamarBribonConKong"
+                    class="w-full py-2.5 px-3 rounded-xl btn-blanco-marron text-xs font-bold shadow-md">
+              🦜 Copiar/Reclamar con Primer Oficial Kong
+            </button>
+          </div>
+        </div>
+
         <div class="mt-2 pt-4 border-t border-amber-900/60">
           <button @click="guardarJugadorYContinuar" class="w-full py-4 btn-blanco-marron text-lg rounded-2xl shadow-lg font-black">
             {{ textoBotonAvanzar }}
@@ -377,10 +472,22 @@
       <div v-else class="flex flex-col gap-4">
         
         <div class="flex flex-col gap-2">
-          <input v-model="terminoBusquedaCarta" 
-                 type="text" 
-                 placeholder="🔍 Buscar carta por nombre o palabra clave..." 
-                 class="w-full rounded-xl px-3.5 py-2.5 text-xs text-white bg-slate-900 border border-slate-700">
+          <div class="relative flex items-center">
+            <input ref="inputBusquedaCarta"
+                   v-model.trim="terminoBusquedaCarta" 
+                   @keydown.enter="$event.target.blur()"
+                   type="text" 
+                   placeholder="🔍 Buscar carta por nombre o palabra clave..." 
+                   class="w-full rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-white bg-slate-900 border border-slate-700 focus:outline-none focus:border-amber-500 transition-colors">
+            
+            <button v-if="terminoBusquedaCarta.length > 0" 
+                    @click="limpiarBusquedaCarta" 
+                    type="button"
+                    title="Limpiar búsqueda"
+                    class="absolute right-2.5 flex items-center justify-center w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition-all">
+              ✕
+            </button>
+          </div>
           
           <div class="flex gap-1.5 overflow-x-auto pb-1 scroll-oculto">
             <button v-for="f in ['Todos', 'Juego Base', 'Reglas Avanzadas', 'Expansión']" :key="f"

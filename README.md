@@ -1,44 +1,51 @@
-# Skull King PWA - Asistente de Juego y Manual Oficial
+Necesito que me genere un README.md profesional para este proyecto, pero sin exagerar ni vender humo.
 
-Asistente digital en español, anotador de puntuación progresiva y enciclopedia de cartas para el juego de mesa **Skull King** (incluyendo el Juego Base, Reglas Avanzadas y la Expansión).
+Quiero una descripción realista, técnica y verificable del proyecto.
 
----
+Debe explicar:
 
-## Características Principales
+* Qué es la aplicación.
+* Qué problema resuelve.
+* Qué funcionalidades principales tiene.
+* Tecnologías utilizadas.
+* Cómo está estructurado el proyecto.
+* Qué características destacadas tiene.
 
-- **Manual Oficial Integrado:** Ordenado estrictamente según el reglamento oficial:
-  1. Reglas generales y puntuación base.
-  2. Reglas del Bribón opcionales.
-  3. Modo oficial para 2 jugadores (Barba Azul / Barbagrís).
-  4. Comodines de bonificación (Carta Blanca).
-- **Soporte Completo de Jugadores:**
-  - *Juego Base / Reglas Avanzadas:* 2 a 8 jugadores.
-  - *Modo Expansión:* 2 a 9 jugadores. El botón para 9 jugadores permanece en la interfaz pero se bloquea visual e interactivamente si no se activa la Expansión.
-- **Motor de Puntuación Oficial:**
-  - Cálculo automático de apuestas de bazas acertadas y falladas.
-  - Reglas del Bribón opcionales (Metralla / Bala de Cañón).
-  - Límite global estricto de **8 Cartas Blancas (Comodines de Bonificación)** por partida.
-  - Alianzas independientes por carta **Botín**, premiando con +20 puntos solo cuando ambos aliados aciertan exactamente su apuesta.
-  - Regla de Oro: anulación automática de bonificaciones al fallar la apuesta de bazas.
-- **Catálogo Detallado de Cartas:** Descripciones, jerarquías de victoria/derrota, habilidades oficiales e imágenes asociadas en español. Incluye los piratas del Juego Base (*Rosie de Laney*, *Bandido Bendt*, *Bribón de Roatán*, *Juanita Jade*, *Harry el Gigante*, *Tigresa*) y cartas de Expansión (*Mary Thorne*, *Primer Oficial Con*, *Carta 0/14*, *Mono 15*, *Mantarraya Moteada*, *Davy Jones*, *Cañón*, *Caminar por la Tabla*, *La Última Andanada*).
-- **PWA Web sin dependencias de compilación:** Desarrollada con Vue 3 y Tailwind CSS mediante archivos estáticos, lista para ejecutarse offline desde cualquier navegador o ser instalada en el dispositivo móvil.
+No quiero frases como:
 
----
+* "la mejor aplicación de Skull King"
+* "sistema revolucionario"
+* "experiencia única"
+* "motor inteligente avanzado" (salvo que explique exactamente qué hace)
+* palabras de marketing exageradas.
 
-## Estructura del Proyecto
+Quiero que parezca un proyecto serio de portfolio de un desarrollador frontend.
 
-Skull-King-AWP/
-├── archivos/
-│   ├── cartas/            # Imágenes individuales de las cartas (.png)
-│   └── iconos/            # Iconos de la PWA e imagen de portada
-├── js/
-│   ├── datos/
-│   │   ├── cartasDatos.js # Catálogo de cartas, jerarquías e imágenes
-│   │   └── reglasDatos.js # Enciclopedia y manual de reglas en 4 categorías
-│   ├── motor/
-│   │   └── motorPuntuacion.js # Motor de puntuación, alianzas y límites globales
-│   └── app.js             # Lógica e interfaz principal de Vue 3
-├── estilos.css            # Hojas de estilo y directivas
-├── index.html             # Interfaz principal de la PWA
-├── manifest.json          # Manifiesto para instalación como app
-└── readme.md              # Documentación oficial
+Datos reales del proyecto:
+
+Es una PWA para llevar partidas del juego de cartas Skull King.
+
+Permite:
+
+* Crear partidas personalizadas.
+* Configurar cantidad de jugadores.
+* Elegir contenido del juego (base, reglas avanzadas y expansión).
+* Registrar apuestas y bazas ganadas por jugador.
+* Calcular puntuaciones automáticamente.
+* Gestionar habilidades de piratas.
+* Registrar eventos especiales como Botín, monstruos y otras cartas.
+* Mostrar proyección de puntos durante la ronda.
+* Guardar partidas localmente.
+* Consultar una Wiki integrada con cartas y reglas.
+
+Tecnologías:
+
+* HTML5.
+* CSS3.
+* JavaScript moderno.
+* Vue 3 mediante CDN.
+* LocalStorage para persistencia de datos.
+
+La estructura debe explicar que la lógica de puntuación está separada del controlador de interfaz mediante módulos JavaScript.
+
+Que sea un README claro, corto y profesional, pensado para mostrar el proyecto a reclutadores o profesores.
