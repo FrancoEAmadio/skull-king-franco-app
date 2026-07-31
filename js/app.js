@@ -1,6 +1,6 @@
 /**
- * js/app.js - Controlador principal de la PWA Skull King
- * Corrección de lógica global para Cartas Únicas (Skull King y Davy Jones).
+ * JS/app.js - Controlador principal de la PWA Skull King
+ * Corrección: Límite de Cartas Blancas (4 en Base/Avanzado y 8 únicamente en Expansión).
  */
 
 const { createApp, ref, computed, onMounted } = Vue;
@@ -10,7 +10,7 @@ import { CATEGORIAS_REGLAS_WIKI } from './datos/reglasDatos.js';
 import { 
   calcularPuntajeRonda, 
   calcularBonoComodines, 
-  procesarAlianzasBotin 
+  calcularBonosAlianzasBotin 
 } from './motor/motorPuntuacion.js';
 
 createApp({
@@ -26,6 +26,8 @@ createApp({
     const terminoBusquedaCarta = ref('');
     const filtroTipoCarta = ref('Todos');
     const categoriasReglas = ref(CATEGORIAS_REGLAS_WIKI);
+
+    const inputBusquedaCarta = ref(null);
 
     const cantidadJugadores = ref(2);
     const bancoNombres = ['Franco', 'Simón', 'Nese', 'Punga', 'Eguren', 'Negreano', 'Martina', 'Ledesma', 'Andrada'];
@@ -43,7 +45,10 @@ createApp({
     const jugadorSeleccionadoIdx = ref(0);
     const historialPartidas = ref([]);
 
+    // Registro de Alianzas Reales de Botín en la ronda actual
     const alianzasBotinRonda = ref([]);
+    const idxBotinJugadorA = ref(0);
+    const idxBotinJugadorB = ref(1);
 
     const jugadorActual = computed(() => {
       return jugadores.value[jugadorSeleccionadoIdx.value] || null;
@@ -76,9 +81,14 @@ createApp({
         rondaActual.value,
         jugadorActual.value.eventosBono,
         configuracionMesa.value.usarModoBribon,
-        jugadorActual.value.modoEnvite
+        jugadorActual.value.modoEnvite,
+        jugadorActual.value.bribonHabilidadPts
       );
-      return res.puntajeTotal;
+
+      const bonosBotin = calcularBonosAlianzasBotin(alianzasBotinRonda.value, jugadores.value);
+      const bonoBotinProyectado = Number(bonosBotin[jugadorSeleccionadoIdx.value]) || 0;
+
+      return res.puntajeTotal + bonoBotinProyectado;
     });
 
     const textoBotonAvanzar = computed(() => {
@@ -93,8 +103,10 @@ createApp({
 
     const catalogoEventosFiltrado = computed(() => {
       return LISTA_EVENTOS_BONO.filter(ev => {
+        if (ev.id === 'alianza_botin') return false;
+
         if (configuracionMesa.value.modoContenido === 'base') {
-          return !['ocho_expansion', 'siete_expansion', 'alianza_botin', 'monstruo_davy'].includes(ev.id);
+          return !['ocho_expansion', 'siete_expansion', 'monstruo_davy'].includes(ev.id);
         }
         if (configuracionMesa.value.modoContenido === 'avanzado') {
           return !['ocho_expansion', 'siete_expansion'].includes(ev.id);
@@ -112,6 +124,14 @@ createApp({
       });
     });
 
+    const limpiarBusquedaCarta = () => {
+      terminoBusquedaCarta.value = '';
+      if (inputBusquedaCarta.value) {
+        inputBusquedaCarta.value.focus();
+      }
+    };
+
+    // --- LÍMITES FÍSICOS GLOBALES DE MESA ---
     const limiteBazasAlcanzado = computed(() => {
       let sumaBazasOtras = 0;
       let sumaComodinesOtras = 0;
@@ -124,7 +144,10 @@ createApp({
       });
 
       const bazasDisponibles = rondaActual.value - sumaBazasOtras;
-      const maxComodinesPermitidos = configuracionMesa.value.modoContenido === 'base' ? 4 : 8;
+      
+      // CORRECCIÓN EXACTA: Únicamente la Expansión tiene 8 cartas blancas. Base y Avanzado tienen 4.
+      const maxComodinesPermitidos = configuracionMesa.value.modoContenido === 'expansion' ? 8 : 4;
+      
       const comodinesDisponibles = maxComodinesPermitidos - sumaComodinesOtras;
 
       return {
@@ -194,18 +217,78 @@ createApp({
         ganadas: 0,
         modoEnvite: 'metralla',
         apuestaBribon: 0,
+        bribonHabilidadPts: null,
         eventosBono: {},
         cartasBlancas: 0
       }));
       rondaActual.value = 1;
       jugadorSeleccionadoIdx.value = 0;
       alianzasBotinRonda.value = [];
+      idxBotinJugadorA.value = 0;
+      idxBotinJugadorB.value = jugadores.value.length > 1 ? 1 : 0;
       partidaFinalizada.value = false;
       pantallaActual.value = 'partida';
       guardarEnCelular();
     };
 
-    // --- GESTIÓN DE BONIFICACIONES (CORRECCIÓN DE CARTAS ÚNICAS) ---
+    const bribonHabilidadOcupadoPorOtro = computed(() => {
+      for (let i = 0; i < jugadores.value.length; i++) {
+        if (i !== jugadorSeleccionadoIdx.value) {
+          const pts = jugadores.value[i].bribonHabilidadPts;
+          if (pts !== null && pts !== undefined) {
+            return jugadores.value[i].nombre;
+          }
+        }
+      }
+      return null;
+    });
+
+    const seleccionarBribonHabilidad = (pts) => {
+      if (!jugadorActual.value) return;
+      jugadorActual.value.bribonHabilidadPts = pts;
+    };
+
+    const reclamarBribonConKong = () => {
+      jugadores.value.forEach((j, idx) => {
+        if (idx !== jugadorSeleccionadoIdx.value) {
+          j.bribonHabilidadPts = null;
+        }
+      });
+      if (jugadorActual.value) {
+        jugadorActual.value.bribonHabilidadPts = 0;
+      }
+    };
+
+    const agregarAlianzaBotin = (idxA, idxB) => {
+      const iA = Number(idxA);
+      const iB = Number(idxB);
+
+      if (isNaN(iA) || isNaN(iB) || iA === iB) {
+        alert("Una alianza de Botín debe realizarse entre dos jugadores diferentes.");
+        return;
+      }
+      if (!jugadores.value[iA] || !jugadores.value[iB]) return;
+
+      if (alianzasBotinRonda.value.length >= 2) {
+        alert("Ya se registraron las 2 alianzas de Botín máximas de esta ronda.");
+        return;
+      }
+
+      alianzasBotinRonda.value.push({
+        idxA: iA,
+        idxB: iB,
+        nombreA: jugadores.value[iA].nombre,
+        nombreB: jugadores.value[iB].nombre
+      });
+
+      guardarEnCelular();
+    };
+
+    const eliminarAlianzaBotin = (index) => {
+      alianzasBotinRonda.value.splice(index, 1);
+      guardarEnCelular();
+    };
+
     const obtenerCantidadBono = (idEvento) => {
       if (!jugadorActual.value || !jugadorActual.value.eventosBono) return 0;
       return Number(jugadorActual.value.eventosBono[idEvento]) || 0;
@@ -213,20 +296,6 @@ createApp({
 
     const obtenerMaximoDisponible = (idEvento) => {
       const actual = obtenerCantidadBono(idEvento);
-
-      // Regla especial Botín: máximo 2 por jugador, máximo 4 en toda la ronda
-      if (idEvento === 'alianza_botin') {
-        let totalUsadoMesa = 0;
-        jugadores.value.forEach(j => {
-          if (j.eventosBono && j.eventosBono.alianza_botin) {
-            totalUsadoMesa += Number(j.eventosBono.alianza_botin) || 0;
-          }
-        });
-        const usadoPorOtros = totalUsadoMesa - actual;
-        const disponibleRonda = Math.max(0, 4 - usadoPorOtros);
-        return Math.min(2, disponibleRonda);
-      }
-
       const regla = LISTA_EVENTOS_BONO.find(r => r.id === idEvento);
       if (!regla || !regla.maximo) return 99;
 
@@ -239,18 +308,12 @@ createApp({
 
       const usadoPorOtros = totalUsadoMesa - actual;
 
-      // =========================================================================
-      // REGLA DE CARTAS ÚNICAS: Skull King y Davy Jones solo existen 1 vez en el mazo.
-      // Si cualquier otro jugador ya registró al menos 1 captura con esa carta en esta
-      // ronda (usadoPorOtros > 0), el máximo disponible para este jugador es 0.
-      // =========================================================================
       if (['pirata_por_sk', 'monstruo_davy'].includes(idEvento)) {
         if (usadoPorOtros > 0) {
           return 0;
         }
       }
 
-      // Para cartas múltiples (Sirenas, 14s, 8s, 7s, etc.), controla el remanente físico
       return Math.max(0, regla.maximo - usadoPorOtros);
     };
 
@@ -281,16 +344,6 @@ createApp({
       }
     };
 
-    const agregarAlianzaBotin = (idxA, idxB) => {
-      if (idxA === undefined || idxB === undefined || idxA === idxB) return;
-      if (alianzasBotinRonda.value.length >= 2) return;
-      alianzasBotinRonda.value.push({ idxA: Number(idxA), idxB: Number(idxB) });
-    };
-
-    const eliminarAlianzaBotin = (index) => {
-      alianzasBotinRonda.value.splice(index, 1);
-    };
-
     const guardarJugadorYContinuar = () => {
       guardarEnCelular();
       if (jugadorSeleccionadoIdx.value < jugadores.value.length - 1) {
@@ -301,22 +354,27 @@ createApp({
     };
 
     const procesarFinDeRonda = () => {
-      procesarAlianzasBotin(alianzasBotinRonda.value, jugadores.value);
+      const bonosBotin = calcularBonosAlianzasBotin(alianzasBotinRonda.value, jugadores.value);
 
-      jugadores.value.forEach(j => {
+      jugadores.value.forEach((j, index) => {
         const res = calcularPuntajeRonda(
           j.apuesta, 
           j.ganadas, 
           rondaActual.value, 
           j.eventosBono, 
           configuracionMesa.value.usarModoBribon, 
-          j.modoEnvite
+          j.modoEnvite,
+          j.bribonHabilidadPts
         );
-        j.puntos += res.puntajeTotal;
+
+        const bonoBotinJugador = Number(bonosBotin[index]) || 0;
+        j.puntos += (res.puntajeTotal + bonoBotinJugador);
+
         j.apuesta = 0;
         j.ganadas = 0;
         j.modoEnvite = 'metralla';
         j.apuestaBribon = 0;
+        j.bribonHabilidadPts = null;
         j.eventosBono = {};
       });
 
@@ -424,6 +482,8 @@ createApp({
       vistaWiki,
       acordeonAbierto,
       terminoBusquedaCarta,
+      inputBusquedaCarta,
+      limpiarBusquedaCarta,
       filtroTipoCarta,
       categoriasReglas,
       cantidadJugadores,
@@ -438,6 +498,8 @@ createApp({
       tablaGeneralOrdenada,
       historialPartidas,
       alianzasBotinRonda,
+      idxBotinJugadorA,
+      idxBotinJugadorB,
       catalogoEventosFiltrado,
       catalogoCartasFiltrado,
       limiteBazasAlcanzado,
@@ -449,6 +511,11 @@ createApp({
       moverJugador,
       irANuevaPartida,
       comenzarPartida,
+      bribonHabilidadOcupadoPorOtro,
+      seleccionarBribonHabilidad,
+      reclamarBribonConKong,
+      agregarAlianzaBotin,
+      eliminarAlianzaBotin,
       cambiarCantidadBono,
       obtenerCantidadBono,
       obtenerMaximoDisponible,
@@ -457,8 +524,6 @@ createApp({
       esBotonBazaDeshabilitado,
       seleccionarBazasGanadas,
       calcularBonoBlancas: calcularBonoComodines,
-      agregarAlianzaBotin,
-      eliminarAlianzaBotin,
       guardarJugadorYContinuar,
       abrirPodioDesdePartida,
       cerrarPodio,
