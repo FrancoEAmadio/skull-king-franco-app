@@ -1,37 +1,33 @@
 /**
  * JS/datos/cartasDatos.js
- * Catálogo de cartas ordenado por jerarquía e importancia en el juego,
- * con la carta Huida incluida y la Carta Blanca al final.
+ * Catálogo de cartas con jerarquía y máximos absolutos de Skull King.
  */
 
 export const CATALAGO_CARTAS_WIKI = [
-  // 1. Skull King (1)
   {
     id: "sk",
-    nombre: "Skull King (Rey Calavera)",
+    nombre: "Skull King",
     modo: "Juego Base",
     cantidad: "1 carta",
     imagen: "archivos/cartas/skull_king.png",
     habilidad: "Vence a todos los piratas. Otorga +30 pts por cada pirata capturado en la baza.",
-    ganaContra: "Todos los números, todos los Piratas y Primer Oficial Con (First Mate Kong)",
+    ganaContra: "Todos los números, todos los Piratas y Primer Oficial Kong",
     pierdeContra: "Sirenas",
     bonificacion: "+30 pts por Pirata capturado",
-    descripcion: "El rey de los mares. Vence a todo el mundo salvo el canto de las Sirenas."
+    descripcion: "El rey de los mares. Vence a todo el mundo pero es seducido ante el canto de las Sirenas."
   },
-  // 2. Primer Oficial Kong (1)
   {
     id: "kong",
-    nombre: "Primer Oficial Con (First Mate Kong)",
+    nombre: "Primer Oficial Kong",
     modo: "Expansión",
     cantidad: "1 carta",
-    imagen: "archivos/cartas/primer_oficial_con.png",
-    habilidad: "Gana a piratas normales. Pierde contra Sirena y Skull King. Si gana una baza, puede utilizar las habilidades de todos los piratas capturados en esa misma baza.",
+    imagen: "archivos/cartas/primer_oficial_kong.png",
+    habilidad: "Gana a piratas normales. Pierde contra Sirena y Skull King. Si gana una baza, copia las habilidades de los piratas capturados.",
     ganaContra: "Todos los números y Piratas estándar",
     pierdeContra: "Sirenas y Skull King",
     bonificacion: "+30 pts si es capturado por Skull King o Sirena",
-    descripcion: "Jerarquía pirata superior. Al ganar la mano se apropia de las habilidades de los piratas que derrotó."
+    descripcion: "Jerarquía pirata superior. Al ganar la mano imita y copia las habilidades de los piratas derrotados."
   },
-  // 3. Sirenas (2)
   {
     id: "sirena",
     nombre: "Sirenas",
@@ -40,14 +36,13 @@ export const CATALAGO_CARTAS_WIKI = [
     imagen: "archivos/cartas/sirena.png",
     habilidad: "Su canto hechiza y derrota al Skull King (+40 pts de bono).",
     ganaContra: "Todos los números, Monstruos y el Skull King",
-    pierdeContra: "Cualquier Pirata (salvo el Primer Oficial Con)",
+    pierdeContra: "Cualquier Pirata (salvo Primer Oficial Kong)",
     bonificacion: "+40 pts si captura al Skull King",
-    descripcion: "Hechizan al Skull King. Si un Pirata captura una Sirena, el rival se lleva +20 pts."
+    descripcion: "Hechizan al Skull King. Si un Pirata captura una Sirena, se lleva +20 pts."
   },
-  // 4. Piratas (7 en total)
   {
     id: "pirata_brent",
-    nombre: "Bandido Bendt",
+    nombre: "Bandido Brent",
     modo: "Juego Base",
     cantidad: "1 carta",
     imagen: "archivos/cartas/pirata_bandido_bendt.png",
@@ -55,7 +50,7 @@ export const CATALAGO_CARTAS_WIKI = [
     ganaContra: "Todos los números y Sirenas",
     pierdeContra: "Skull King y Piratas jugados antes que él",
     bonificacion: "+20 pts si captura una Sirena",
-    descripcion: "Permite mejorar tu mano robando dos cartas frescas y descartando dos cartas no deseadas al momento de jugarlo."
+    descripcion: "Permite mejorar tu mano robando dos cartas frescas y descartando dos no deseadas."
   },
   {
     id: "pirata_rascal",
@@ -63,11 +58,11 @@ export const CATALAGO_CARTAS_WIKI = [
     modo: "Juego Base",
     cantidad: "1 carta",
     imagen: "archivos/cartas/pirata_bribon_de_roatan.png",
-    habilidad: "Permite realizar un envite adicional: 0, 10 o 20 puntos. Si acierta su apuesta de bazas, suma esos puntos. Si falla, los pierde.",
+    habilidad: "Permite realizar un envite adicional: 0, 10 o 20 puntos. Si acierta su apuesta de bazas, suma esos puntos.",
     ganaContra: "Todos los números y Sirenas",
     pierdeContra: "Skull King y Piratas jugados antes que él",
     bonificacion: "+20 pts si captura una Sirena",
-    descripcion: "El pirata astuto. Al jugarlo, puedes arriesgar puntos adicionales sobre el resultado exacto de tu ronda."
+    descripcion: "El pirata astuto. Te permite arriesgar puntos adicionales sobre el resultado exacto de tu ronda."
   },
   {
     id: "pirata_harry",
@@ -75,11 +70,11 @@ export const CATALAGO_CARTAS_WIKI = [
     modo: "Juego Base",
     cantidad: "1 carta",
     imagen: "archivos/cartas/pirata_harry_el_gigante.png",
-    habilidad: "Al finalizar la ronda puede modificar su apuesta: +1, -1 o dejarla igual.",
+    habilidad: "Al finalizar la ronda puede modificar su apuesta en ±1 baza.",
     ganaContra: "Todos los números y Sirenas",
     pierdeContra: "Skull King y Piratas jugados antes que él",
     bonificacion: "+20 pts si captura una Sirena",
-    descripcion: "Un gigante del mar que te otorga flexibilidad al final de la mano para corregir tu apuesta inicial de bazas."
+    descripcion: "Un gigante del mar que te otorga flexibilidad para ajustar tu apuesta inicial de bazas."
   },
   {
     id: "pirata_juanita",
@@ -91,7 +86,7 @@ export const CATALAGO_CARTAS_WIKI = [
     ganaContra: "Todos los números y Sirenas",
     pierdeContra: "Skull King y Piratas jugados antes que ella",
     bonificacion: "+20 pts si captura una Sirena",
-    descripcion: "Te permite inspeccionar en secreto el mazo de cartas que no entraron en juego en la ronda actual."
+    descripcion: "Te permite inspeccionar en secreto el mazo de cartas que no entraron en juego."
   },
   {
     id: "pirata_rosie",
@@ -103,7 +98,7 @@ export const CATALAGO_CARTAS_WIKI = [
     ganaContra: "Todos los números y Sirenas",
     pierdeContra: "Skull King y Piratas jugados antes que ella",
     bonificacion: "+20 pts si captura una Sirena",
-    descripcion: "Al ganar la baza con Rosie, el jugador selecciona el orden de turno y quién lidera la siguiente mano."
+    descripcion: "Al ganar la baza, el jugador selecciona quién liderará la siguiente mano."
   },
   {
     id: "pirata_tigresa",
@@ -111,9 +106,9 @@ export const CATALAGO_CARTAS_WIKI = [
     modo: "Juego Base",
     cantidad: "1 carta",
     imagen: "archivos/cartas/pirata_tigresa.png",
-    habilidad: "Al jugarla, elegís si actúa como un Pirata estándar o como una Bandera de Huida (0).",
+    habilidad: "Al jugarla, elegís si actúa como Pirata estándar o como Bandera de Huida (0).",
     ganaContra: "Todos los números y Sirenas (si se juega como Pirata)",
-    pierdeContra: "Skull King (o contra todas las cartas si se juega como Huida)",
+    pierdeContra: "Skull King (o contra todas si se juega como Huida)",
     bonificacion: "+20 pts si captura una Sirena",
     descripcion: "Comodín dual que te permite atacar como Pirata o huir para evitar ganar la baza."
   },
@@ -123,13 +118,12 @@ export const CATALAGO_CARTAS_WIKI = [
     modo: "Expansión",
     cantidad: "1 carta",
     imagen: "archivos/cartas/pirata_mary_thorne.png",
-    habilidad: "Al ganar una baza, el jugador elige una carta al azar de la mano de cualquier jugador, incluido él mismo, sin mirarla. La carta elegida debe jugarse obligatoriamente en la siguiente baza sin importar si rompe reglas de palo.",
+    habilidad: "Al ganar una baza, elige una posición de carta de la mano de un rival para forzar su jugada.",
     ganaContra: "Todos los números y Sirenas",
     pierdeContra: "Skull King y Piratas jugados antes que ella",
     bonificacion: "+20 pts si captura una Sirena",
     descripcion: "Pirata intrépida que te permite forzar la jugada de una carta al azar en el siguiente turno."
   },
-  // 5. Palo Negro (1 al 14)
   {
     id: "palo_negro",
     nombre: "Palo Negro / Calavera (El Triunfo)",
@@ -142,20 +136,18 @@ export const CATALAGO_CARTAS_WIKI = [
     bonificacion: "+20 pts al capturar el 14 Negro",
     descripcion: "Triunfo del juego. Un 1 Negro le gana a cualquier 14 de color estándar."
   },
-  // 6. Monito 15 (1)
   {
     id: "monito15",
-    nombre: "Mono 15",
+    nombre: "Mono Comodín (15)",
     modo: "Expansión",
     cantidad: "1 carta",
     imagen: "archivos/cartas/mono_15.png",
-    habilidad: "Comodín numérico de valor 15. Solo puede representar los colores amarillo, verde o violeta. Nunca representa al palo negro. Pierde contra cualquier triunfo negro.",
-    ganaContra: "Cualquier carta 14 de los colores normales (Verde, Amarillo, Violeta)",
+    habilidad: "Comodín numérico de valor 15 para colores estándar. Pierde contra Palo Negro.",
+    ganaContra: "Cualquier carta 14 de colores normales",
     pierdeContra: "Palo Negro (Triunfo), Sirenas, Piratas y Skull King",
     bonificacion: "Sin bono adicional",
-    descripcion: "El número más alto de los colores estándar, pero indefenso ante cualquier carta de Triunfo."
+    descripcion: "El número más alto de los colores estándar, pero vulnerable ante el Triunfo."
   },
-  // 7. Palo Amarillo (1 al 14)
   {
     id: "palo_amarillo",
     nombre: "Palo Amarillo (1 al 14)",
@@ -166,9 +158,8 @@ export const CATALAGO_CARTAS_WIKI = [
     ganaContra: "Cartas amarillas de menor valor",
     pierdeContra: "Cartas amarillas más altas, Palo Negro, Sirenas, Piratas y Skull King",
     bonificacion: "+10 pts al capturar el 14",
-    descripcion: "Palo de color estándar. Estás obligado a asistir si se sale con Amarillo."
+    descripcion: "Palo de color estándar."
   },
-  // 8. Palo Violeta (1 al 14)
   {
     id: "palo_violeta",
     nombre: "Palo Violeta (1 al 14)",
@@ -179,9 +170,8 @@ export const CATALAGO_CARTAS_WIKI = [
     ganaContra: "Cartas violetas de menor valor",
     pierdeContra: "Cartas violetas más altas, Palo Negro, Sirenas, Piratas y Skull King",
     bonificacion: "+10 pts al capturar el 14",
-    descripcion: "Palo de color estándar. Estás obligado a asistir si se sale con Violeta."
+    descripcion: "Palo de color estándar."
   },
-  // 9. Palo Verde (1 al 14)
   {
     id: "palo_verde",
     nombre: "Palo Verde (1 al 14)",
@@ -192,126 +182,115 @@ export const CATALAGO_CARTAS_WIKI = [
     ganaContra: "Cartas verdes de menor valor",
     pierdeContra: "Cartas verdes más altas, Palo Negro, Sirenas, Piratas y Skull King",
     bonificacion: "+10 pts al capturar el 14",
-    descripcion: "Palo de color estándar. Estás obligado a asistir si se sale con Verde."
+    descripcion: "Palo de color estándar."
   },
-
-  // ==================== CARTAS QUE NO PUEDEN GANAR UNA BAZA ====================
-  // 10. Kraken (1)
   {
     id: "kraken",
     nombre: "Kraken",
     modo: "Reglas Avanzadas",
     cantidad: "1 carta",
     imagen: "archivos/cartas/kraken.png",
-    habilidad: "Monstruo Marino que destruye completamente la baza: nadie gana y nadie se lleva bonus. El jugador que jugó el Kraken lidera la siguiente baza. IMPORTANTE: Si en una misma baza se juegan varios monstruos marinos, solo se aplica el efecto del último monstruo jugado (reemplazando al anterior). Puede ser derrotado por Davy Jones.",
+    habilidad: "Monstruo Marino que destruye completamente la baza: nadie la gana.",
     ganaContra: "Destruye la baza completa",
-    pierdeContra: "Davy Jones (elimina monstruos marinos) o un monstruo marino posterior",
+    pierdeContra: "Davy Jones o monstruo posterior",
     bonificacion: "Sin bono adicional",
-    descripcion: "Monstruo supremo que anula completamente la baza en juego. Si después del Kraken se juega otro monstruo marino (Ballena Blanca o Raya Moteada), su efecto queda reemplazado por el del último monstruo jugado. Además, Davy Jones puede eliminarlo."
+    descripcion: "Monstruo supremo que anula la baza en juego."
   },
-  // 11. Ballena Blanca (1)
   {
     id: "ballena",
     nombre: "Ballena Blanca",
     modo: "Reglas Avanzadas",
     cantidad: "1 carta",
     imagen: "archivos/cartas/ballena.png",
-    habilidad: "Monstruo Marino que anula todas las habilidades de las cartas especiales en la baza (Piratas, Sirenas y Skull King pierden su poder). También anula el efecto de los palos, incluido el palo negro (triunfo): todas las cartas se comparan únicamente por su valor numérico sin importar el color (gana el número más alto). Si se juegan varios monstruos marinos, solo se aplica el efecto del último.",
+    habilidad: "Anula poderes especiales y triunfos: gana el número más alto sin importar color.",
     ganaContra: "Anula poderes especiales y palos en la baza",
-    pierdeContra: "Davy Jones (elimina monstruos marinos) o un monstruo marino posterior",
+    pierdeContra: "Davy Jones o monstruo posterior",
     bonificacion: "Sin bono adicional",
-    descripcion: "Anula poderes especiales y colores en la baza. El color y el triunfo dejan de importar: un 13 violeta vence a un 12 negro, o un 14 amarillo vence a un 13 negro. Si luego se juega otro monstruo marino, solo se aplica el efecto del último monstruo jugado. La Ballena Blanca también puede ser eliminada por Davy Jones."
+    descripcion: "Anula poderes especiales y colores en la baza."
   },
-  // 12. Raya Moteada (1)
   {
     id: "raya_moteada",
     nombre: "Mantarraya Moteada",
     modo: "Expansión",
     cantidad: "1 carta",
     imagen: "archivos/cartas/mantarraya_moteada.png",
-    habilidad: "Monstruo Marino que invierte el orden numérico: la carta numerada más baja gana la baza. Si hay empates en el número bajo, gana quien la jugó primero. IMPORTANTE: Si aparecen varios monstruos marinos en la misma baza, únicamente tiene efecto el último monstruo jugado. Puede ser derrotada por Davy Jones.",
-    ganaContra: "Hace que la carta numérica más baja gane la baza",
-    pierdeContra: "Davy Jones (elimina monstruos marinos) o un monstruo marino posterior",
+    habilidad: "Invierte el orden: la carta numérica más baja gana la baza.",
+    ganaContra: "Hace que la carta más baja gane",
+    pierdeContra: "Davy Jones o monstruo posterior",
     bonificacion: "Sin bono adicional",
-    descripcion: "Monstruo que da vuelta la jerarquía de poder haciendo que el número más bajo sea el ganador. Si se juegan múltiples monstruos marinos en la misma baza, solo se aplica el efecto del último. Además, puede ser eliminada por Davy Jones."
+    descripcion: "Monstruo que invierte la jerarquía numérica."
   },
-  // 13. Davy Jones (1)
   {
     id: "davy_jones",
     nombre: "Davy Jones",
     modo: "Expansión",
     cantidad: "1 carta",
     imagen: "archivos/cartas/davy_jones.png",
-    habilidad: "No gana bazas (vale 0). Destruye todos los monstruos marinos de la baza (Kraken, Ballena Blanca, Mantarraya Moteada). Otorga +20 pts por cada monstruo marino destruido en la baza.",
-    ganaContra: "No gana bazas por sí mismo",
+    habilidad: "Destruye monstruos marinos de la baza. Otorga +20 pts por cada monstruo destruido.",
+    ganaContra: "No gana bazas numéricamente",
     pierdeContra: "Su función es destruir monstruos marinos",
     bonificacion: "+20 pts por cada Monstruo Marino destruido",
-    descripcion: "Cazador implacable de monstruos marinos. IMPORTANTE: Esta carta no genera alianzas (no confundir con Botín)."
+    descripcion: "Cazador implacable de monstruos marinos."
   },
-  // 14. Caminar por el Tablón (1)
   {
     id: "tablon",
-    nombre: "Caminar por la Tabla (Walk the Plank)",
+    nombre: "Caminar por la Tabla",
     modo: "Expansión",
     cantidad: "1 carta",
     imagen: "archivos/cartas/caminar_por_la_tabla.png",
-    habilidad: "No gana bazas (vale 0). Al final de la baza, elimina un pirata estándar de la baza si lo hubiere, alterando qué pirata resulta el ganador.",
+    habilidad: "Elimina un pirata estándar de la baza.",
     ganaContra: "No gana bazas",
     pierdeContra: "Pierde contra cualquier carta",
     bonificacion: "Sin bono adicional",
-    descripcion: "Carta que condena a un pirata normal y lo expulsa de la disputa por la mano."
+    descripcion: "Carta que expulsa a un pirata normal de la disputa."
   },
-  // 15. La Última Descarga (1)
   {
     id: "last_volley",
     nombre: "La Última Descarga",
     modo: "Expansión",
     cantidad: "1 carta",
     imagen: "archivos/cartas/canon.png",
-    habilidad: "Permite jugar una segunda carta después de que todos los jugadores hayan jugado. Luego el jugador tendrá una carta menos durante el resto de la ronda y no participará en la última baza.",
+    habilidad: "Permite jugar una segunda carta y saltarse la última baza(no sirve como huida).",
     ganaContra: "No gana bazas",
     pierdeContra: "Pierde contra cualquier carta",
     bonificacion: "Sin bono adicional",
-    descripcion: "Esta carta no gana una baza y no funciona como una carta de Huida. Después de que todos los jugadores hayan jugado una carta, el jugador que utilizó La Última Descarga juega inmediatamente una segunda carta. A partir de ese momento tendrá una carta menos durante el resto de la ronda y se saltará automáticamente la última baza."
+    descripcion: "Permite jugar una segunda carta al final de la baza."
   },
-  // 16. Botín (2)
   {
     id: "botin",
     nombre: "Botín",
     modo: "Reglas Avanzadas",
     cantidad: "2 cartas",
     imagen: "archivos/cartas/botin.png",
-    habilidad: "Vale 0 en la baza. Crea una alianza independiente entre el jugador que la juega y quien gana la baza. Si AMBOS jugadores cumplen su apuesta de bazas al final de la ronda, cobran +20 pts cada uno.",
+    habilidad: "Crea una alianza. Si ambos aliados aciertan su envite, cobran +20 pts cada uno.",
     ganaContra: "No gana bazas (Vale 0)",
     pierdeContra: "Pierde contra cualquier carta",
     bonificacion: "+20 pts a cada aliado si ambos cumplen su apuesta",
-    descripcion: "Carta de alianza pacífica entre dos jugadores. IMPORTANTE: No confundir con Davy Jones."
+    descripcion: "Carta de alianza pacífica entre dos jugadores."
   },
-  // 17. Huida (5)
   {
     id: "huida",
     nombre: "Huida",
     modo: "Juego Base",
     cantidad: "5 cartas",
     imagen: "archivos/cartas/huida.png",
-    habilidad: "Las cinco cartas de Huida nunca pueden ganar una baza. Pierden frente a cualquier otra carta que pueda ganarla y son especialmente útiles para evitar obtener bazas no deseadas cuando el jugador intenta cumplir su apuesta.",
+    habilidad: "Pierde frente a cualquier otra carta. Útil para evitar ganar bazas no deseadas.",
     ganaContra: "Ninguna carta.",
-    pierdeContra: "Todas las cartas que pueden ganar una baza.",
-    bonificacion: "No posee ninguna bonificación.",
-    descripcion: "Las cartas de Huida representan la decisión de retirarse de una baza sin intentar ganarla. Su utilidad radica en poder descartarse de una carta sin competir por la victoria de la mano, facilitando el cumplimiento del envite realizado."
+    pierdeContra: "Todas las cartas.",
+    bonificacion: "Sin bonificación.",
+    descripcion: "Permite descartarse sin competir por la victoria de la mano."
   },
-  // 18. Carta Blanca (comodín de bonificación - última del catálogo)
   {
     id: "carta_blanca_base",
     nombre: "Carta Blanca (Comodín de Bonificación)",
     modo: "Reglas Avanzadas",
-    cantidad: "4 cartas (o 8 con expansión)",
+    cantidad: "4 cartas (u 8 con expansión)",
     imagen: "archivos/cartas/carta_blanca.png",
-    habilidad: "Se aparta al recibirla durante el reparto y se roba otra carta. Suma puntos al final del juego.",
+    habilidad: "Se aparta al recibirla y se roba otra carta. Otorga bonificación acumulada al final.",
     ganaContra: "No se juega en las bazas",
     pierdeContra: "No se juega en las bazas",
-    bonificacion: "1 = +10 pts | 2 = +20 pts | 3 = +50 pts | 4+ = +100 pts al final",
-    descripcion: "Comodín de bonificación acumulativo. Existen 4 cartas en el Juego Base y 4 adicionales en la Expansión (límite global de 8 en toda la mesa)."
+    bonificacion: "1 = +5 pts | 2 = +10 pts | 3 = +20 pts | 4+ = +50 pts al final",
+    descripcion: "Comodín de bonificación acumulativo."
   }
 ];
 
@@ -325,7 +304,7 @@ export const LISTA_EVENTOS_BONO = [
   { id: "siete_expansion", etiqueta: "7 capturado (-5 pts c/u)", puntos: -5, maximo: 4 },
   { id: "alianza_botin", etiqueta: "Alianza de Botín (+20 c/u)", puntos: 20, maximo: 2 },
   { id: "monstruo_davy", etiqueta: "Monstruo destruido por Davy Jones (+20 c/u)", puntos: 20, maximo: 3 },
-  { id: "kong_por_sk_sirena", etiqueta: "Primer Oficial Con capturado por SK/Sirena (+30)", puntos: 30, maximo: 1 }
+  { id: "kong_por_sk_sirena", etiqueta: "Primer Oficial Kong capturado por SK/Sirena (+30)", puntos: 30, maximo: 1 }
 ];
 
 export const CATALOGO_CARTAS_WIKI = CATALAGO_CARTAS_WIKI;
