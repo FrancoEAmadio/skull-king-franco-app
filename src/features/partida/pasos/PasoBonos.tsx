@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useApp } from '../../../estado/AppProvider';
 import { useSwipeHorizontal } from '../../../ui/useSwipeHorizontal';
 import { LISTA_EVENTOS_BONO } from '../../../datos/cartasDatos';
-import type { EventoBono } from '../../../tipos';
+import {
+  esEventoBonoBase,
+  estaDisponibleEventoBono,
+  estaReglaActiva,
+} from '../../../dominio/disponibilidadContenido';
 import { PanelHabilidades } from '../componentes/PanelHabilidades';
 import { PanelEventosBono } from '../componentes/PanelEventosBono';
 import { PanelAlianzasBotin } from '../componentes/PanelAlianzasBotin';
@@ -46,25 +50,13 @@ export function PasoBonos() {
 
   if (!jugadorActual) return null;
 
-  const eventosBase = LISTA_EVENTOS_BONO.filter(
-    (e) => !['alianza_botin', 'kong_por_sk_sirena'].includes(e.id)
+  const eventosDisponibles = LISTA_EVENTOS_BONO.filter(
+    (evento) =>
+      evento.id !== 'alianza_botin' &&
+      estaDisponibleEventoBono(evento.id, configuracionMesa)
   );
-  const eventosExpansion: EventoBono[] = [
-    LISTA_EVENTOS_BONO.find((e) => e.id === 'kong_por_sk_sirena')!,
-  ].filter(Boolean);
-
-  const eventosBaseFiltrados = eventosBase.filter((e) => {
-    if (e.id === 'siete_expansion' || e.id === 'ocho_expansion') {
-      return configuracionMesa.modoContenido === 'expansion';
-    }
-    return true;
-  });
-
-  const eventosExpansionFiltrados =
-    configuracionMesa.modoContenido === 'expansion' &&
-    configuracionMesa.reglasOpcionales.primerOficialKong !== false
-      ? eventosExpansion
-      : [];
+  const eventosBase = eventosDisponibles.filter((evento) => esEventoBonoBase(evento.id));
+  const eventosExpansion = eventosDisponibles.filter((evento) => !esEventoBonoBase(evento.id));
 
   const sinBonosNormales =
     jugadorActual.apuesta !== jugadorActual.ganadas &&
@@ -167,13 +159,12 @@ export function PasoBonos() {
         )}
 
         <PanelEventosBono
-          eventosBase={eventosBaseFiltrados}
-          eventosExpansion={eventosExpansionFiltrados}
+          eventosBase={eventosBase}
+          eventosExpansion={eventosExpansion}
           sinBonosNormales={sinBonosNormales}
         />
 
-        {configuracionMesa.modoContenido !== 'base' &&
-          configuracionMesa.reglasOpcionales.botin !== false && <PanelAlianzasBotin />}
+        {estaReglaActiva(configuracionMesa, 'botin') && <PanelAlianzasBotin />}
 
         <button
           onClick={guardarJugadorYContinuar}

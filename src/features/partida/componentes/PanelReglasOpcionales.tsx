@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Toggle } from '../../../ui/Toggle';
+import { modoPermiteRegla } from '../../../dominio/disponibilidadContenido';
 import type { ConfiguracionMesa, ReglasOpcionales } from '../../../tipos';
 
 const OPCIONES_AVANZADAS: [keyof ReglasOpcionales, string][] = [
@@ -28,8 +29,6 @@ interface Props {
 
 export function PanelReglasOpcionales({ configuracion, onCambiar }: Props) {
   const [abierto, setAbierto] = useState(false);
-  const deshabilitarAvanzadas = configuracion.modoContenido === 'base';
-  const deshabilitarExpansion = configuracion.modoContenido !== 'expansion';
 
   return (
     <section className="tarjeta-marron p-4 flex flex-col gap-4">
@@ -56,7 +55,6 @@ export function PanelReglasOpcionales({ configuracion, onCambiar }: Props) {
             color="text-purple-300"
             opciones={OPCIONES_AVANZADAS}
             configuracion={configuracion}
-            deshabilitado={deshabilitarAvanzadas}
             onCambiar={onCambiar}
           />
           <GrupoOpciones
@@ -64,7 +62,6 @@ export function PanelReglasOpcionales({ configuracion, onCambiar }: Props) {
             color="text-amber-300"
             opciones={OPCIONES_EXPANSION}
             configuracion={configuracion}
-            deshabilitado={deshabilitarExpansion}
             onCambiar={onCambiar}
           />
         </div>
@@ -78,13 +75,15 @@ interface GrupoProps {
   color: string;
   opciones: [keyof ReglasOpcionales, string][];
   configuracion: ConfiguracionMesa;
-  deshabilitado: boolean;
   onCambiar: (regla: keyof ReglasOpcionales, valor: boolean) => void;
 }
 
-function GrupoOpciones({ titulo, color, opciones, configuracion, deshabilitado, onCambiar }: GrupoProps) {
+function GrupoOpciones({ titulo, color, opciones, configuracion, onCambiar }: GrupoProps) {
+  const grupoDeshabilitado = opciones.every(
+    ([regla]) => !modoPermiteRegla(configuracion.modoContenido, regla)
+  );
   const clasesContenedor = `flex flex-col gap-2.5 bg-slate-900/80 p-3 rounded-xl border border-slate-800 transition-all ${
-    deshabilitado ? 'opacity-40 pointer-events-none select-none' : ''
+    grupoDeshabilitado ? 'opacity-40 pointer-events-none select-none' : ''
   }`;
 
   return (
@@ -92,17 +91,20 @@ function GrupoOpciones({ titulo, color, opciones, configuracion, deshabilitado, 
       <div className="flex items-center justify-between border-b border-slate-800 pb-1">
         <span className={`text-xs font-bold ${color} uppercase tracking-wider`}>{titulo}</span>
       </div>
-      {opciones.map(([clave, etiqueta]) => (
-        <label key={clave} className="flex items-center justify-between cursor-pointer py-1">
-          <span className="font-semibold text-xs text-slate-200">{etiqueta}</span>
-          <Toggle
-            tamano="sm"
-            checked={configuracion.reglasOpcionales[clave]}
-            disabled={deshabilitado}
-            onChange={(valor) => onCambiar(clave, valor)}
-          />
-        </label>
-      ))}
+      {opciones.map(([clave, etiqueta]) => {
+        const deshabilitada = !modoPermiteRegla(configuracion.modoContenido, clave);
+        return (
+          <label key={clave} className="flex items-center justify-between cursor-pointer py-1">
+            <span className="font-semibold text-xs text-slate-200">{etiqueta}</span>
+            <Toggle
+              tamano="sm"
+              checked={configuracion.reglasOpcionales[clave]}
+              disabled={deshabilitada}
+              onChange={(valor) => onCambiar(clave, valor)}
+            />
+          </label>
+        );
+      })}
     </div>
   );
 }

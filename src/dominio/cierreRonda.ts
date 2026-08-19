@@ -9,6 +9,11 @@ import type {
   ResumenRondaJugador,
 } from '../tipos';
 import { calcularBonosAlianzasBotin } from './alianzas';
+import {
+  estaDisponibleRegistroHabilidad,
+  estaReglaActiva,
+  filtrarEventosBonoDisponibles,
+} from './disponibilidadContenido';
 import { calcularPuntajeRonda } from './puntuacion';
 
 interface ContextoCierre {
@@ -136,7 +141,14 @@ export function cerrarRondaParaJugador(
   ctx: ContextoCierre,
   bonoBotin: number
 ): ResultadoCierreJugador {
-  const jugador = ctx.jugadores[indice]!;
+  const jugadorOriginal = ctx.jugadores[indice]!;
+  const jugador: Jugador = {
+    ...jugadorOriginal,
+    eventosBono: filtrarEventosBonoDisponibles(
+      jugadorOriginal.eventosBono,
+      ctx.configuracion
+    ),
+  };
   const apuesta = Number(jugador.apuesta) || 0;
   const ganadas = Number(jugador.ganadas) || 0;
 
@@ -161,7 +173,9 @@ export function cerrarRondaParaJugador(
   agregarAlianzasJugador(indice, ctx.jugadores, ctx.alianzas, bonos);
 
   const habilidadesJugador = ctx.habilidades.filter(
-    (h) => h.jugadorIdx === indice || h.jugadorNombre === jugador.nombre
+    (habilidad) =>
+      estaDisponibleRegistroHabilidad(habilidad, ctx.configuracion) &&
+      (habilidad.jugadorIdx === indice || habilidad.jugadorNombre === jugador.nombre)
   );
 
   const totalRonda = resultado.puntajeTotal + bonoBotin;
@@ -252,10 +266,12 @@ export function cerrarRonda(
   ctx: ContextoCierre,
   editandoRondaAnterior: boolean
 ): ResultadoCierreRonda {
-  const bonosBotin = calcularBonosAlianzasBotin(ctx.alianzas, ctx.jugadores);
+  const alianzas = estaReglaActiva(ctx.configuracion, 'botin') ? ctx.alianzas : [];
+  const contexto = { ...ctx, alianzas };
+  const bonosBotin = calcularBonosAlianzasBotin(alianzas, ctx.jugadores);
 
   const cierresPorJugador = ctx.jugadores.map((_, indice) =>
-    cerrarRondaParaJugador(indice, ctx, bonosBotin[indice] ?? 0)
+    cerrarRondaParaJugador(indice, contexto, bonosBotin[indice] ?? 0)
   );
 
   const jugadoresConHistorial = cierresPorJugador.map(({ jugadorActualizado, entradaRonda }) => {
