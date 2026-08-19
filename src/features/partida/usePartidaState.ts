@@ -37,6 +37,13 @@ import { calcularBonosAlianzasBotin } from '../../dominio/alianzas';
 import { calcularMaximoDisponible } from '../../dominio/bonos';
 import { aplicarFinDePartida } from '../../dominio/estadisticas';
 import {
+  estaDisponibleEventoBono,
+  estaReglaActiva,
+  filtrarEventosBonoDisponibles,
+  filtrarRegistrosHabilidadDisponibles,
+  normalizarConfiguracionPorModo,
+} from '../../dominio/disponibilidadContenido';
+import {
   calcularCartasPorJugadorEnRonda,
   calcularIndiceJugadorInicial,
   calcularJugadoresOrdenados,
@@ -81,6 +88,16 @@ function crearJugadorDePartida(permanente: JugadorPermanente): Jugador {
     capturasMonstruo: 0,
     historial: [],
   };
+}
+
+function filtrarEventosJugadores(
+  jugadores: Jugador[],
+  configuracion: ConfiguracionMesa
+): Jugador[] {
+  return jugadores.map((jugador) => ({
+    ...jugador,
+    eventosBono: filtrarEventosBonoDisponibles(jugador.eventosBono, configuracion),
+  }));
 }
 
 const ORDEN_PASOS: PasoPartida[] = ['apuestas', 'bazas', 'bonos', 'resumen'];
@@ -144,26 +161,39 @@ export function usePartidaState({
     const partida = cargarPartidaGuardada();
     if (!partida) return;
 
-    setHayPartidaGuardada(true);
-    setJugadores(partida.jugadores);
-    setRondaActual(partida.rondaActual);
-    setConfiguracionMesa((previa) => ({
-      ...previa,
+    const configuracionCargada = normalizarConfiguracionPorModo({
+      ...CONFIG_INICIAL,
       ...partida.configuracionMesa,
       reglasOpcionales: {
-        ...previa.reglasOpcionales,
+        ...CONFIG_INICIAL.reglasOpcionales,
         ...partida.configuracionMesa.reglasOpcionales,
       },
-    }));
-    setAlianzasBotinRonda(partida.alianzasBotinRonda);
+    });
+    const jugadoresCargados = filtrarEventosJugadores(
+      partida.jugadores,
+      configuracionCargada
+    );
+
+    setHayPartidaGuardada(true);
+    setJugadores(jugadoresCargados);
+    setRondaActual(partida.rondaActual);
+    setConfiguracionMesa(configuracionCargada);
+    setAlianzasBotinRonda(
+      estaReglaActiva(configuracionCargada, 'botin') ? partida.alianzasBotinRonda : []
+    );
     setJugadorSeleccionadoIdx(partida.jugadorSeleccionadoIdx);
-    setRegistroHabilidadesRonda(partida.registroHabilidadesRonda);
+    setRegistroHabilidadesRonda(
+      filtrarRegistrosHabilidadDisponibles(
+        partida.registroHabilidadesRonda,
+        configuracionCargada
+      )
+    );
     setCartasPorRondaActivas(
       partida.cartasPorRondaActivas.length > 0
         ? partida.cartasPorRondaActivas
         : obtenerCartasPorRondaDelModo(
-            partida.configuracionMesa.modoReparto,
-            partida.configuracionMesa.cartasPorRonda
+            configuracionCargada.modoReparto,
+            configuracionCargada.cartasPorRonda
           )
     );
     setPasoPartida(partida.pasoPartida);
@@ -233,17 +263,23 @@ export function usePartidaState({
 
   const puntajeProyectadoActual = useMemo(() => {
     if (!jugadorActual) return 0;
+    const eventosBono = filtrarEventosBonoDisponibles(
+      jugadorActual.eventosBono,
+      configuracionMesa
+    );
     const resultado = calcularPuntajeRonda({
       apuesta: jugadorActual.apuesta,
       ganadas: jugadorActual.ganadas,
       numeroRonda: cartasPorJugadorEnRonda,
-      eventosBono: jugadorActual.eventosBono,
+      eventosBono,
       usarModoBribon: configuracionMesa.usarModoBribon,
       modoEnvite: jugadorActual.modoEnvite,
       bribonHabilidadPts: jugadorActual.bribonHabilidadPts,
       cobrarBonosSinAcierto: configuracionMesa.cobrarBonosSinAcierto,
     });
-    const bonosBotin = calcularBonosAlianzasBotin(alianzasBotinRonda, jugadores);
+    const bonosBotin = estaReglaActiva(configuracionMesa, 'botin')
+      ? calcularBonosAlianzasBotin(alianzasBotinRonda, jugadores)
+      : {};
     return resultado.puntajeTotal + (bonosBotin[jugadorSeleccionadoIdx] ?? 0);
   }, [
     jugadorActual,
@@ -324,9 +360,10 @@ export function usePartidaState({
       alert('Seleccioná al menos 2 piratas para empezar la partida.');
       return;
     }
+    const configuracionActiva = normalizarConfiguracionPorModo(configuracionMesa);
     const cartas = obtenerCartasPorRondaDelModo(
-      configuracionMesa.modoReparto,
-      configuracionMesa.cartasPorRonda
+      configuracionActiva.modoReparto,
+      configuracionActiva.cartasPorRonda
     );
 
     const nuevosJugadores = idsJugadoresSeleccionados
@@ -334,6 +371,7 @@ export function usePartidaState({
       .filter((jug): jug is JugadorPermanente => Boolean(jug))
       .map(crearJugadorDePartida);
 
+    setConfiguracionMesa(configuracionActiva);
     setCartasPorRondaActivas(cartas);
     setJugadores(nuevosJugadores);
     setRondaActual(1);
@@ -424,10 +462,19 @@ export function usePartidaState({
       if (pasoPartida === 'resumen') {
         if (!ultimaRondaEditable) return;
         const estadoRestaurado = clonarEstadoRondaEditable(ultimaRondaEditable);
-        setJugadores(estadoRestaurado.jugadores);
+        setJugadores(filtrarEventosJugadores(estadoRestaurado.jugadores, configuracionMesa));
         setRondaActual(estadoRestaurado.ronda);
-        setAlianzasBotinRonda(estadoRestaurado.alianzasBotinRonda);
-        setRegistroHabilidadesRonda(estadoRestaurado.registroHabilidadesRonda);
+        setAlianzasBotinRonda(
+          estaReglaActiva(configuracionMesa, 'botin')
+            ? estadoRestaurado.alianzasBotinRonda
+            : []
+        );
+        setRegistroHabilidadesRonda(
+          filtrarRegistrosHabilidadDisponibles(
+            estadoRestaurado.registroHabilidadesRonda,
+            configuracionMesa
+          )
+        );
         setJugadorSeleccionadoIdx(estadoRestaurado.jugadorSeleccionadoIdx);
         setResumenRondaActual([]);
         setPartidaPendienteFinalizar(false);
@@ -435,7 +482,7 @@ export function usePartidaState({
 
       setPasoPartida(pasoDestino);
     },
-    [pasoPartida, puedeIrAPasoAnterior, ultimaRondaEditable]
+    [pasoPartida, puedeIrAPasoAnterior, ultimaRondaEditable, configuracionMesa]
   );
 
   const avanzarAPasoBonos = useCallback(() => {
@@ -461,7 +508,7 @@ export function usePartidaState({
 
   const cambiarCantidadBono = useCallback(
     (idEvento: string, delta: number) => {
-      if (!jugadorActual) return;
+      if (!jugadorActual || !estaDisponibleEventoBono(idEvento, configuracionMesa)) return;
       const actual = Number(jugadorActual.eventosBono[idEvento]) || 0;
       const maximo = calcularMaximoDisponible(idEvento, {
         jugadorSeleccionadoIdx,
@@ -485,8 +532,11 @@ export function usePartidaState({
   );
 
   const obtenerCantidadBono = useCallback(
-    (idEvento: string) => Number(jugadorActual?.eventosBono[idEvento]) || 0,
-    [jugadorActual]
+    (idEvento: string) =>
+      estaDisponibleEventoBono(idEvento, configuracionMesa)
+        ? Number(jugadorActual?.eventosBono[idEvento]) || 0
+        : 0,
+    [jugadorActual, configuracionMesa]
   );
 
   const obtenerMaximoBono = useCallback(
@@ -517,6 +567,7 @@ export function usePartidaState({
 
   const agregarAlianzaBotin = useCallback(
     (idxA: number, idxB: number) => {
+      if (!estaReglaActiva(configuracionMesa, 'botin')) return;
       if (idxA === idxB) {
         alert('Una alianza de Botín debe realizarse entre dos jugadores diferentes.');
         return;
@@ -533,7 +584,7 @@ export function usePartidaState({
         { idxA, idxB, nombreA: jugadorA.nombre, nombreB: jugadorB.nombre },
       ]);
     },
-    [jugadores, alianzasBotinRonda.length]
+    [jugadores, alianzasBotinRonda.length, configuracionMesa]
   );
 
   const eliminarAlianzaBotin = useCallback((indice: number) => {
@@ -620,7 +671,12 @@ export function usePartidaState({
 
   const aplicarKongCopiaBribon = useCallback(
     (indiceJugador: number, pts: number) => {
-      if (esKongYaRegistradoCon('Bribón')) return;
+      if (
+        !estaReglaActiva(configuracionMesa, 'primerOficialKong') ||
+        esKongYaRegistradoCon('Bribón')
+      ) {
+        return;
+      }
       const ok = registrarHabilidad('Primer Oficial Kong', indiceJugador, {
         etiqueta: 'Primer Oficial Kong (Copió Bribón de Roatán)',
         detalle: `Copió apuesta de ${pts} pts (ambos conservan su apuesta de riesgo)`,
@@ -631,12 +687,17 @@ export function usePartidaState({
         bribonStolenFrom: '(Copiado por Kong)',
       });
     },
-    [esKongYaRegistradoCon, registrarHabilidad, actualizarJugador]
+    [configuracionMesa, esKongYaRegistradoCon, registrarHabilidad, actualizarJugador]
   );
 
   const aplicarKongHarryGigante = useCallback(
     (indiceJugador: number, delta: number) => {
-      if (esKongYaRegistradoCon('Harry')) return;
+      if (
+        !estaReglaActiva(configuracionMesa, 'primerOficialKong') ||
+        esKongYaRegistradoCon('Harry')
+      ) {
+        return;
+      }
       const jugador = jugadores[indiceJugador];
       if (!jugador) return;
       const nuevoEnvite = Math.max(
@@ -651,6 +712,7 @@ export function usePartidaState({
       actualizarJugador(indiceJugador, { apuesta: nuevoEnvite });
     },
     [
+      configuracionMesa,
       esKongYaRegistradoCon,
       jugadores,
       cartasPorJugadorEnRonda,
@@ -756,12 +818,25 @@ export function usePartidaState({
     );
 
     if (editandoRondaAnterior && backupRondaActual) {
-      setJugadores(aplicarEntradasRonda(jugadoresCerrados, backupRondaActual.jugadoresEstado));
+      const jugadoresRestaurados = aplicarEntradasRonda(
+        jugadoresCerrados,
+        backupRondaActual.jugadoresEstado
+      );
+      setJugadores(filtrarEventosJugadores(jugadoresRestaurados, configuracionMesa));
       setRondaActual(backupRondaActual.ronda);
       setPasoPartida(backupRondaActual.pasoPartida);
       setJugadorSeleccionadoIdx(backupRondaActual.jugadorSeleccionadoIdx);
-      setAlianzasBotinRonda(backupRondaActual.alianzasBotinRonda);
-      setRegistroHabilidadesRonda(backupRondaActual.registroHabilidadesRonda);
+      setAlianzasBotinRonda(
+        estaReglaActiva(configuracionMesa, 'botin')
+          ? backupRondaActual.alianzasBotinRonda
+          : []
+      );
+      setRegistroHabilidadesRonda(
+        filtrarRegistrosHabilidadDisponibles(
+          backupRondaActual.registroHabilidadesRonda,
+          configuracionMesa
+        )
+      );
       setResumenRondaActual(backupRondaActual.resumenRondaActual);
       setUltimaRondaEditable(estadoEditable);
       setEditandoRondaAnterior(false);
@@ -823,10 +898,17 @@ export function usePartidaState({
     const rondaAnterior = clonarEstadoRondaEditable(ultimaRondaEditable);
 
     setBackupRondaActual(backup);
-    setJugadores(rondaAnterior.jugadores);
+    setJugadores(filtrarEventosJugadores(rondaAnterior.jugadores, configuracionMesa));
     setRondaActual(rondaAnterior.ronda);
-    setAlianzasBotinRonda(rondaAnterior.alianzasBotinRonda);
-    setRegistroHabilidadesRonda(rondaAnterior.registroHabilidadesRonda);
+    setAlianzasBotinRonda(
+      estaReglaActiva(configuracionMesa, 'botin') ? rondaAnterior.alianzasBotinRonda : []
+    );
+    setRegistroHabilidadesRonda(
+      filtrarRegistrosHabilidadDisponibles(
+        rondaAnterior.registroHabilidadesRonda,
+        configuracionMesa
+      )
+    );
     setJugadorSeleccionadoIdx(rondaAnterior.jugadorSeleccionadoIdx);
     setResumenRondaActual([]);
     setEditandoRondaAnterior(true);
@@ -841,6 +923,7 @@ export function usePartidaState({
     alianzasBotinRonda,
     registroHabilidadesRonda,
     resumenRondaActual,
+    configuracionMesa,
   ]);
 
   const cancelarModificacionRondaAnterior = useCallback(() => {
@@ -848,13 +931,24 @@ export function usePartidaState({
     setRondaActual(backupRondaActual.ronda);
     setPasoPartida(backupRondaActual.pasoPartida);
     setJugadorSeleccionadoIdx(backupRondaActual.jugadorSeleccionadoIdx);
-    setJugadores(clonarJugadores(backupRondaActual.jugadoresCompletos));
-    setAlianzasBotinRonda(backupRondaActual.alianzasBotinRonda);
-    setRegistroHabilidadesRonda(backupRondaActual.registroHabilidadesRonda);
+    setJugadores(
+      filtrarEventosJugadores(clonarJugadores(backupRondaActual.jugadoresCompletos), configuracionMesa)
+    );
+    setAlianzasBotinRonda(
+      estaReglaActiva(configuracionMesa, 'botin')
+        ? backupRondaActual.alianzasBotinRonda
+        : []
+    );
+    setRegistroHabilidadesRonda(
+      filtrarRegistrosHabilidadDisponibles(
+        backupRondaActual.registroHabilidadesRonda,
+        configuracionMesa
+      )
+    );
     setResumenRondaActual(backupRondaActual.resumenRondaActual);
     setEditandoRondaAnterior(false);
     setBackupRondaActual(null);
-  }, [editandoRondaAnterior, backupRondaActual]);
+  }, [editandoRondaAnterior, backupRondaActual, configuracionMesa]);
 
   const descartarPartidaActual = useCallback(() => {
     if (!confirm('¿Estás seguro de que querés descartar y eliminar la partida actual?')) return;

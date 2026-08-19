@@ -1,3 +1,4 @@
+import { estaDisponibleEventoBono, estaReglaActiva } from './disponibilidadContenido';
 import type { ConfiguracionMesa, Jugador } from '../tipos';
 
 interface ContextoLimite {
@@ -21,12 +22,8 @@ function limiteBaseCasoPirataPorSk(ctx: ContextoLimite): number {
 }
 
 function limiteBaseCasoMonstruoDavy(ctx: ContextoLimite): number {
-  const { modoContenido, reglasOpcionales } = ctx.configuracion;
-  let total = 0;
-  if (modoContenido !== 'base' && reglasOpcionales.kraken) total++;
-  if (modoContenido !== 'base' && reglasOpcionales.ballenaBlanca) total++;
-  if (modoContenido === 'expansion' && reglasOpcionales.mantarrayaMoteada) total++;
-  return total;
+  const monstruos = ['kraken', 'ballenaBlanca', 'mantarrayaMoteada'] as const;
+  return monstruos.filter((regla) => estaReglaActiva(ctx.configuracion, regla)).length;
 }
 
 const LIMITES_FIJOS: Record<string, number> = {
@@ -40,6 +37,7 @@ const LIMITES_FIJOS: Record<string, number> = {
 };
 
 export function calcularMaximoDisponible(idEvento: string, ctx: ContextoLimite): number {
+  if (!estaDisponibleEventoBono(idEvento, ctx.configuracion)) return 0;
   const usadoPorOtros = sumarUsadoPorOtros(idEvento, ctx);
   const limiteBase =
     idEvento === 'pirata_por_sk'

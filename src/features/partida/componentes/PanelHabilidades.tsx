@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../../../estado/AppProvider';
+import { estaReglaActiva } from '../../../dominio/disponibilidadContenido';
 
 interface Props {
   abierto: boolean;
@@ -13,6 +14,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
   const { partida } = useApp();
   const {
     jugadores,
+    configuracionMesa,
     registroHabilidadesRonda,
     habilidadesBloqueadasPorLimite,
     esHabilidadYaRegistrada,
@@ -30,6 +32,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
   const [habHabilidadCopiada, setHabHabilidadCopiada] = useState<HabCopiada>('Bribón de Roatán');
 
   const bloqueado = habilidadesBloqueadasPorLimite;
+  const kongDisponible = estaReglaActiva(configuracionMesa, 'primerOficialKong');
 
   return (
     <div className={`p-3 rounded-2xl transition-all ${bloqueado ? 'bg-slate-900/50 border border-slate-800' : 'tarjeta-marron'}`}>
@@ -74,7 +77,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
                     <option value="harry_gigante" disabled={esHabilidadYaRegistrada('Harry el Gigante')}>
                       Harry el Gigante {esHabilidadYaRegistrada('Harry el Gigante') ? '✓' : ''}
                     </option>
-                    <option value="kong">Primer Oficial Kong</option>
+                    {kongDisponible && <option value="kong">Primer Oficial Kong</option>}
                   </select>
                 </div>
 
@@ -149,7 +152,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
                 </div>
               )}
 
-              {habSeleccionada === 'kong' && (
+              {kongDisponible && habSeleccionada === 'kong' && (
                 <div className="mt-1 flex flex-col gap-2.5">
                   <div className="flex flex-col text-left">
                     <label className="text-[9px] text-slate-400 font-bold uppercase block mb-1">
