@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { calcularPromedioPuntos } from '../../dominio/estadisticas';
 import type { JugadorPermanente } from '../../tipos';
+import { ModalConfirmarEliminacionJugador } from './ModalConfirmarEliminacionJugador';
 
 type Vista = 'gestor' | 'historial' | 'estadisticas';
 
@@ -19,6 +20,8 @@ export function PantallaJugadores() {
   const [vista, setVista] = useState<Vista>('gestor');
   const [nombreNuevo, setNombreNuevo] = useState('');
   const [edicion, setEdicion] = useState<{ id: string; nombre: string } | null>(null);
+  const [jugadorPendienteEliminar, setJugadorPendienteEliminar] =
+    useState<JugadorPermanente | null>(null);
 
   const crear = () => {
     const nuevo = crearJugadorPermanente(nombreNuevo);
@@ -32,6 +35,12 @@ export function PantallaJugadores() {
     if (!edicion) return;
     renombrarJugadorPermanente(edicion.id, edicion.nombre);
     setEdicion(null);
+  };
+
+  const confirmarEliminacion = () => {
+    if (!jugadorPendienteEliminar) return;
+    eliminarJugadorPermanente(jugadorPendienteEliminar.id);
+    setJugadorPendienteEliminar(null);
   };
 
   return (
@@ -121,7 +130,8 @@ export function PantallaJugadores() {
                         ✏️
                       </button>
                       <button
-                        onClick={() => eliminarJugadorPermanente(jug.id)}
+                        onClick={() => setJugadorPendienteEliminar(jug)}
+                        aria-label={`Eliminar a ${jug.nombre}`}
                         className="w-8 h-8 bg-red-950/80 border border-red-800 text-red-300 rounded-lg text-xs"
                       >
                         🗑️
@@ -167,6 +177,12 @@ export function PantallaJugadores() {
       )}
       {/* Sombreado del último item para no perder botón lejos, se usa scroll natural del main */}
       <span className="hidden">{partida.hayPartidaGuardada}</span>
+
+      <ModalConfirmarEliminacionJugador
+        jugador={jugadorPendienteEliminar}
+        onCancelar={() => setJugadorPendienteEliminar(null)}
+        onConfirmar={confirmarEliminacion}
+      />
     </main>
   );
 }
