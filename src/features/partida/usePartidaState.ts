@@ -356,10 +356,7 @@ export function usePartidaState({
   }, [setPantallaActual]);
 
   const comenzarPartida = useCallback(() => {
-    if (idsJugadoresSeleccionados.length < 2) {
-      alert('Seleccioná al menos 2 piratas para empezar la partida.');
-      return;
-    }
+    if (idsJugadoresSeleccionados.length < 2) return 'jugadores_insuficientes' as const;
     const configuracionActiva = normalizarConfiguracionPorModo(configuracionMesa);
     const cartas = obtenerCartasPorRondaDelModo(
       configuracionActiva.modoReparto,
@@ -386,6 +383,7 @@ export function usePartidaState({
     setBackupRondaActual(null);
     setUltimaRondaEditable(null);
     setPantallaActual('partida');
+    return 'partida_iniciada' as const;
   }, [
     idsJugadoresSeleccionados,
     configuracionMesa,
@@ -486,14 +484,10 @@ export function usePartidaState({
   );
 
   const avanzarAPasoBonos = useCallback(() => {
-    if (totalGanadasAsignadas > cartasPorJugadorEnRonda) {
-      alert(
-        `Las bazas asignadas (${totalGanadasAsignadas}) superan el máximo posible de esta ronda (${cartasPorJugadorEnRonda}).`
-      );
-      return;
-    }
+    if (totalGanadasAsignadas > cartasPorJugadorEnRonda) return 'bazas_excedidas' as const;
     setJugadorSeleccionadoIdx(indiceJugadorInicial);
     setPasoPartida('bonos');
+    return 'fase_actualizada' as const;
   }, [totalGanadasAsignadas, cartasPorJugadorEnRonda, indiceJugadorInicial]);
 
   const cambiarCartasBlancas = useCallback((indice: number, delta: number) => {
@@ -567,22 +561,21 @@ export function usePartidaState({
 
   const agregarAlianzaBotin = useCallback(
     (idxA: number, idxB: number) => {
-      if (!estaReglaActiva(configuracionMesa, 'botin')) return;
-      if (idxA === idxB) {
-        alert('Una alianza de Botín debe realizarse entre dos jugadores diferentes.');
-        return;
-      }
+      if (!estaReglaActiva(configuracionMesa, 'botin')) return 'regla_inactiva' as const;
+      if (idxA === idxB) return 'jugadores_iguales' as const;
+
       const jugadorA = jugadores[idxA];
       const jugadorB = jugadores[idxB];
-      if (!jugadorA || !jugadorB) return;
+      if (!jugadorA || !jugadorB) return 'jugador_invalido' as const;
       if (alianzasBotinRonda.length >= MAX_ALIANZAS_POR_RONDA) {
-        alert('Ya se registraron las 2 alianzas de Botín máximas de esta ronda.');
-        return;
+        return 'limite_alcanzado' as const;
       }
+
       setAlianzasBotinRonda((previas) => [
         ...previas,
         { idxA, idxB, nombreA: jugadorA.nombre, nombreB: jugadorB.nombre },
       ]);
+      return 'alianza_agregada' as const;
     },
     [jugadores, alianzasBotinRonda.length, configuracionMesa]
   );
@@ -951,7 +944,6 @@ export function usePartidaState({
   }, [editandoRondaAnterior, backupRondaActual, configuracionMesa]);
 
   const descartarPartidaActual = useCallback(() => {
-    if (!confirm('¿Estás seguro de que querés descartar y eliminar la partida actual?')) return;
     borrarPartidaGuardada();
     setHayPartidaGuardada(false);
     setPantallaActual('inicio');
@@ -967,7 +959,6 @@ export function usePartidaState({
   );
 
   const borrarTodoElHistorial = useCallback(() => {
-    if (!confirm('¿Estás seguro de que querés borrar todo el historial de partidas?')) return;
     setHistorialPartidas([]);
     borrarHistorial();
   }, []);

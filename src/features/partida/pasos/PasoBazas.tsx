@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { ContadorMasMenos } from '../../../ui/ContadorMasMenos';
+import { ModalAviso } from '../../../ui/ModalAviso';
 import { useApp } from '../../../estado/AppProvider';
 
 export function PasoBazas() {
@@ -12,6 +14,11 @@ export function PasoBazas() {
     limpiarBazasRonda,
     avanzarAPasoBonos,
   } = partida;
+  const [mostrarAvisoBazas, setMostrarAvisoBazas] = useState(false);
+
+  const intentarAvanzar = () => {
+    if (avanzarAPasoBonos() === 'bazas_excedidas') setMostrarAvisoBazas(true);
+  };
 
   return (
     <section className="flex flex-col gap-4 flex-1 overflow-y-auto">
@@ -56,11 +63,19 @@ export function PasoBazas() {
       ))}
 
       <button
-        onClick={avanzarAPasoBonos}
+        onClick={intentarAvanzar}
         className="w-full mt-1 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
       >
         Siguiente: Bonos ➔
       </button>
+
+      <ModalAviso
+        abierto={mostrarAvisoBazas}
+        titulo="Revisá las bazas"
+        mensaje={`Asignaste ${totalGanadasAsignadas} bazas, pero esta ronda admite un máximo de ${cartasPorJugadorEnRonda}.`}
+        textoBoton="Corregir"
+        onCerrar={() => setMostrarAvisoBazas(false)}
+      />
     </section>
   );
 }

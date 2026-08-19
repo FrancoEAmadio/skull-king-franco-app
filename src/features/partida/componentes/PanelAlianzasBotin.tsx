@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../../../estado/AppProvider';
 import { MAX_ALIANZAS_POR_RONDA } from '../../../constantes';
+import { ModalAviso } from '../../../ui/ModalAviso';
 
 export function PanelAlianzasBotin() {
   const { partida } = useApp();
@@ -13,11 +14,21 @@ export function PanelAlianzasBotin() {
 
   const [idxA, setIdxA] = useState(0);
   const [idxB, setIdxB] = useState(1);
+  const [aviso, setAviso] = useState<string | null>(null);
 
   const limiteAlcanzado = alianzasBotinRonda.length >= MAX_ALIANZAS_POR_RONDA;
 
   const agregar = () => {
-    agregarAlianzaBotin(idxA, idxB);
+    const resultado = agregarAlianzaBotin(idxA, idxB);
+    if (resultado === 'jugadores_iguales') {
+      setAviso('Elegí dos jugadores distintos para formar una alianza.');
+    } else if (resultado === 'limite_alcanzado') {
+      setAviso(`Ya se registraron las ${MAX_ALIANZAS_POR_RONDA} alianzas máximas de esta ronda.`);
+    } else if (resultado === 'regla_inactiva') {
+      setAviso('La regla de Botín no está activa en esta partida.');
+    } else if (resultado === 'jugador_invalido') {
+      setAviso('Seleccioná dos jugadores válidos.');
+    }
   };
 
   return (
@@ -90,6 +101,14 @@ export function PanelAlianzasBotin() {
           ))}
         </div>
       )}
+
+      <ModalAviso
+        abierto={aviso !== null}
+        titulo="No se pudo registrar la alianza"
+        mensaje={aviso ?? ''}
+        textoBoton="Entendido"
+        onCerrar={() => setAviso(null)}
+      />
     </div>
   );
 }

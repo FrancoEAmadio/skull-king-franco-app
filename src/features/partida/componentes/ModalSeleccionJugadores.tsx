@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { MAX_JUGADORES_BASE, MAX_JUGADORES_EXPANSION } from '../../../constantes';
 import { useApp } from '../../../estado/AppProvider';
 import { Modal } from '../../../ui/Modal';
+import { ModalAviso } from '../../../ui/ModalAviso';
 import { TarjetaSeleccionJugador } from './TarjetaSeleccionJugador';
 
 interface Props {
@@ -141,28 +142,13 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
         </div>
       </Modal>
 
-      <Modal
+      <ModalAviso
         abierto={mostrarLimite}
+        titulo="Límite alcanzado"
+        mensaje={`Este modo permite seleccionar un máximo de ${maximoJugadores} jugadores.`}
+        textoBoton="OK"
         onCerrar={() => setMostrarLimite(false)}
-        ancho="max-w-xs"
-        zIndex="z-[70]"
-      >
-        <div className="flex flex-col gap-4 p-5 text-center">
-          <div>
-            <h3 className="text-xl font-black text-amber-300">Límite alcanzado</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-300">
-              Este modo permite seleccionar un máximo de {maximoJugadores} jugadores.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setMostrarLimite(false)}
-            className="btn-blanco-marron w-full rounded-xl py-3 text-sm font-black"
-          >
-            OK
-          </button>
-        </div>
-      </Modal>
+      />
     </>
   );
 }
