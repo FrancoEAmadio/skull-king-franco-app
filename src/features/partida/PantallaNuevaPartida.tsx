@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
+import { ModalAviso } from '../../ui/ModalAviso';
 import { Toggle } from '../../ui/Toggle';
 import type { ConfiguracionMesa, ModoContenido, ModoRepartoId, ReglasOpcionales } from '../../tipos';
 import { PanelReglasOpcionales } from './componentes/PanelReglasOpcionales';
@@ -15,6 +17,11 @@ export function PantallaNuevaPartida() {
   const { setPantallaActual, partida } = useApp();
   const { configuracionMesa, setConfiguracionMesa, comenzarPartida, idsJugadoresSeleccionados } =
     partida;
+  const [mostrarAvisoJugadores, setMostrarAvisoJugadores] = useState(false);
+
+  const intentarComenzarPartida = () => {
+    if (comenzarPartida() === 'jugadores_insuficientes') setMostrarAvisoJugadores(true);
+  };
 
   const actualizarConfig = <K extends keyof ConfiguracionMesa>(clave: K, valor: ConfiguracionMesa[K]) =>
     setConfiguracionMesa({ ...configuracionMesa, [clave]: valor });
@@ -123,11 +130,18 @@ export function PantallaNuevaPartida() {
       />
 
       <button
-        onClick={comenzarPartida}
+        onClick={intentarComenzarPartida}
         className="w-full mt-2 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
       >
         Empezar Partida ➔
       </button>
+
+      <ModalAviso
+        abierto={mostrarAvisoJugadores}
+        titulo="Faltan piratas"
+        mensaje="Seleccioná al menos 2 piratas para comenzar la partida."
+        onCerrar={() => setMostrarAvisoJugadores(false)}
+      />
     </main>
   );
 }
