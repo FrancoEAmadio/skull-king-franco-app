@@ -1,5 +1,5 @@
 import { MAX_PARTIDAS_EVOLUCION } from '../constantes';
-import type { EstadisticasJugador, JugadorPermanente } from '../tipos';
+import type { EntradaEvolucion, EstadisticasJugador, JugadorPermanente } from '../tipos';
 
 export function crearEstadisticasVacias(): EstadisticasJugador {
   return {
@@ -38,6 +38,27 @@ export function calcularPorcentajeAciertos(jugador: JugadorPermanente): number {
   const total = est.apuestasAcertadas + est.apuestasFalladas;
   if (!total) return 0;
   return Math.round((est.apuestasAcertadas / total) * 100);
+}
+
+export interface FrecuenciaPosicion {
+  posicion: number;
+  cantidad: number;
+}
+
+export function calcularPosicionesFrecuentes(
+  evolucion: EntradaEvolucion[],
+  limite = 3
+): FrecuenciaPosicion[] {
+  const frecuencias = evolucion.reduce<Map<number, number>>((conteos, entrada) => {
+    if (!Number.isInteger(entrada.posicion) || entrada.posicion <= 0) return conteos;
+    conteos.set(entrada.posicion, (conteos.get(entrada.posicion) ?? 0) + 1);
+    return conteos;
+  }, new Map());
+
+  return [...frecuencias.entries()]
+    .map(([posicion, cantidad]) => ({ posicion, cantidad }))
+    .sort((a, b) => b.cantidad - a.cantidad || a.posicion - b.posicion)
+    .slice(0, limite);
 }
 
 export interface DatosFinPartidaJugador {

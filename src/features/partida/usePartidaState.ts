@@ -16,6 +16,8 @@ import type {
 import {
   MAX_ALIANZAS_POR_RONDA,
   MAX_HABILIDADES_POR_RONDA,
+  MAX_JUGADORES_BASE,
+  MAX_JUGADORES_EXPANSION,
 } from '../../constantes';
 import {
   borrarHistorial,
@@ -821,15 +823,18 @@ export function usePartidaState({
     (id: string) => {
       const yaSeleccionado = idsJugadoresSeleccionados.includes(id);
       if (yaSeleccionado) {
-        setIdsJugadoresSeleccionados(idsJugadoresSeleccionados.filter((i) => i !== id));
-        return;
+        setIdsJugadoresSeleccionados(idsJugadoresSeleccionados.filter((seleccionadoId) => seleccionadoId !== id));
+        return 'seleccion_actualizada' as const;
       }
-      const maximo = configuracionMesa.modoContenido === 'expansion' ? 9 : 8;
-      if (idsJugadoresSeleccionados.length >= maximo) {
-        alert(`La mesa admite un máximo de ${maximo} piratas ${maximo === 8 ? '(9 solo con Expansión)' : ''}.`);
-        return;
-      }
+
+      const maximoJugadores =
+        configuracionMesa.modoContenido === 'expansion'
+          ? MAX_JUGADORES_EXPANSION
+          : MAX_JUGADORES_BASE;
+      if (idsJugadoresSeleccionados.length >= maximoJugadores) return 'limite_alcanzado' as const;
+
       setIdsJugadoresSeleccionados([...idsJugadoresSeleccionados, id]);
+      return 'seleccion_actualizada' as const;
     },
     [idsJugadoresSeleccionados, configuracionMesa.modoContenido]
   );
