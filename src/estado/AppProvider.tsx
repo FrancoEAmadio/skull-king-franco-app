@@ -60,14 +60,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     actualizarJugadoresPermanentes: reemplazarLista,
   });
 
-  const eliminarJugadorPermanente = useCallback(
-    (id: string) => {
-      if (!confirm('¿Eliminar esta tarjeta de jugador y todas sus estadísticas guardadas?')) return;
-      eliminar(id);
-    },
-    [eliminar]
-  );
-
   const cerrarPodio = useCallback(() => {
     setMostrarPodio(false);
     if (partida.partidaFinalizada) setPantallaActual('inicio');
@@ -81,7 +73,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     jugadoresPermanentes,
     crearJugadorPermanente: crear,
     renombrarJugadorPermanente: renombrar,
-    eliminarJugadorPermanente,
+    eliminarJugadorPermanente: eliminar,
     partida,
     mostrarPodio,
     abrirPodio,
