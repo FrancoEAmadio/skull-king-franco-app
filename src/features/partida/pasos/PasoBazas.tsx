@@ -10,7 +10,6 @@ export function PasoBazas() {
     cambiarGanadas,
     maxGanadasPara,
     limpiarBazasRonda,
-    volverAPasoApuestas,
     avanzarAPasoBonos,
   } = partida;
 
@@ -56,20 +55,12 @@ export function PasoBazas() {
         </div>
       ))}
 
-      <div className="flex gap-2 mt-1">
-        <button
-          onClick={volverAPasoApuestas}
-          className="w-1/3 py-4 btn-marron-oscuro text-sm rounded-2xl font-bold"
-        >
-          ← Envites
-        </button>
-        <button
-          onClick={avanzarAPasoBonos}
-          className="flex-1 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
-        >
-          Siguiente: Bonos ➔
-        </button>
-      </div>
+      <button
+        onClick={avanzarAPasoBonos}
+        className="w-full mt-1 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
+      >
+        Siguiente: Bonos ➔
+      </button>
     </section>
   );
 }

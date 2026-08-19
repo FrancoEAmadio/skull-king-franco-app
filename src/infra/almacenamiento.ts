@@ -55,6 +55,32 @@ export function cargarPartidaGuardada(): PartidaGuardada | null {
   if (partida.configuracionMesa?.reglasOpcionales) {
     delete (partida.configuracionMesa.reglasOpcionales as Record<string, unknown>).cartas7y8;
   }
+
+  partida.ultimaRondaEditable ??= null;
+  partida.partidaPendienteFinalizar ??= false;
+
+  if (partida.backupRondaActual) {
+    const backup = partida.backupRondaActual;
+    backup.jugadoresEstado = backup.jugadoresEstado.map((jugador, indice) => ({
+      ...jugador,
+      cartasBlancas: jugador.cartasBlancas ?? partida.jugadores[indice]?.cartasBlancas ?? 0,
+      incrementoCartasBlancas: jugador.incrementoCartasBlancas ?? 0,
+    }));
+    backup.jugadoresCompletos ??= partida.jugadores.map((jugador, indice) => {
+      const entrada = backup.jugadoresEstado[indice];
+      return entrada
+        ? {
+            ...jugador,
+            ...entrada,
+            eventosBono: { ...entrada.eventosBono },
+          }
+        : jugador;
+    });
+    backup.alianzasBotinRonda ??= [];
+    backup.registroHabilidadesRonda ??= [];
+    backup.resumenRondaActual ??= [];
+  }
+
   return partida as PartidaGuardada;
 }
 
