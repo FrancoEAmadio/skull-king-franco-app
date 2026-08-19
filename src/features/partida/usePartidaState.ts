@@ -2,9 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type {
   AlianzaBotin,
   BackupRondaActual,
-  BackupRondaJugador,
   ConfiguracionMesa,
   EntradaHistorialPartida,
+  EstadoRondaEditable,
   Jugador,
   JugadorPermanente,
   PantallaId,
@@ -43,6 +43,13 @@ import {
   calcularLimiteComodines,
   calcularMaxGanadasPara,
 } from './selectores';
+import {
+  aplicarEntradasRonda,
+  clonarEstadoRondaEditable,
+  clonarJugadores,
+  crearBackupRondaActual,
+  crearEstadoRondaEditable,
+} from './estadoEditableRonda';
 
 interface Argumentos {
   pantallaActual: PantallaId;
@@ -76,28 +83,7 @@ function crearJugadorDePartida(permanente: JugadorPermanente): Jugador {
   };
 }
 
-function snapshotJugador(jugador: Jugador): BackupRondaJugador {
-  return {
-    apuesta: jugador.apuesta,
-    ganadas: jugador.ganadas,
-    modoEnvite: jugador.modoEnvite,
-    bribonHabilidadPts: jugador.bribonHabilidadPts,
-    bribonStolenFrom: jugador.bribonStolenFrom,
-    eventosBono: { ...jugador.eventosBono },
-  };
-}
-
-function aplicarBackupJugador(jugador: Jugador, backup: BackupRondaJugador): Jugador {
-  return {
-    ...jugador,
-    apuesta: backup.apuesta,
-    ganadas: backup.ganadas,
-    modoEnvite: backup.modoEnvite,
-    bribonHabilidadPts: backup.bribonHabilidadPts,
-    bribonStolenFrom: backup.bribonStolenFrom,
-    eventosBono: { ...backup.eventosBono },
-  };
-}
+const ORDEN_PASOS: PasoPartida[] = ['apuestas', 'bazas', 'bonos', 'resumen'];
 
 const CONFIG_INICIAL: ConfiguracionMesa = {
   modoContenido: 'expansion',
@@ -146,8 +132,10 @@ export function usePartidaState({
 
   const [hayPartidaGuardada, setHayPartidaGuardada] = useState(false);
   const [partidaFinalizada, setPartidaFinalizada] = useState(false);
+  const [partidaPendienteFinalizar, setPartidaPendienteFinalizar] = useState(false);
   const [editandoRondaAnterior, setEditandoRondaAnterior] = useState(false);
   const [backupRondaActual, setBackupRondaActual] = useState<BackupRondaActual | null>(null);
+  const [ultimaRondaEditable, setUltimaRondaEditable] = useState<EstadoRondaEditable | null>(null);
 
   const [historialPartidas, setHistorialPartidas] = useState<EntradaHistorialPartida[]>([]);
 
@@ -182,6 +170,8 @@ export function usePartidaState({
     setResumenRondaActual(partida.resumenRondaActual);
     setEditandoRondaAnterior(partida.editandoRondaAnterior);
     setBackupRondaActual(partida.backupRondaActual);
+    setUltimaRondaEditable(partida.ultimaRondaEditable);
+    setPartidaPendienteFinalizar(partida.partidaPendienteFinalizar);
   }, []);
 
   const totalRondas = cartasPorRondaActivas.length || 10;
@@ -212,6 +202,13 @@ export function usePartidaState({
     [cartasPorRondaActivas, rondaActual]
   );
 
+  const rondaVisible =
+    pasoPartida === 'resumen' && ultimaRondaEditable ? ultimaRondaEditable.ronda : rondaActual;
+  const cartasPorJugadorVisibles = useMemo(
+    () => calcularCartasPorJugadorEnRonda(cartasPorRondaActivas, rondaVisible),
+    [cartasPorRondaActivas, rondaVisible]
+  );
+
   const tablaGeneralOrdenada = useMemo(
     () => [...jugadores].sort((a, b) => b.puntos - a.puntos),
     [jugadores]
@@ -222,7 +219,12 @@ export function usePartidaState({
     0
   );
 
-  const puedeModificarRondaAnterior = rondaActual > 1 && !editandoRondaAnterior && !partidaFinalizada;
+  const puedeModificarRondaAnterior =
+    rondaActual > 1 &&
+    pasoPartida !== 'resumen' &&
+    !editandoRondaAnterior &&
+    !partidaFinalizada &&
+    ultimaRondaEditable?.ronda === rondaActual - 1;
 
   const limiteComodines = useMemo(
     () => calcularLimiteComodines(jugadores, jugadorSeleccionadoIdx, configuracionMesa),
@@ -273,6 +275,8 @@ export function usePartidaState({
         resumenRondaActual,
         editandoRondaAnterior,
         backupRondaActual,
+        ultimaRondaEditable,
+        partidaPendienteFinalizar,
         ...parcial,
       };
       guardarPartida(partida);
@@ -290,6 +294,8 @@ export function usePartidaState({
       resumenRondaActual,
       editandoRondaAnterior,
       backupRondaActual,
+      ultimaRondaEditable,
+      partidaPendienteFinalizar,
     ]
   );
 
@@ -337,8 +343,10 @@ export function usePartidaState({
     setRegistroHabilidadesRonda([]);
     setResumenRondaActual([]);
     setPartidaFinalizada(false);
+    setPartidaPendienteFinalizar(false);
     setEditandoRondaAnterior(false);
     setBackupRondaActual(null);
+    setUltimaRondaEditable(null);
     setPantallaActual('partida');
   }, [
     idsJugadoresSeleccionados,
@@ -390,8 +398,45 @@ export function usePartidaState({
   }, []);
 
   const avanzarAPasoBazas = useCallback(() => setPasoPartida('bazas'), []);
-  const volverAPasoApuestas = useCallback(() => setPasoPartida('apuestas'), []);
-  const volverAPasoBazas = useCallback(() => setPasoPartida('bazas'), []);
+
+  const puedeIrAPasoAnterior = useCallback(
+    (pasoDestino: PasoPartida) => {
+      if (partidaFinalizada) return false;
+      if (pasoPartida === 'resumen') {
+        const rondaEsperada = partidaPendienteFinalizar ? rondaActual : rondaActual - 1;
+        if (ultimaRondaEditable?.ronda !== rondaEsperada) return false;
+      }
+      return ORDEN_PASOS.indexOf(pasoDestino) < ORDEN_PASOS.indexOf(pasoPartida);
+    },
+    [
+      partidaFinalizada,
+      partidaPendienteFinalizar,
+      pasoPartida,
+      rondaActual,
+      ultimaRondaEditable,
+    ]
+  );
+
+  const irAPasoAnterior = useCallback(
+    (pasoDestino: PasoPartida) => {
+      if (!puedeIrAPasoAnterior(pasoDestino)) return;
+
+      if (pasoPartida === 'resumen') {
+        if (!ultimaRondaEditable) return;
+        const estadoRestaurado = clonarEstadoRondaEditable(ultimaRondaEditable);
+        setJugadores(estadoRestaurado.jugadores);
+        setRondaActual(estadoRestaurado.ronda);
+        setAlianzasBotinRonda(estadoRestaurado.alianzasBotinRonda);
+        setRegistroHabilidadesRonda(estadoRestaurado.registroHabilidadesRonda);
+        setJugadorSeleccionadoIdx(estadoRestaurado.jugadorSeleccionadoIdx);
+        setResumenRondaActual([]);
+        setPartidaPendienteFinalizar(false);
+      }
+
+      setPasoPartida(pasoDestino);
+    },
+    [pasoPartida, puedeIrAPasoAnterior, ultimaRondaEditable]
+  );
 
   const avanzarAPasoBonos = useCallback(() => {
     if (totalGanadasAsignadas > cartasPorJugadorEnRonda) {
@@ -677,6 +722,7 @@ export function usePartidaState({
       setResumenRondaActual(conBlancas.resumen);
       borrarPartidaGuardada();
       setHayPartidaGuardada(false);
+      setPartidaPendienteFinalizar(false);
       setPartidaFinalizada(true);
       setPasoPartida('resumen');
     },
@@ -690,7 +736,13 @@ export function usePartidaState({
       return;
     }
 
-    // Fin de ronda: cierre y recálculo
+    const estadoEditable = crearEstadoRondaEditable({
+      ronda: rondaActual,
+      jugadores,
+      alianzasBotinRonda,
+      registroHabilidadesRonda,
+      jugadorSeleccionadoIdx,
+    });
     const { jugadores: jugadoresCerrados, resumen } = cerrarRonda(
       {
         jugadores,
@@ -703,32 +755,36 @@ export function usePartidaState({
       editandoRondaAnterior
     );
 
+    if (editandoRondaAnterior && backupRondaActual) {
+      setJugadores(aplicarEntradasRonda(jugadoresCerrados, backupRondaActual.jugadoresEstado));
+      setRondaActual(backupRondaActual.ronda);
+      setPasoPartida(backupRondaActual.pasoPartida);
+      setJugadorSeleccionadoIdx(backupRondaActual.jugadorSeleccionadoIdx);
+      setAlianzasBotinRonda(backupRondaActual.alianzasBotinRonda);
+      setRegistroHabilidadesRonda(backupRondaActual.registroHabilidadesRonda);
+      setResumenRondaActual(backupRondaActual.resumenRondaActual);
+      setUltimaRondaEditable(estadoEditable);
+      setEditandoRondaAnterior(false);
+      setBackupRondaActual(null);
+      return;
+    }
+
     setJugadores(jugadoresCerrados);
     setResumenRondaActual(resumen);
     setAlianzasBotinRonda([]);
     setRegistroHabilidadesRonda([]);
-
-    if (editandoRondaAnterior && backupRondaActual) {
-      const conBackup = jugadoresCerrados.map((jugador, idx) => {
-        const backup = backupRondaActual.jugadoresEstado[idx];
-        return backup ? aplicarBackupJugador(jugador, backup) : jugador;
-      });
-      setJugadores(conBackup);
-      setRondaActual(backupRondaActual.ronda);
-      setEditandoRondaAnterior(false);
-      setBackupRondaActual(null);
-      setPasoPartida('resumen');
-      return;
-    }
+    setUltimaRondaEditable(estadoEditable);
 
     if (rondaActual < totalRondas) {
-      setRondaActual(rondaActual + 1);
-      setJugadorSeleccionadoIdx(calcularIndiceJugadorInicial(rondaActual + 1, jugadoresCerrados.length));
+      const siguienteRonda = rondaActual + 1;
+      setRondaActual(siguienteRonda);
+      setJugadorSeleccionadoIdx(calcularIndiceJugadorInicial(siguienteRonda, jugadoresCerrados.length));
       setPasoPartida('resumen');
       return;
     }
 
-    cerrarPartida(jugadoresCerrados, resumen);
+    setPartidaPendienteFinalizar(true);
+    setPasoPartida('resumen');
   }, [
     indiceVisualActual,
     jugadoresOrdenados,
@@ -736,50 +792,55 @@ export function usePartidaState({
     configuracionMesa,
     alianzasBotinRonda,
     registroHabilidadesRonda,
+    jugadorSeleccionadoIdx,
     rondaActual,
     cartasPorJugadorEnRonda,
     editandoRondaAnterior,
     backupRondaActual,
     totalRondas,
-    cerrarPartida,
   ]);
+
+  const confirmarFinalizacionPartida = useCallback(() => {
+    if (!partidaPendienteFinalizar) return;
+    cerrarPartida(jugadores, resumenRondaActual);
+  }, [partidaPendienteFinalizar, cerrarPartida, jugadores, resumenRondaActual]);
 
   const irASiguienteRonda = useCallback(() => setPasoPartida('apuestas'), []);
 
   const iniciarModificacionRondaAnterior = useCallback(() => {
-    if (!puedeModificarRondaAnterior) return;
+    if (!puedeModificarRondaAnterior || !ultimaRondaEditable) return;
 
-    const backup: BackupRondaActual = {
+    const backup = crearBackupRondaActual({
       ronda: rondaActual,
       pasoPartida,
       jugadorSeleccionadoIdx,
-      jugadoresEstado: jugadores.map(snapshotJugador),
-    };
-
-    const rondaAnterior = rondaActual - 1;
-    const jugadoresRestaurados = jugadores.map((jugador) => {
-      const entrada = jugador.historial.find((h) => h.ronda === rondaAnterior);
-      if (!entrada) return jugador;
-      return {
-        ...jugador,
-        apuesta: entrada.apuesta !== '-' ? Number(entrada.apuesta) || 0 : 0,
-        ganadas: entrada.ganadas !== '-' ? Number(entrada.ganadas) || 0 : 0,
-        eventosBono: {},
-      };
+      jugadores,
+      alianzasBotinRonda,
+      registroHabilidadesRonda,
+      resumenRondaActual,
+      cartasBlancasPrevias: ultimaRondaEditable.jugadores.map((jugador) => jugador.cartasBlancas),
     });
+    const rondaAnterior = clonarEstadoRondaEditable(ultimaRondaEditable);
 
     setBackupRondaActual(backup);
-    setJugadores(jugadoresRestaurados);
-    setRondaActual(rondaAnterior);
+    setJugadores(rondaAnterior.jugadores);
+    setRondaActual(rondaAnterior.ronda);
+    setAlianzasBotinRonda(rondaAnterior.alianzasBotinRonda);
+    setRegistroHabilidadesRonda(rondaAnterior.registroHabilidadesRonda);
+    setJugadorSeleccionadoIdx(rondaAnterior.jugadorSeleccionadoIdx);
+    setResumenRondaActual([]);
     setEditandoRondaAnterior(true);
     setPasoPartida('apuestas');
-    setJugadorSeleccionadoIdx(calcularIndiceJugadorInicial(rondaAnterior, jugadoresRestaurados.length));
   }, [
     puedeModificarRondaAnterior,
+    ultimaRondaEditable,
     rondaActual,
     pasoPartida,
     jugadorSeleccionadoIdx,
     jugadores,
+    alianzasBotinRonda,
+    registroHabilidadesRonda,
+    resumenRondaActual,
   ]);
 
   const cancelarModificacionRondaAnterior = useCallback(() => {
@@ -787,12 +848,10 @@ export function usePartidaState({
     setRondaActual(backupRondaActual.ronda);
     setPasoPartida(backupRondaActual.pasoPartida);
     setJugadorSeleccionadoIdx(backupRondaActual.jugadorSeleccionadoIdx);
-    setJugadores((previos) =>
-      previos.map((jugador, idx) => {
-        const backup = backupRondaActual.jugadoresEstado[idx];
-        return backup ? aplicarBackupJugador(jugador, backup) : jugador;
-      })
-    );
+    setJugadores(clonarJugadores(backupRondaActual.jugadoresCompletos));
+    setAlianzasBotinRonda(backupRondaActual.alianzasBotinRonda);
+    setRegistroHabilidadesRonda(backupRondaActual.registroHabilidadesRonda);
+    setResumenRondaActual(backupRondaActual.resumenRondaActual);
     setEditandoRondaAnterior(false);
     setBackupRondaActual(null);
   }, [editandoRondaAnterior, backupRondaActual]);
@@ -867,10 +926,13 @@ export function usePartidaState({
     resumenRondaActual,
     hayPartidaGuardada,
     partidaFinalizada,
+    partidaPendienteFinalizar,
     editandoRondaAnterior,
     historialPartidas,
     // derivados
     totalRondas,
+    rondaVisible,
+    cartasPorJugadorVisibles,
     jugadorActual,
     jugadoresOrdenados,
     indiceVisualActual,
@@ -894,8 +956,8 @@ export function usePartidaState({
     limpiarBazasRonda,
     avanzarAPasoBazas,
     avanzarAPasoBonos,
-    volverAPasoApuestas,
-    volverAPasoBazas,
+    puedeIrAPasoAnterior,
+    irAPasoAnterior,
     cambiarCartasBlancas,
     cambiarCantidadBono,
     obtenerCantidadBono,
@@ -912,6 +974,7 @@ export function usePartidaState({
     aplicarKongHarryGigante,
     eliminarRegistroHabilidad,
     guardarJugadorYContinuar,
+    confirmarFinalizacionPartida,
     irASiguienteRonda,
     iniciarModificacionRondaAnterior,
     cancelarModificacionRondaAnterior,

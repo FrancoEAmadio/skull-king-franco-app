@@ -18,13 +18,18 @@ export function PantallaPartida() {
   const { partida, setMenuHamburguesaAbierto, abrirPodio, setPantallaActual } = useApp();
   const {
     rondaActual,
+    rondaVisible,
     totalRondas,
-    cartasPorJugadorEnRonda,
+    cartasPorJugadorVisibles,
     pasoPartida,
     jugadores,
     indiceJugadorInicial,
     puedeModificarRondaAnterior,
+    editandoRondaAnterior,
+    puedeIrAPasoAnterior,
+    irAPasoAnterior,
     iniciarModificacionRondaAnterior,
+    cancelarModificacionRondaAnterior,
   } = partida;
 
   const jugadorInicial = jugadores[indiceJugadorInicial];
@@ -71,10 +76,10 @@ export function PantallaPartida() {
             </button>
             <div>
               <span className="text-xs uppercase tracking-widest text-amber-300 font-bold block">
-                Ronda {rondaActual} / {totalRondas}
+                Ronda {rondaVisible} / {totalRondas}
               </span>
               <h2 className="text-lg font-extrabold text-white leading-tight">
-                {cartasPorJugadorEnRonda} carta{cartasPorJugadorEnRonda > 1 ? 's' : ''} en juego
+                {cartasPorJugadorVisibles} carta{cartasPorJugadorVisibles > 1 ? 's' : ''} en juego
               </h2>
             </div>
           </div>
@@ -98,7 +103,7 @@ export function PantallaPartida() {
           </div>
         </div>
 
-        {jugadorInicial && jugadorReparte && (
+        {pasoPartida !== 'resumen' && jugadorInicial && jugadorReparte && (
           <div className="flex items-center justify-between tarjeta-marron p-2.5 text-xs">
             <div className="text-amber-300 font-semibold">
               ⚓ Arranca: <strong className="text-white">{jugadorInicial.nombre}</strong>
@@ -110,28 +115,55 @@ export function PantallaPartida() {
         )}
 
         <div className="flex items-center justify-between px-1">
-          {PASOS.map(([pasoId, etiqueta], idx) => {
-            const pasoIndex = ORDEN_PASOS.indexOf(pasoPartida);
+          {PASOS.map(([pasoId, etiqueta]) => {
             const esActual = pasoPartida === pasoId;
-            const esPasado = pasoIndex > idx;
+            const puedeVolver = puedeIrAPasoAnterior(pasoId);
             return (
-              <div key={pasoId} className="flex-1 flex flex-col items-center gap-1">
-                <div
-                  className={`w-full h-1.5 rounded-full ${
-                    esActual ? 'bg-amber-400' : esPasado ? 'bg-emerald-600' : 'bg-slate-800'
+              <button
+                key={pasoId}
+                type="button"
+                onClick={() => irAPasoAnterior(pasoId)}
+                disabled={!puedeVolver}
+                title={puedeVolver ? `Volver a ${etiqueta}` : undefined}
+                className={`flex flex-1 flex-col items-center gap-1 rounded-lg px-0.5 py-1 ${
+                  puedeVolver ? 'cursor-pointer hover:bg-slate-800/70' : 'cursor-default'
+                }`}
+              >
+                <span
+                  className={`h-1.5 w-full rounded-full ${
+                    esActual ? 'bg-amber-400' : puedeVolver ? 'bg-emerald-600' : 'bg-slate-800'
                   }`}
                 />
                 <span
                   className={`text-[8px] font-bold uppercase ${
-                    esActual ? 'text-amber-300' : 'text-slate-500'
+                    esActual ? 'text-amber-300' : puedeVolver ? 'text-emerald-300' : 'text-slate-500'
                   }`}
                 >
                   {etiqueta}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>
+
+        {ORDEN_PASOS.indexOf(pasoPartida) > 0 && !partida.partidaFinalizada && (
+          <span className="text-center text-[9px] font-medium text-slate-500">
+            Tocá una fase completada para corregir datos anteriores.
+          </span>
+        )}
+
+        {editandoRondaAnterior && (
+          <div className="flex items-center justify-between rounded-xl border border-amber-700/60 bg-amber-950/40 px-3 py-2">
+            <span className="text-xs font-bold text-amber-200">Editando Ronda {rondaActual}</span>
+            <button
+              type="button"
+              onClick={cancelarModificacionRondaAnterior}
+              className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 text-[10px] font-bold text-slate-300 hover:text-white"
+            >
+              Cancelar corrección
+            </button>
+          </div>
+        )}
       </header>
 
       {pasoPartida === 'apuestas' && <PasoApuestas />}

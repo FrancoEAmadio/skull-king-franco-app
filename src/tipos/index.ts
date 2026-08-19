@@ -192,6 +192,16 @@ export interface BackupRondaJugador {
   bribonHabilidadPts: number | null;
   bribonStolenFrom: string | null;
   eventosBono: Record<string, number>;
+  cartasBlancas: number;
+  incrementoCartasBlancas: number;
+}
+
+export interface EstadoRondaEditable {
+  ronda: number;
+  jugadores: Jugador[];
+  alianzasBotinRonda: AlianzaBotin[];
+  registroHabilidadesRonda: RegistroHabilidad[];
+  jugadorSeleccionadoIdx: number;
 }
 
 export interface BackupRondaActual {
@@ -199,6 +209,10 @@ export interface BackupRondaActual {
   pasoPartida: PasoPartida;
   jugadorSeleccionadoIdx: number;
   jugadoresEstado: BackupRondaJugador[];
+  jugadoresCompletos: Jugador[];
+  alianzasBotinRonda: AlianzaBotin[];
+  registroHabilidadesRonda: RegistroHabilidad[];
+  resumenRondaActual: ResumenRondaJugador[];
 }
 
 export interface PartidaGuardada {
@@ -213,4 +227,6 @@ export interface PartidaGuardada {
   resumenRondaActual: ResumenRondaJugador[];
   editandoRondaAnterior: boolean;
   backupRondaActual: BackupRondaActual | null;
+  ultimaRondaEditable: EstadoRondaEditable | null;
+  partidaPendienteFinalizar: boolean;
 }

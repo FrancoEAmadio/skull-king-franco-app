@@ -5,21 +5,29 @@ export function PasoResumen() {
   const {
     resumenRondaActual,
     partidaFinalizada,
-    editandoRondaAnterior,
+    partidaPendienteFinalizar,
+    rondaVisible,
     irASiguienteRonda,
-    cancelarModificacionRondaAnterior,
+    confirmarFinalizacionPartida,
   } = partida;
+
+  const confirmarResultadoFinal = () => {
+    confirmarFinalizacionPartida();
+    abrirPodio();
+  };
 
   return (
     <section className="flex flex-col gap-4 flex-1 overflow-y-auto">
       <div className="tarjeta-marron p-3.5 border-l-4 border-amber-500">
         <span className="text-xs font-bold text-amber-300 uppercase block">
-          5. Resumen de la Ronda {editandoRondaAnterior ? '(Modificada)' : ''}
+          5. Resumen de la Ronda {rondaVisible}
         </span>
         <span className="text-[10px] text-slate-300 block mt-0.5">
           {partidaFinalizada
             ? '¡Partida finalizada! Resultados acumulados.'
-            : 'Puntaje de la ronda antes de continuar.'}
+            : partidaPendienteFinalizar
+              ? 'Revisá el resultado antes de confirmar definitivamente la partida.'
+              : 'Puntaje de la ronda antes de continuar.'}
         </span>
       </div>
 
@@ -127,27 +135,19 @@ export function PasoResumen() {
         </div>
       ))}
 
-      {editandoRondaAnterior ? (
-        <div className="flex gap-2 mt-1">
-          <button
-            onClick={cancelarModificacionRondaAnterior}
-            className="w-1/3 py-4 btn-marron-oscuro text-sm rounded-2xl font-bold"
-          >
-            ✕ Cancelar
-          </button>
-          <button
-            onClick={irASiguienteRonda}
-            className="flex-1 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
-          >
-            ✓ Confirmar Corrección y Volver ➔
-          </button>
-        </div>
-      ) : partidaFinalizada ? (
+      {partidaFinalizada ? (
         <button
           onClick={abrirPodio}
           className="w-full mt-1 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
         >
           🏁 Ver Resultado Final
+        </button>
+      ) : partidaPendienteFinalizar ? (
+        <button
+          onClick={confirmarResultadoFinal}
+          className="w-full mt-1 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
+        >
+          Confirmar Resultado Final
         </button>
       ) : (
         <button

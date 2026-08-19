@@ -21,7 +21,6 @@ export function PasoBonos() {
     puntajeProyectadoActual,
     textoBotonAvanzar,
     guardarJugadorYContinuar,
-    volverAPasoBazas,
   } = partida;
 
   const [acordeonHabilidadesAbierto, setAcordeonHabilidadesAbierto] = useState(false);
@@ -176,20 +175,12 @@ export function PasoBonos() {
         {configuracionMesa.modoContenido !== 'base' &&
           configuracionMesa.reglasOpcionales.botin !== false && <PanelAlianzasBotin />}
 
-        <div className="mt-1 pt-2 pb-1 flex gap-2">
-          <button
-            onClick={volverAPasoBazas}
-            className="w-1/3 py-4 btn-marron-oscuro text-sm rounded-2xl font-bold"
-          >
-            ← Bazas
-          </button>
-          <button
-            onClick={guardarJugadorYContinuar}
-            className="flex-1 py-4 btn-blanco-marron text-lg rounded-2xl shadow-lg font-black"
-          >
-            {textoBotonAvanzar}
-          </button>
-        </div>
+        <button
+          onClick={guardarJugadorYContinuar}
+          className="w-full mt-1 py-4 btn-blanco-marron text-lg rounded-2xl shadow-lg font-black"
+        >
+          {textoBotonAvanzar}
+        </button>
       </div>
     </section>
   );
