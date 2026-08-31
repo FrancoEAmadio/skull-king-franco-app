@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ContadorMasMenos } from '../../../ui/ContadorMasMenos';
 import { useApp } from '../../../estado/AppProvider';
 import type { EventoBono } from '../../../tipos';
 
@@ -19,7 +20,7 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
     limpiarTodosLosEventos,
   } = partida;
 
-  const [abierto, setAbierto] = useState(true);
+  const [abierto, setAbierto] = useState(false);
 
   if (!jugadorActual) return null;
 
@@ -64,24 +65,26 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
       </div>
 
       {abierto && (
-        <div className="flex flex-col gap-3 mt-3 pt-3 border-t border-slate-800/80">
-          <div className="flex flex-col gap-2 bg-slate-950/70 p-2.5 rounded-xl border border-slate-800">
-            <span className="text-[10px] text-amber-300 font-bold uppercase">Juego Base / Avanzado:</span>
-            {eventosBase.map((evento) => (
-              <FilaEvento
-                key={evento.id}
-                evento={evento}
-                cantidad={obtenerCantidadBono(evento.id)}
-                maximo={obtenerMaximoBono(evento.id)}
-                onCambiar={(delta) => cambiarCantidadBono(evento.id, delta)}
-                onBorrar={() => borrarBonoInmediato(evento.id)}
-              />
-            ))}
-          </div>
+        <div className="flex flex-col gap-3 mt-2 pt-2 border-t border-slate-800/80">
+          {eventosBase.length > 0 && (
+            <div className="flex flex-col gap-1">
+              <span className="text-[9px] text-slate-500 font-bold uppercase">Juego Base / Avanzado</span>
+              {eventosBase.map((evento) => (
+                <FilaEvento
+                  key={evento.id}
+                  evento={evento}
+                  cantidad={obtenerCantidadBono(evento.id)}
+                  maximo={obtenerMaximoBono(evento.id)}
+                  onCambiar={(delta) => cambiarCantidadBono(evento.id, delta)}
+                  onBorrar={() => borrarBonoInmediato(evento.id)}
+                />
+              ))}
+            </div>
+          )}
 
           {eventosExpansion.length > 0 && (
-            <div className="flex flex-col gap-2 bg-slate-950/70 p-2.5 rounded-xl border border-purple-900/40">
-              <span className="text-[10px] text-purple-300 font-bold uppercase">Expansión:</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-[9px] text-purple-400/70 font-bold uppercase">Expansión</span>
               {eventosExpansion.map((evento) => (
                 <FilaEvento
                   key={evento.id}
@@ -110,14 +113,17 @@ interface FilaEventoProps {
 
 function FilaEvento({ evento, cantidad, maximo, onCambiar, onBorrar }: FilaEventoProps) {
   const enMaximo = cantidad >= maximo;
-  const puntosTexto = evento.puntos > 0 ? `+${evento.puntos}` : `${evento.puntos}`;
+  const estaEnCero = cantidad === 0;
+  const colorTexto = estaEnCero ? 'text-slate-400' : 'text-slate-200';
 
   return (
-    <div className="flex items-center justify-between gap-2">
+    <div className={`flex items-center justify-between gap-3 py-1.5 ${estaEnCero ? 'opacity-60' : ''}`}>
       <div className="flex flex-col flex-1 min-w-0">
-        <span className="text-[11px] text-slate-200 font-semibold truncate">{evento.etiqueta}</span>
-        <span className="text-[9px] text-slate-500">
-          {puntosTexto} pts c/u · máx {maximo}
+        <span className={`text-[11px] font-semibold truncate ${colorTexto}`}>
+          {evento.etiqueta}{' '}
+          <span className="text-[9px] text-amber-400 font-bold">
+            +{evento.puntos} pts · máx {maximo}
+          </span>
         </span>
       </div>
       <div className="flex items-center gap-1.5 shrink-0">
@@ -131,23 +137,16 @@ function FilaEvento({ evento, cantidad, maximo, onCambiar, onBorrar }: FilaEvent
             ✕
           </button>
         )}
-        <button
-          type="button"
-          onClick={() => onCambiar(-1)}
-          disabled={cantidad <= 0}
-          className="w-7 h-7 btn-marron-oscuro rounded-lg font-bold text-sm disabled:opacity-20"
-        >
-          -
-        </button>
-        <span className="w-6 text-center text-base font-black text-amber-300">{cantidad}</span>
-        <button
-          type="button"
-          onClick={() => onCambiar(1)}
-          disabled={enMaximo}
-          className="w-7 h-7 btn-blanco-marron rounded-lg font-bold text-sm text-black disabled:opacity-20"
-        >
-          +
-        </button>
+        <ContadorMasMenos
+          valor={cantidad}
+          onDecrementar={() => onCambiar(-1)}
+          onIncrementar={() => onCambiar(1)}
+          decrementarDisabled={cantidad <= 0}
+          incrementarDisabled={enMaximo}
+          colorValor={estaEnCero ? 'text-slate-500' : 'text-amber-300'}
+          tamanoBoton="sm"
+          resaltar={!estaEnCero}
+        />
       </div>
     </div>
   );

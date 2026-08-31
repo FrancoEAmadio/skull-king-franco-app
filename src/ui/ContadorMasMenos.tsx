@@ -6,6 +6,7 @@ interface Props {
   incrementarDisabled?: boolean;
   colorValor?: string;
   tamanoBoton?: 'sm' | 'md';
+  resaltar?: boolean;
 }
 
 export function ContadorMasMenos({
@@ -16,6 +17,7 @@ export function ContadorMasMenos({
   incrementarDisabled,
   colorValor = 'text-amber-300',
   tamanoBoton = 'md',
+  resaltar = true,
 }: Props) {
   const clasesBoton = tamanoBoton === 'sm' ? 'w-8 h-8 text-sm' : 'w-9 h-9';
   const tamanoValor = tamanoBoton === 'sm' ? 'text-lg' : 'text-2xl';
@@ -33,7 +35,9 @@ export function ContadorMasMenos({
       <button
         onClick={onIncrementar}
         disabled={incrementarDisabled}
-        className={`${clasesBoton} btn-blanco-marron rounded-lg font-bold text-black disabled:opacity-20`}
+        className={`${clasesBoton} ${
+          resaltar ? 'btn-blanco-marron' : 'btn-marron-oscuro'
+        } rounded-lg font-bold text-black disabled:opacity-20`}
       >
         +
       </button>

@@ -22,7 +22,7 @@ function ContenidoApp() {
 
       <footer className="mt-6 py-3 text-center border-t border-slate-800/80 w-full">
         <p className="text-[11px] text-slate-500 font-medium">
-          Desarrollado por Franco Ezequiel Amadio y MATEAV23 © 2026
+          Desarrollado por FrancoEAmadio y MATEAV23 © 2026
         </p>
       </footer>
 

@@ -88,34 +88,30 @@ export function PasoBonos() {
         ))}
       </nav>
 
-      <div className="flex-1 overflow-y-auto flex flex-col gap-4 pt-3">
-        <div className="tarjeta-marron p-4 flex justify-between items-center border-l-4 border-amber-500">
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-2xl font-black text-white">{jugadorActual.nombre}</h3>
-              <span className="text-[10px] text-slate-400 uppercase font-semibold">
-                ({indiceVisualActual + 1} de {jugadoresOrdenados.length})
-              </span>
-            </div>
-            <p className="text-xs text-slate-300 mt-0.5">
-              Envite: {jugadorActual.apuesta} · Bazas ganadas: {jugadorActual.ganadas}
-            </p>
-          </div>
-          <div className="text-right">
-            <span className="text-3xl font-black text-amber-300 block">{jugadorActual.puntos} pts</span>
-            <span
-              className={`text-xs font-bold px-2 py-0.5 rounded-full inline-block mt-1 ${
-                puntajeProyectadoActual >= 0
-                  ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                  : 'bg-red-950 text-red-400 border border-red-800'
-              }`}
-            >
-              Ronda: {puntajeProyectadoActual >= 0 ? '+' : ''}
-              {puntajeProyectadoActual} pts
-            </span>
-          </div>
+      <div className="tarjeta-marron p-3 flex items-center justify-between border-l-4 border-amber-500">
+        <div>
+          <span className="text-[10px] text-slate-400 uppercase font-bold block">Puntos totales</span>
+          <span className="text-2xl font-black text-white leading-none">
+            {jugadorActual.puntos}{' '}
+            <span className="text-sm text-amber-300 font-bold">pts</span>
+          </span>
         </div>
+        <div className="text-right">
+          <span className="text-[10px] text-slate-400 uppercase font-bold block">Ronda</span>
+          <span
+            className={`text-lg font-black px-2.5 py-0.5 rounded-full inline-block ${
+              puntajeProyectadoActual >= 0
+                ? 'text-emerald-300 bg-emerald-950/60 border border-emerald-800'
+                : 'text-red-300 bg-red-950/60 border border-red-800'
+            }`}
+          >
+            {puntajeProyectadoActual >= 0 ? '+' : ''}
+            {puntajeProyectadoActual} pts
+          </span>
+        </div>
+      </div>
 
+      <div className="flex-1 overflow-y-auto flex flex-col gap-4 pt-3">
         {configuracionMesa.usarComodinesBonificacion && (
           <div className="p-3 bg-amber-950/40 border border-amber-700/50 rounded-xl flex items-center justify-between">
             <div>
