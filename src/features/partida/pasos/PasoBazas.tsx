@@ -50,7 +50,12 @@ export function PasoBazas() {
           key={originalIndex}
           className="tarjeta-marron p-3.5 flex items-center justify-between border-l-4 border-emerald-500/70"
         >
-          <span className="font-black text-white text-base">{jugador.nombre}</span>
+          <div className="flex flex-col gap-0.5">
+            <span className="font-black text-white text-base">{jugador.nombre}</span>
+            <span className="text-[10px] font-bold text-amber-300 bg-slate-900/60 border border-slate-800/50 px-1.5 py-0.5 rounded-md w-fit">
+              Envite: {jugador.apuesta}
+            </span>
+          </div>
           <ContadorMasMenos
             valor={jugador.ganadas}
             colorValor="text-emerald-400"
