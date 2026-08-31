@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
+import { useSwipeHorizontal } from '../../ui/useSwipeHorizontal';
 import { CATALOGO_CARTAS_WIKI } from '../../datos/cartasDatos';
 import { CATEGORIAS_REGLAS_WIKI } from '../../datos/reglasDatos';
 import type { CartaWiki } from '../../tipos';
@@ -28,6 +29,26 @@ export function PantallaReglas() {
   const [reglasAbiertas, setReglasAbiertas] = useState<Record<string, boolean>>({});
   const [termino, setTermino] = useState('');
   const [filtro, setFiltro] = useState<FiltroCarta>('Todos');
+  const filtroRef = useRef<HTMLButtonElement | null>(null);
+
+  const indiceFiltro = useMemo(() => FILTROS.indexOf(filtro), [filtro]);
+
+  const avanzarFiltro = () => setFiltro(FILTROS[(indiceFiltro + 1) % FILTROS.length]);
+  const retrocederFiltro = () =>
+    setFiltro(FILTROS[(indiceFiltro - 1 + FILTROS.length) % FILTROS.length]);
+
+  useEffect(() => {
+    filtroRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'center',
+      block: 'nearest',
+    });
+  }, [filtro]);
+
+  const { iniciarPointer, finalizarPointer } = useSwipeHorizontal({
+    onSwipeIzquierda: avanzarFiltro,
+    onSwipeDerecha: retrocederFiltro,
+  });
 
   const cartasFiltradas = useMemo(() => {
     const busqueda = termino.toLowerCase();
@@ -47,29 +68,80 @@ export function PantallaReglas() {
     setReglasAbiertas((actual) => ({ ...actual, [clave]: !actual[clave] }));
 
   return (
-    <main className="py-6 overflow-y-auto w-full">
-      <button
-        onClick={() => setPantallaActual('inicio')}
-        className="mb-4 text-sm text-amber-300 font-bold"
+    <main className="py-6 w-full">
+      <div
+        className="sticky top-0 z-20 w-full pb-4 border-b border-slate-800/50 backdrop-blur-md"
+        style={{ backgroundColor: 'var(--bg-card)' }}
       >
-        ← Volver al menú
-      </button>
-      <h2 className="text-2xl font-bold mb-1 text-white">Manual y Jerarquía del Juego</h2>
-      <p className="text-xs text-slate-300 mb-4">Organizado por categorías y expansiones</p>
+        <button
+          onClick={() => setPantallaActual('inicio')}
+          className="mb-4 text-sm text-amber-300 font-bold"
+        >
+          ← Volver al menú
+        </button>
+        <h2 className="text-2xl font-bold mb-1 text-white">Manual y Jerarquía del Juego</h2>
+        <p className="text-xs text-slate-300 mb-4">Organizado por categorías y expansiones</p>
 
-      <div className="grid grid-cols-2 gap-2 mb-4">
-        <button
-          onClick={() => setVista('manual')}
-          className={`py-2.5 px-3 rounded-xl font-bold text-xs border ${vista === 'manual' ? 'btn-blanco-marron' : 'btn-marron-oscuro'}`}
-        >
-          📖 Reglas del Juego
-        </button>
-        <button
-          onClick={() => setVista('cartas')}
-          className={`py-2.5 px-3 rounded-xl font-bold text-xs border ${vista === 'cartas' ? 'btn-blanco-marron' : 'btn-marron-oscuro'}`}
-        >
-          🃏 Catálogo de Cartas
-        </button>
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          <button
+            onClick={() => setVista('manual')}
+            className={`py-2.5 px-3 rounded-xl font-bold text-xs border text-center ${
+              vista === 'manual' ? 'btn-blanco-marron' : 'btn-marron-oscuro'
+            }`}
+          >
+            📖 Reglas del Juego
+          </button>
+          <button
+            onClick={() => setVista('cartas')}
+            className={`py-2.5 px-3 rounded-xl font-bold text-xs border text-center ${
+              vista === 'cartas' ? 'btn-blanco-marron' : 'btn-marron-oscuro'
+            }`}
+          >
+            🃏 Catálogo de Cartas
+          </button>
+        </div>
+
+        {vista === 'cartas' && (
+          <div className="flex flex-col gap-2">
+            <div className="relative flex items-center">
+              <input
+                value={termino}
+                onChange={(e) => setTermino(e.target.value.trimStart())}
+                onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+                type="text"
+                placeholder="🔍 Buscar carta..."
+                className="w-full rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-white bg-slate-900 border border-slate-700 focus:outline-none focus:border-amber-500"
+              />
+              {termino.length > 0 && (
+                <button
+                  onClick={() => setTermino('')}
+                  className="absolute right-2.5 flex items-center justify-center w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            <div
+              className="flex gap-1.5 overflow-x-auto pb-1 scroll-oculto"
+              style={{ scrollBehavior: 'smooth' }}
+            >
+              {FILTROS.map((f) => (
+                <button
+                  key={f}
+                  ref={f === filtro ? filtroRef : undefined}
+                  onClick={() => setFiltro(f)}
+                  className={`px-3 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap text-center ${
+                    filtro === f
+                      ? 'btn-blanco-marron text-black'
+                      : 'bg-slate-900 border border-slate-800 text-slate-300'
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {vista === 'manual' ? (
@@ -89,7 +161,10 @@ export function PantallaReglas() {
                     const clave = `${categoria.id}-${idx}`;
                     const abierta = reglasAbiertas[clave] ?? false;
                     return (
-                      <div key={clave} className="border-b border-slate-800/60 pb-3 last:border-none last:pb-0">
+                      <div
+                        key={clave}
+                        className="border-b border-slate-800/60 pb-3 last:border-none last:pb-0"
+                      >
                         <button
                           onClick={() => toggleRegla(clave)}
                           className="w-full text-left font-bold text-white flex justify-between items-center py-1"
@@ -113,76 +188,47 @@ export function PantallaReglas() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <div className="relative flex items-center">
-              <input
-                value={termino}
-                onChange={(e) => setTermino(e.target.value.trimStart())}
-                onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
-                type="text"
-                placeholder="🔍 Buscar carta..."
-                className="w-full rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-white bg-slate-900 border border-slate-700 focus:outline-none focus:border-amber-500"
-              />
-              {termino.length > 0 && (
-                <button
-                  onClick={() => setTermino('')}
-                  className="absolute right-2.5 flex items-center justify-center w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold"
+        <div
+          onPointerDown={iniciarPointer}
+          onPointerUp={finalizarPointer}
+          style={{ touchAction: 'pan-y' }}
+          className="flex flex-col gap-3 select-none"
+        >
+          {cartasFiltradas.map((carta) => (
+            <article key={carta.id} className="tarjeta-marron p-3.5 flex flex-col gap-3">
+              <div className="flex items-start justify-between">
+                <span
+                  className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${estiloBadgeModo(
+                    carta.modo
+                  )}`}
                 >
-                  ✕
-                </button>
-              )}
-            </div>
-            <div className="flex gap-1.5 overflow-x-auto pb-1 scroll-oculto">
-              {FILTROS.map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFiltro(f)}
-                  className={`px-3 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap ${
-                    filtro === f
-                      ? 'btn-blanco-marron text-black'
-                      : 'bg-slate-900 border border-slate-800 text-slate-300'
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            {cartasFiltradas.map((carta) => (
-              <article key={carta.id} className="tarjeta-marron p-3.5 flex flex-col gap-3">
-                <div className="flex items-start justify-between">
-                  <span
-                    className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${estiloBadgeModo(carta.modo)}`}
-                  >
-                    {iconoModo(carta.modo)} {carta.modo}
-                  </span>
-                  <span className="text-xs font-bold text-slate-400">Cantidad: {carta.cantidad}</span>
+                  {iconoModo(carta.modo)} {carta.modo}
+                </span>
+                <span className="text-xs font-bold text-slate-400">
+                  Cantidad: {carta.cantidad}
+                </span>
+              </div>
+              <div className="flex gap-3 items-start">
+                <img
+                  src={`./${carta.imagen}`}
+                  alt={carta.nombre}
+                  className="w-16 h-22 object-cover rounded-lg border border-slate-700 bg-slate-900 shrink-0"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                <div className="flex flex-col gap-1">
+                  <h4 className="text-sm font-extrabold text-white">{carta.nombre}</h4>
+                  <p className="text-xs text-slate-300 leading-relaxed">{carta.descripcion}</p>
+                  {carta.habilidad && (
+                    <p className="text-xs text-amber-300 font-semibold mt-1 bg-amber-950/30 p-1.5 rounded border border-amber-900/40">
+                      ⚡ {carta.habilidad}
+                    </p>
+                  )}
                 </div>
-                <div className="flex gap-3 items-start">
-                  <img
-                    src={`./${carta.imagen}`}
-                    alt={carta.nombre}
-                    className="w-16 h-22 object-cover rounded-lg border border-slate-700 bg-slate-900 shrink-0"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  <div className="flex flex-col gap-1">
-                    <h4 className="text-sm font-extrabold text-white">{carta.nombre}</h4>
-                    <p className="text-xs text-slate-300 leading-relaxed">{carta.descripcion}</p>
-                    {carta.habilidad && (
-                      <p className="text-xs text-amber-300 font-semibold mt-1 bg-amber-950/30 p-1.5 rounded border border-amber-900/40">
-                        ⚡ {carta.habilidad}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+              </div>
+            </article>
+          ))}
         </div>
       )}
     </main>
