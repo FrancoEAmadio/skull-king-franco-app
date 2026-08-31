@@ -15,6 +15,8 @@ export const UMBRAL_SWIPE_PX = 45;
 export const RATIO_PREDOMINIO_HORIZONTAL = 1.35;
 
 export const CARTAS_POR_RONDA_DEFECTO = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
+export const MAX_RONDAS_PERSONALIZADO = 15;
+export const MAX_CARTAS_POR_RONDA = 10;
 
 export const CLAVE_LS_PARTIDA_GUARDADA = 'skullking_guardado';
 export const CLAVE_LS_HISTORIAL = 'skullking_historial';
