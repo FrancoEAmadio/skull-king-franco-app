@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import type { TouchEvent } from 'react';
+import type { TouchEvent, PointerEvent } from 'react';
 import { RATIO_PREDOMINIO_HORIZONTAL, UMBRAL_SWIPE_PX } from '../constantes';
 
 interface OpcionesSwipe {
@@ -10,19 +10,7 @@ interface OpcionesSwipe {
 export function useSwipeHorizontal({ onSwipeIzquierda, onSwipeDerecha }: OpcionesSwipe) {
   const inicioRef = useRef({ x: 0, y: 0 });
 
-  const iniciarTouch = (evento: TouchEvent) => {
-    const touch = evento.touches[0];
-    if (!touch) return;
-    inicioRef.current = { x: touch.clientX, y: touch.clientY };
-  };
-
-  const finalizarTouch = (evento: TouchEvent) => {
-    const touch = evento.changedTouches[0];
-    if (!touch) return;
-
-    const deltaX = touch.clientX - inicioRef.current.x;
-    const deltaY = touch.clientY - inicioRef.current.y;
-
+  const procesarDelta = (deltaX: number, deltaY: number) => {
     const esHorizontalDominante =
       Math.abs(deltaX) > UMBRAL_SWIPE_PX &&
       Math.abs(deltaX) > Math.abs(deltaY) * RATIO_PREDOMINIO_HORIZONTAL;
@@ -33,5 +21,28 @@ export function useSwipeHorizontal({ onSwipeIzquierda, onSwipeDerecha }: Opcione
     else onSwipeDerecha();
   };
 
-  return { iniciarTouch, finalizarTouch };
+  const iniciarTouch = (evento: TouchEvent) => {
+    const touch = evento.touches[0];
+    if (!touch) return;
+    inicioRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const finalizarTouch = (evento: TouchEvent) => {
+    const touch = evento.changedTouches[0];
+    if (!touch) return;
+    procesarDelta(touch.clientX - inicioRef.current.x, touch.clientY - inicioRef.current.y);
+  };
+
+  const iniciarPointer = (evento: PointerEvent) => {
+    inicioRef.current = { x: evento.clientX, y: evento.clientY };
+    if (evento.currentTarget instanceof Element) {
+      evento.currentTarget.setPointerCapture(evento.pointerId);
+    }
+  };
+
+  const finalizarPointer = (evento: PointerEvent) => {
+    procesarDelta(evento.clientX - inicioRef.current.x, evento.clientY - inicioRef.current.y);
+  };
+
+  return { iniciarTouch, finalizarTouch, iniciarPointer, finalizarPointer };
 }
