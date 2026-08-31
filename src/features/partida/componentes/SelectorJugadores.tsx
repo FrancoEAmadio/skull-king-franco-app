@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../../../estado/AppProvider';
+import { MIN_JUGADORES } from '../../../constantes';
 import { ModalSeleccionJugadores } from './ModalSeleccionJugadores';
 
 export function SelectorJugadores() {
@@ -7,6 +8,8 @@ export function SelectorJugadores() {
     partida: { idsJugadoresSeleccionados },
   } = useApp();
   const [selectorAbierto, setSelectorAbierto] = useState(false);
+
+  const faltanPiratas = idsJugadoresSeleccionados.length < MIN_JUGADORES;
 
   return (
     <section className="flex flex-col gap-3">
@@ -20,7 +23,9 @@ export function SelectorJugadores() {
       <button
         type="button"
         onClick={() => setSelectorAbierto(true)}
-        className="btn-marron-oscuro flex w-full items-center justify-between rounded-2xl px-4 py-4 text-left"
+        className={`btn-marron-oscuro flex w-full items-center justify-between rounded-2xl px-4 py-4 text-left ${
+          faltanPiratas ? 'titilar-amarillo' : ''
+        }`}
       >
         <div>
           <span className="block text-base font-black text-white">Seleccionar jugadores</span>
