@@ -4,9 +4,11 @@ import { ModalAviso } from '../../ui/ModalAviso';
 import { Toggle } from '../../ui/Toggle';
 import type { ConfiguracionMesa, ModoContenido, ModoRepartoId, ReglasOpcionales } from '../../tipos';
 import { reglasOpcionalesPorDefectoDelModo } from '../../dominio/disponibilidadContenido';
+import { MAX_RONDAS_PERSONALIZADO, MAX_CARTAS_POR_RONDA } from '../../constantes';
 import { PanelReglasOpcionales } from './componentes/PanelReglasOpcionales';
 import { SelectorJugadores } from './componentes/SelectorJugadores';
 import { SelectorModoReparto } from './componentes/SelectorModoReparto';
+import { ConfiguradorRepartoPersonalizado } from './componentes/ConfiguradorRepartoPersonalizado';
 
 const MODOS_CONTENIDO: { id: ModoContenido; etiqueta: string }[] = [
   { id: 'base', etiqueta: '🟢 Juego Base' },
@@ -19,6 +21,8 @@ export function PantallaNuevaPartida() {
   const { configuracionMesa, setConfiguracionMesa, comenzarPartida, idsJugadoresSeleccionados } =
     partida;
   const [mostrarAvisoJugadores, setMostrarAvisoJugadores] = useState(false);
+  const [configurandoPersonalizado, setConfigurandoPersonalizado] = useState(false);
+  const [modoRepartoPrevio, setModoRepartoPrevio] = useState<ModoRepartoId | null>(null);
 
   const intentarComenzarPartida = () => {
     if (comenzarPartida() === 'jugadores_insuficientes') setMostrarAvisoJugadores(true);
@@ -38,13 +42,36 @@ export function PantallaNuevaPartida() {
     }
   };
 
-  const cambiarModoReparto = (modo: ModoRepartoId) =>
-    setConfiguracionMesa({ ...configuracionMesa, modoReparto: modo });
+  const abrirConfiguradorPersonalizado = () => {
+    if (configuracionMesa.modoReparto !== 'personalizado') {
+      setModoRepartoPrevio(configuracionMesa.modoReparto);
+      setConfiguracionMesa({ ...configuracionMesa, modoReparto: 'personalizado' });
+    }
+    setConfigurandoPersonalizado(true);
+  };
 
-  const cambiarCartasPersonalizadas = (indice: number, cantidad: number) => {
-    const nuevas = [...configuracionMesa.cartasPorRonda];
-    nuevas[indice] = cantidad;
-    setConfiguracionMesa({ ...configuracionMesa, cartasPorRonda: nuevas });
+  const guardarRepartoPersonalizado = (cartas: number[]) => {
+    setConfiguracionMesa({ ...configuracionMesa, modoReparto: 'personalizado', cartasPorRonda: cartas });
+    setConfigurandoPersonalizado(false);
+    setModoRepartoPrevio(null);
+  };
+
+  const cancelarConfiguracionPersonalizada = () => {
+    if (modoRepartoPrevio !== null) {
+      setConfiguracionMesa({ ...configuracionMesa, modoReparto: modoRepartoPrevio });
+      setModoRepartoPrevio(null);
+    }
+    setConfigurandoPersonalizado(false);
+  };
+
+  const cambiarModoReparto = (modo: ModoRepartoId) => {
+    if (modo === 'personalizado') {
+      abrirConfiguradorPersonalizado();
+      return;
+    }
+    setConfiguracionMesa({ ...configuracionMesa, modoReparto: modo });
+    setConfigurandoPersonalizado(false);
+    setModoRepartoPrevio(null);
   };
 
   const cambiarReglaOpcional = (regla: keyof ReglasOpcionales, valor: boolean) =>
@@ -52,6 +79,20 @@ export function PantallaNuevaPartida() {
       ...configuracionMesa,
       reglasOpcionales: { ...configuracionMesa.reglasOpcionales, [regla]: valor },
     });
+
+  if (configurandoPersonalizado) {
+    return (
+      <main className="py-6 flex flex-col w-full overflow-y-auto">
+        <ConfiguradorRepartoPersonalizado
+          cartasPorRondaInicial={configuracionMesa.cartasPorRonda}
+          maxRondas={MAX_RONDAS_PERSONALIZADO}
+          maxCartasPorRonda={MAX_CARTAS_POR_RONDA}
+          onGuardar={guardarRepartoPersonalizado}
+          onCancelar={cancelarConfiguracionPersonalizada}
+        />
+      </main>
+    );
+  }
 
   return (
     <main className="py-6 flex flex-col gap-6 w-full overflow-y-auto">
@@ -96,7 +137,7 @@ export function PantallaNuevaPartida() {
       <SelectorModoReparto
         configuracion={configuracionMesa}
         onCambiarModo={cambiarModoReparto}
-        onCambiarCartasPersonalizadas={cambiarCartasPersonalizadas}
+        onConfigurarPersonalizado={abrirConfiguradorPersonalizado}
       />
 
       <SelectorJugadores />

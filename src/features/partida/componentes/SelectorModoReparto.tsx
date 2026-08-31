@@ -5,13 +5,20 @@ import type { ConfiguracionMesa, ModoRepartoId } from '../../../tipos';
 interface Props {
   configuracion: ConfiguracionMesa;
   onCambiarModo: (modo: ModoRepartoId) => void;
-  onCambiarCartasPersonalizadas: (ronda: number, cantidad: number) => void;
+  onConfigurarPersonalizado: () => void;
+}
+
+function textoVistaPrevia(vistaPrevia: number[]): string {
+  if (vistaPrevia.length <= 8) return vistaPrevia.join(', ');
+  const inicio = vistaPrevia.slice(0, 4).join(', ');
+  const fin = vistaPrevia.slice(-2).join(', ');
+  return `${inicio}, ..., ${fin}`;
 }
 
 export function SelectorModoReparto({
   configuracion,
   onCambiarModo,
-  onCambiarCartasPersonalizadas,
+  onConfigurarPersonalizado,
 }: Props) {
   const modoSeleccionado = MODOS_REPARTO.find((m) => m.id === configuracion.modoReparto);
   const vistaPrevia = useMemo(
@@ -41,40 +48,20 @@ export function SelectorModoReparto({
 
       <div className="mt-2 p-2.5 bg-slate-900/90 border border-amber-900/40 rounded-xl flex items-center justify-between text-xs">
         <span className="text-slate-300 font-semibold">Esta partida tendrá:</span>
-        <span className="font-black text-amber-300">
-          {vistaPrevia.length} ronda{vistaPrevia.length === 1 ? '' : 's'} ({vistaPrevia.join(', ')}{' '}
+        <span className="font-black text-amber-300 text-right ml-3">
+          {vistaPrevia.length} ronda{vistaPrevia.length === 1 ? '' : 's'} ({textoVistaPrevia(vistaPrevia)}{' '}
           carta{vistaPrevia.length === 1 && vistaPrevia[0] === 1 ? '' : 's'})
         </span>
       </div>
 
       {configuracion.modoReparto === 'personalizado' && (
-        <div className="bg-slate-900/90 p-3 rounded-xl border border-slate-800 flex flex-col gap-2.5 mt-3">
-          <span className="text-[11px] text-slate-300 font-semibold block border-b border-slate-800 pb-1">
-            Configurá cuántas cartas se repartirán en cada una de las 10 rondas:
-          </span>
-          <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
-            {Array.from({ length: 10 }, (_, i) => i + 1).map((numeroRonda) => (
-              <div key={numeroRonda} className="tarjeta-ronda-personalizada">
-                <span className="linea-1">Ronda</span>
-                <span className="linea-2">{numeroRonda}</span>
-                <div className="linea-3">
-                  <select
-                    value={configuracion.cartasPorRonda[numeroRonda - 1] ?? numeroRonda}
-                    onChange={(e) =>
-                      onCambiarCartasPersonalizadas(numeroRonda - 1, Number(e.target.value))
-                    }
-                  >
-                    {Array.from({ length: 10 }, (_, j) => j + 1).map((cantidad) => (
-                      <option key={cantidad} value={cantidad}>
-                        {cantidad}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={onConfigurarPersonalizado}
+          className="w-full mt-3 py-3 btn-marron-oscuro rounded-2xl font-bold text-sm border border-amber-700/50 hover:border-amber-500/50"
+        >
+          ⚙️ Configurar reparto
+        </button>
       )}
     </section>
   );
