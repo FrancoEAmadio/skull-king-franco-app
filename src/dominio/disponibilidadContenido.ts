@@ -61,6 +61,17 @@ export function normalizarConfiguracionPorModo(
   return { ...configuracion, reglasOpcionales };
 }
 
+export function reglasOpcionalesPorDefectoDelModo(
+  modoContenido: ModoContenido
+): ReglasOpcionales {
+  const reglas = {} as Record<keyof ReglasOpcionales, boolean>;
+  const claves = Array.from(new Set([...REGLAS_AVANZADAS, ...REGLAS_EXPANSION]));
+  for (const regla of claves) {
+    reglas[regla] = modoPermiteRegla(modoContenido, regla);
+  }
+  return reglas as ReglasOpcionales;
+}
+
 function hayMonstruoActivo(configuracion: ConfiguracionMesa): boolean {
   return (
     estaReglaActiva(configuracion, 'kraken') ||

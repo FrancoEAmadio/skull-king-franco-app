@@ -3,6 +3,7 @@ import { useApp } from '../../estado/AppProvider';
 import { ModalAviso } from '../../ui/ModalAviso';
 import { Toggle } from '../../ui/Toggle';
 import type { ConfiguracionMesa, ModoContenido, ModoRepartoId, ReglasOpcionales } from '../../tipos';
+import { reglasOpcionalesPorDefectoDelModo } from '../../dominio/disponibilidadContenido';
 import { PanelReglasOpcionales } from './componentes/PanelReglasOpcionales';
 import { SelectorJugadores } from './componentes/SelectorJugadores';
 import { SelectorModoReparto } from './componentes/SelectorModoReparto';
@@ -27,7 +28,11 @@ export function PantallaNuevaPartida() {
     setConfiguracionMesa({ ...configuracionMesa, [clave]: valor });
 
   const cambiarModoContenido = (modo: ModoContenido) => {
-    setConfiguracionMesa({ ...configuracionMesa, modoContenido: modo });
+    setConfiguracionMesa({
+      ...configuracionMesa,
+      modoContenido: modo,
+      reglasOpcionales: reglasOpcionalesPorDefectoDelModo(modo),
+    });
     if (modo !== 'expansion' && idsJugadoresSeleccionados.length === 9) {
       partida.alternarSeleccionJugador(idsJugadoresSeleccionados[8]!);
     }
