@@ -36,7 +36,7 @@ function ResumenPosicion({ frecuencia, destacada = false, seleccionado }: Resume
     return (
       <div className="flex min-h-10 flex-col items-center justify-center">
         <span className={`${destacada ? 'text-lg' : 'text-sm'} font-black ${colorSecundario}`}>—</span>
-        <span className={`text-[8px] font-bold uppercase ${colorSecundario}`}>Sin registro</span>
+        <span className={`text-[11px] font-bold uppercase ${colorSecundario}`}>Sin registro</span>
       </div>
     );
   }
@@ -46,7 +46,7 @@ function ResumenPosicion({ frecuencia, destacada = false, seleccionado }: Resume
       <span className={`${destacada ? 'text-3xl' : 'text-base'} font-black leading-none ${colorPrincipal}`}>
         {formatearPosicion(frecuencia.posicion)}
       </span>
-      <span className={`mt-1 text-[9px] font-bold ${colorSecundario}`}>
+      <span className={`mt-1 text-[11px] font-bold ${colorSecundario}`}>
         {frecuencia.cantidad} {frecuencia.cantidad === 1 ? 'vez' : 'veces'}
       </span>
     </div>
@@ -74,8 +74,8 @@ export function TarjetaSeleccionJugador({ jugador, posicionSeleccion, onSeleccio
               {jugador.nombre}
             </span>
           </div>
-          <span className={`mt-1 block text-[9px] font-bold uppercase tracking-wide ${
-            seleccionado ? 'text-amber-900' : 'text-slate-500'
+          <span className={`mt-1 block text-[11px] font-bold uppercase tracking-wide ${
+            seleccionado ? 'text-amber-900' : 'text-slate-400'
           }`}>
             {seleccionado ? 'Seleccionado' : 'Tocá para seleccionar'}
           </span>

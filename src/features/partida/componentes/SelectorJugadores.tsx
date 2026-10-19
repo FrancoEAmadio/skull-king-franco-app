@@ -29,7 +29,7 @@ export function SelectorJugadores() {
       >
         <div>
           <span className="block text-base font-black text-white">Seleccionar jugadores</span>
-          <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-wide text-slate-400">
+          <span className="mt-0.5 block text-[11px] font-bold uppercase tracking-wide text-slate-400">
             Abrir listado de piratas
           </span>
         </div>

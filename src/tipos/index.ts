@@ -58,6 +58,12 @@ export interface RegistroHabilidad {
   tipo: string;
   etiqueta: string;
   detalle: string;
+  /** Id permanente del jugador afectado (permite revertir aunque cambie el orden de la mesa). */
+  jugadorId?: string;
+  /** Cambio REAL aplicado al envite (+1, -1 o 0 si el tope lo impidió). Solo Harry el Gigante. */
+  deltaEnvite?: number;
+  /** Envite que tenía el jugador justo antes de aplicar la habilidad. */
+  envitePrevio?: number;
 }
 
 export interface EntradaHistorialRonda {
@@ -175,6 +181,8 @@ export interface JugadorPermanente {
 }
 
 export interface RankingJugador {
+  /** Id de la tarjeta permanente (partidas nuevas). Las viejas se vinculan por nombre. */
+  permanenteId?: string;
   nombre: string;
   puntos: number;
   historial: EntradaHistorialRonda[];

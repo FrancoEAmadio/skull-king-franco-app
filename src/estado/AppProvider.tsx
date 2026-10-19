@@ -13,6 +13,7 @@ interface ContextoApp {
   crearJugadorPermanente: (nombre: string) => JugadorPermanente | null;
   renombrarJugadorPermanente: (id: string, nuevoNombre: string) => void;
   eliminarJugadorPermanente: (id: string) => void;
+  reemplazarJugadoresPermanentes: (lista: JugadorPermanente[]) => void;
 
   partida: PartidaState;
 
@@ -22,6 +23,9 @@ interface ContextoApp {
 
   menuHamburguesaAbierto: boolean;
   setMenuHamburguesaAbierto: (abierto: boolean) => void;
+
+  ajustesAbiertos: boolean;
+  setAjustesAbiertos: (abierto: boolean) => void;
 
   jugadorViendoHistorial: { nombre: string; historial: unknown[] } | null;
   verHistorialJugador: (jugador: { nombre: string; historial: unknown[] }) => void;
@@ -38,6 +42,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [pantallaActual, setPantallaActual] = useState<PantallaId>('inicio');
   const [mostrarPodio, setMostrarPodio] = useState(false);
   const [menuHamburguesaAbierto, setMenuHamburguesaAbierto] = useState(false);
+  const [ajustesAbiertos, setAjustesAbiertos] = useState(false);
   const [jugadorViendoHistorial, setJugadorViendoHistorial] = useState<{
     nombre: string;
     historial: unknown[];
@@ -74,12 +79,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     crearJugadorPermanente: crear,
     renombrarJugadorPermanente: renombrar,
     eliminarJugadorPermanente: eliminar,
+    reemplazarJugadoresPermanentes: reemplazarLista,
     partida,
     mostrarPodio,
     abrirPodio,
     cerrarPodio,
     menuHamburguesaAbierto,
     setMenuHamburguesaAbierto,
+    ajustesAbiertos,
+    setAjustesAbiertos,
     jugadorViendoHistorial,
     verHistorialJugador: setJugadorViendoHistorial,
     cerrarHistorialJugador: () => setJugadorViendoHistorial(null),

@@ -603,7 +603,12 @@ export function usePartidaState({
     (
       tipo: string,
       indiceJugador: number,
-      extra: { etiqueta: string; detalle: string }
+      extra: {
+        etiqueta: string;
+        detalle: string;
+        deltaEnvite?: number;
+        envitePrevio?: number;
+      }
     ): boolean => {
       const jugador = jugadores[indiceJugador];
       if (!jugador) return false;
@@ -614,9 +619,12 @@ export function usePartidaState({
           ronda: rondaActual,
           jugadorIdx: indiceJugador,
           jugadorNombre: jugador.nombre,
+          jugadorId: jugador.permanenteId,
           tipo,
           etiqueta: extra.etiqueta,
           detalle: extra.detalle,
+          ...(extra.deltaEnvite !== undefined ? { deltaEnvite: extra.deltaEnvite } : {}),
+          ...(extra.envitePrevio !== undefined ? { envitePrevio: extra.envitePrevio } : {}),
         },
       ]);
       return true;
@@ -646,9 +654,12 @@ export function usePartidaState({
         0,
         Math.min(cartasPorJugadorEnRonda, (jugador.apuesta || 0) + delta)
       );
+      const envitePrevio = jugador.apuesta || 0;
       const ok = registrarHabilidad('Harry el Gigante', indiceJugador, {
         etiqueta: 'Harry el Gigante (Modificó Envite)',
-        detalle: `Modificó su envite de ${jugador.apuesta} a ${nuevoEnvite} baza(s) (${delta > 0 ? '+1' : '-1'})`,
+        detalle: `Modificó su envite de ${envitePrevio} a ${nuevoEnvite} baza(s) (${delta > 0 ? '+1' : '-1'})`,
+        deltaEnvite: nuevoEnvite - envitePrevio,
+        envitePrevio,
       });
       if (!ok) return;
       actualizarJugador(indiceJugador, { apuesta: nuevoEnvite });
@@ -697,9 +708,12 @@ export function usePartidaState({
         0,
         Math.min(cartasPorJugadorEnRonda, (jugador.apuesta || 0) + delta)
       );
+      const envitePrevio = jugador.apuesta || 0;
       const ok = registrarHabilidad('Primer Oficial Kong', indiceJugador, {
         etiqueta: 'Primer Oficial Kong (Copió Harry el Gigante)',
-        detalle: `Modificó su envite de ${jugador.apuesta} a ${nuevoEnvite} baza(s) (${delta > 0 ? '+1' : '-1'}) copiando a Harry`,
+        detalle: `Modificó su envite de ${envitePrevio} a ${nuevoEnvite} baza(s) (${delta > 0 ? '+1' : '-1'}) copiando a Harry`,
+        deltaEnvite: nuevoEnvite - envitePrevio,
+        envitePrevio,
       });
       if (!ok) return;
       actualizarJugador(indiceJugador, { apuesta: nuevoEnvite });
@@ -718,15 +732,41 @@ export function usePartidaState({
     (indice: number) => {
       const item = registroHabilidadesRonda[indice];
       if (!item) return;
+
+      const indiceAfectado = (() => {
+        if (item.jugadorId) {
+          const porId = jugadores.findIndex((jug) => jug.permanenteId === item.jugadorId);
+          if (porId !== -1) return porId;
+        }
+        return item.jugadorIdx;
+      })();
+
       const esBribon =
         item.tipo === 'Bribón de Roatán' ||
         (item.tipo === 'Primer Oficial Kong' && item.etiqueta.includes('Bribón'));
       if (esBribon) {
-        actualizarJugador(item.jugadorIdx, { bribonHabilidadPts: null, bribonStolenFrom: null });
+        actualizarJugador(indiceAfectado, { bribonHabilidadPts: null, bribonStolenFrom: null });
       }
+
+      // Harry el Gigante (propio o copiado por Kong): se deshace el cambio de envite
+      // sobre el jugador exacto al que se le aplicó, devolviéndolo a su valor original.
+      const esHarry =
+        item.tipo === 'Harry el Gigante' ||
+        (item.tipo === 'Primer Oficial Kong' && item.etiqueta.includes('Harry'));
+      if (esHarry && item.deltaEnvite !== undefined && item.deltaEnvite !== 0) {
+        const afectado = jugadores[indiceAfectado];
+        if (afectado) {
+          const revertido = Math.max(
+            0,
+            Math.min(cartasPorJugadorEnRonda, (afectado.apuesta || 0) - item.deltaEnvite)
+          );
+          actualizarJugador(indiceAfectado, { apuesta: revertido });
+        }
+      }
+
       setRegistroHabilidadesRonda((previas) => previas.filter((_, idx) => idx !== indice));
     },
-    [registroHabilidadesRonda, actualizarJugador]
+    [registroHabilidadesRonda, jugadores, cartasPorJugadorEnRonda, actualizarJugador]
   );
 
   const cerrarPartida = useCallback(
@@ -747,6 +787,7 @@ export function usePartidaState({
       const nuevaEntrada: EntradaHistorialPartida = {
         fecha,
         ranking: rankingFinal.map((jug) => ({
+          permanenteId: jug.permanenteId,
           nombre: jug.nombre,
           puntos: jug.puntos,
           historial: jug.historial,
@@ -958,6 +999,11 @@ export function usePartidaState({
     [historialPartidas]
   );
 
+  const reemplazarHistorial = useCallback((nuevo: EntradaHistorialPartida[]) => {
+    setHistorialPartidas(nuevo);
+    guardarHistorial(nuevo);
+  }, []);
+
   const borrarTodoElHistorial = useCallback(() => {
     setHistorialPartidas([]);
     borrarHistorial();
@@ -1065,6 +1111,7 @@ export function usePartidaState({
     cancelarModificacionRondaAnterior,
     descartarPartidaActual,
     eliminarPartidaHistorial,
+    reemplazarHistorial,
     borrarTodoElHistorial,
   };
 }

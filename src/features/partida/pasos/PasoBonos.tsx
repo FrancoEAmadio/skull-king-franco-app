@@ -90,14 +90,14 @@ export function PasoBonos() {
 
       <div className="tarjeta-marron p-3 flex items-center justify-between border-l-4 border-amber-500">
         <div>
-          <span className="text-[10px] text-slate-400 uppercase font-bold block">Puntos totales</span>
+          <span className="text-[11px] text-slate-400 uppercase font-bold block">Puntos totales</span>
           <span className="text-2xl font-black text-white leading-none">
             {jugadorActual.puntos}{' '}
             <span className="text-sm text-amber-300 font-bold">pts</span>
           </span>
         </div>
         <div className="text-right">
-          <span className="text-[10px] text-slate-400 uppercase font-bold block">Ronda</span>
+          <span className="text-[11px] text-slate-400 uppercase font-bold block">Ronda</span>
           <span
             className={`text-lg font-black px-2.5 py-0.5 rounded-full inline-block ${
               puntajeProyectadoActual >= 0

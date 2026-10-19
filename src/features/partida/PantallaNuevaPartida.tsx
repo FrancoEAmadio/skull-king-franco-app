@@ -98,7 +98,7 @@ export function PantallaNuevaPartida() {
     <main className="py-6 flex flex-col gap-6 w-full overflow-y-auto">
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-[10px] uppercase tracking-widest text-amber-400 font-bold block">
+          <span className="text-[11px] uppercase tracking-widest text-amber-400 font-bold block">
             Paso 1 de 5
           </span>
           <h2 className="text-2xl font-bold text-white">Configurar Mesa</h2>

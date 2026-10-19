@@ -79,7 +79,7 @@ export function PanelAlianzasBotin() {
 
       {alianzasBotinRonda.length > 0 && (
         <div className="flex flex-col gap-1.5 mt-2">
-          <span className="text-[10px] text-slate-400 font-bold uppercase">
+          <span className="text-[11px] text-slate-400 font-bold uppercase">
             Alianzas en esta ronda:
           </span>
           {alianzasBotinRonda.map((alianza, idx) => (

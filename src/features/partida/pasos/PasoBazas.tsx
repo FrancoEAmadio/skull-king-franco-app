@@ -25,14 +25,14 @@ export function PasoBazas() {
       <div className="tarjeta-marron p-3.5 flex items-center justify-between border-l-4 border-emerald-500">
         <div>
           <span className="text-xs font-bold text-amber-300 uppercase block">3. Registro de Bazas</span>
-          <span className="text-[10px] text-slate-300 block mt-0.5">
+          <span className="text-[11px] text-slate-300 block mt-0.5">
             Anotá cuántas bazas ganó cada jugador (pueden ser menos si nadie la ganó).
           </span>
         </div>
         <button
           type="button"
           onClick={limpiarBazasRonda}
-          className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-700 font-bold shrink-0"
+          className="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-700 font-bold shrink-0"
         >
           🔄 Limpiar
         </button>
@@ -52,7 +52,7 @@ export function PasoBazas() {
         >
           <div className="flex flex-col gap-0.5">
             <span className="font-black text-white text-base">{jugador.nombre}</span>
-            <span className="text-[10px] font-bold text-amber-300 bg-slate-900/60 border border-slate-800/50 px-1.5 py-0.5 rounded-md w-fit">
+            <span className="text-[11px] font-bold text-amber-300 bg-slate-900/60 border border-slate-800/50 px-1.5 py-0.5 rounded-md w-fit">
               Envite: {jugador.apuesta}
             </span>
           </div>

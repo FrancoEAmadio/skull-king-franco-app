@@ -16,7 +16,7 @@ export function PasoApuestas() {
     <section className="flex flex-col gap-4 flex-1 overflow-y-auto">
       <div className="tarjeta-marron p-3.5">
         <span className="text-xs font-bold text-amber-300 uppercase block">2. Fase de Envites</span>
-        <span className="text-[10px] text-slate-300 block mt-0.5">
+        <span className="text-[11px] text-slate-300 block mt-0.5">
           Anotá cuántas bazas pronostica ganar cada pirata en esta ronda.
         </span>
       </div>

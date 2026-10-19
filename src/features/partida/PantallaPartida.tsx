@@ -48,7 +48,7 @@ export function PantallaPartida() {
           >
             ← Menú
           </button>
-          <span className="text-[10px] uppercase tracking-widest text-amber-400 font-bold">
+          <span className="text-[11px] uppercase tracking-widest text-amber-400 font-bold">
             Partida en curso
           </span>
         </div>
@@ -135,8 +135,8 @@ export function PantallaPartida() {
                   }`}
                 />
                 <span
-                  className={`text-[8px] font-bold uppercase ${
-                    esActual ? 'text-amber-300' : puedeVolver ? 'text-emerald-300' : 'text-slate-500'
+                  className={`text-[11px] font-bold uppercase ${
+                    esActual ? 'text-amber-300' : puedeVolver ? 'text-emerald-300' : 'text-slate-400'
                   }`}
                 >
                   {etiqueta}
@@ -147,7 +147,7 @@ export function PantallaPartida() {
         </div>
 
         {ORDEN_PASOS.indexOf(pasoPartida) > 0 && !partida.partidaFinalizada && (
-          <span className="text-center text-[9px] font-medium text-slate-500">
+          <span className="text-center text-[11px] font-medium text-slate-400">
             Tocá una fase completada para corregir datos anteriores.
           </span>
         )}
@@ -158,7 +158,7 @@ export function PantallaPartida() {
             <button
               type="button"
               onClick={cancelarModificacionRondaAnterior}
-              className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 text-[10px] font-bold text-slate-300 hover:text-white"
+              className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-slate-300 hover:text-white"
             >
               Cancelar corrección
             </button>
