@@ -44,7 +44,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
           🏴‍☠️ Habilidades de Piratas
         </label>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-slate-400 font-bold">
+          <span className="text-[11px] text-slate-400 font-bold">
             {registroHabilidadesRonda.length}/3
           </span>
           <span className="text-amber-400 font-bold text-base px-1">
@@ -55,6 +55,11 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
 
       {abierto && (
         <div className="flex flex-col gap-3 mt-3 pt-3 border-t border-slate-800/80">
+          <p className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-2 text-left text-[11px] leading-relaxed text-slate-300">
+            ℹ️ Regla oficial: la habilidad de un pirata se usa justo después de la baza que ganó con esa carta.
+            Tras la última baza de la ronda solo tiene efecto Harry el Gigante. Si te equivocás de jugador,
+            tocá ✕ en el registro: el envite vuelve a su valor original.
+          </p>
           {bloqueado ? (
             <p className="text-xs text-slate-400 text-center py-2">
               Se alcanzó el límite de 3 habilidades por ronda.
@@ -63,7 +68,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
             <>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col text-left">
-                  <label className="text-[9px] text-slate-400 font-bold uppercase block mb-1">
+                  <label className="text-[11px] text-slate-400 font-bold uppercase block mb-1">
                     Habilidad:
                   </label>
                   <select
@@ -82,7 +87,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
                 </div>
 
                 <div className="flex flex-col text-left">
-                  <label className="text-[9px] text-slate-400 font-bold uppercase block mb-1">
+                  <label className="text-[11px] text-slate-400 font-bold uppercase block mb-1">
                     Pirata que la utilizó:
                   </label>
                   <select
@@ -102,7 +107,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
               {habSeleccionada === 'bribon_rotan' && (
                 <div className="mt-1 flex flex-col gap-2">
                   <div className="flex flex-col text-left">
-                    <label className="text-[9px] text-slate-400 font-bold uppercase block mb-1">
+                    <label className="text-[11px] text-slate-400 font-bold uppercase block mb-1">
                       Apuesta de puntos de riesgo:
                     </label>
                     <select
@@ -155,7 +160,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
               {kongDisponible && habSeleccionada === 'kong' && (
                 <div className="mt-1 flex flex-col gap-2.5">
                   <div className="flex flex-col text-left">
-                    <label className="text-[9px] text-slate-400 font-bold uppercase block mb-1">
+                    <label className="text-[11px] text-slate-400 font-bold uppercase block mb-1">
                       Habilidad copiada por Kong:
                     </label>
                     <select
@@ -174,7 +179,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
 
                   {habHabilidadCopiada === 'Bribón de Roatán' && (
                     <div className="flex flex-col gap-2 text-left">
-                      <label className="text-[9px] text-slate-400 font-bold uppercase block mb-0.5">
+                      <label className="text-[11px] text-slate-400 font-bold uppercase block mb-0.5">
                         Apuesta de puntos copiada:
                       </label>
                       <select
@@ -229,7 +234,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
 
           {registroHabilidadesRonda.length > 0 && (
             <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] text-slate-400 font-bold uppercase">
+              <span className="text-[11px] text-slate-400 font-bold uppercase">
                 Habilidades en esta ronda:
               </span>
               {registroHabilidadesRonda.map((h, idx) => (
@@ -239,14 +244,15 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
                 >
                   <div className="flex flex-col text-left">
                     <span className="font-bold text-purple-300">
-                      {h.etiqueta} <span className="text-slate-400 text-[10px]">({h.jugadorNombre})</span>
+                      {h.etiqueta} <span className="text-slate-400 text-[11px]">({h.jugadorNombre})</span>
                     </span>
-                    <span className="text-[10px] text-slate-300 mt-0.5">{h.detalle}</span>
+                    <span className="text-[11px] text-slate-300 mt-0.5">{h.detalle}</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => eliminarRegistroHabilidad(idx)}
-                    className="text-xs text-red-400 hover:text-red-300 font-bold px-2 py-1 rounded bg-slate-800"
+                    aria-label={`Quitar ${h.etiqueta}`}
+                    className="text-xs text-red-300 hover:text-red-200 font-bold min-h-9 min-w-9 px-2 py-1 rounded bg-slate-800"
                   >
                     ✕
                   </button>

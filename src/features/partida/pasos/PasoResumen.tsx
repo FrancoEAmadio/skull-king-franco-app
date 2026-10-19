@@ -22,7 +22,7 @@ export function PasoResumen() {
         <span className="text-xs font-bold text-amber-300 uppercase block">
           5. Resumen de la Ronda {rondaVisible}
         </span>
-        <span className="text-[10px] text-slate-300 block mt-0.5">
+        <span className="text-[11px] text-slate-300 block mt-0.5">
           {partidaFinalizada
             ? '¡Partida finalizada! Resultados acumulados.'
             : partidaPendienteFinalizar
@@ -56,7 +56,7 @@ export function PasoResumen() {
 
           {res.bonosCobradas && res.bonosCobradas.length > 0 && (
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] text-emerald-400 font-bold uppercase">
+              <span className="text-[11px] text-emerald-400 font-bold uppercase">
                 ✓ Bonificaciones y Apuestas:
               </span>
               {res.bonosCobradas.map((b, i) => (
@@ -82,7 +82,7 @@ export function PasoResumen() {
 
           {res.bonosNoCobradas && res.bonosNoCobradas.length > 0 && (
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] text-slate-400 font-bold uppercase">
+              <span className="text-[11px] text-slate-400 font-bold uppercase">
                 ✕ Bonos no cobrados por fallar envite:
               </span>
               {res.bonosNoCobradas.map((b, i) => (
@@ -101,7 +101,7 @@ export function PasoResumen() {
 
           {res.habilidadesRegistradas && res.habilidadesRegistradas.length > 0 && (
             <div className="flex flex-col gap-1">
-              <span className="text-[10px] text-purple-300 font-bold uppercase">
+              <span className="text-[11px] text-purple-300 font-bold uppercase">
                 🏴‍☠️ Habilidades usadas:
               </span>
               {res.habilidadesRegistradas.map((hab, i) => (
@@ -117,7 +117,7 @@ export function PasoResumen() {
 
           <div className="flex justify-between items-end pt-2 border-t border-slate-800">
             <div className="flex flex-col">
-              <span className="text-[9px] text-slate-400 uppercase font-bold">Total ronda</span>
+              <span className="text-[11px] text-slate-400 uppercase font-bold">Total ronda</span>
               <span
                 className={`font-black text-xl ${
                   res.totalRonda >= 0 ? 'text-emerald-400' : 'text-red-400'
@@ -128,7 +128,7 @@ export function PasoResumen() {
               </span>
             </div>
             <div className="flex flex-col text-right">
-              <span className="text-[9px] text-amber-300/70 uppercase font-bold">Acumulado</span>
+              <span className="text-[11px] text-amber-300/70 uppercase font-bold">Acumulado</span>
               <span className="font-black text-2xl text-amber-400">{res.acumuladoNuevo}</span>
             </div>
           </div>

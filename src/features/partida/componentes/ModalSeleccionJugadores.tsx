@@ -68,7 +68,7 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
         <div className="flex items-center justify-between border-b border-amber-900/60 bg-slate-900 p-4">
           <div>
             <h3 className="text-lg font-black text-amber-300">Seleccionar jugadores</h3>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
               {idsJugadoresSeleccionados.length} de {maximoJugadores} seleccionados
             </span>
           </div>

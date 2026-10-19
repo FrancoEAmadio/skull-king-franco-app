@@ -53,7 +53,7 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
                 e.stopPropagation();
                 limpiarTodosLosEventos();
               }}
-              className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 font-bold"
+              className="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 font-bold"
             >
               🧹 Limpiar
             </button>
@@ -68,7 +68,7 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
         <div className="flex flex-col gap-3 mt-2 pt-2 border-t border-slate-800/80">
           {eventosBase.length > 0 && (
             <div className="flex flex-col gap-1">
-              <span className="text-[9px] text-slate-500 font-bold uppercase">Juego Base / Avanzado</span>
+              <span className="text-[11px] text-slate-400 font-bold uppercase">Juego Base / Avanzado</span>
               {eventosBase.map((evento) => (
                 <FilaEvento
                   key={evento.id}
@@ -84,7 +84,7 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
 
           {eventosExpansion.length > 0 && (
             <div className="flex flex-col gap-1">
-              <span className="text-[9px] text-purple-400/70 font-bold uppercase">Expansión</span>
+              <span className="text-[11px] text-purple-400/70 font-bold uppercase">Expansión</span>
               {eventosExpansion.map((evento) => (
                 <FilaEvento
                   key={evento.id}
@@ -121,7 +121,7 @@ function FilaEvento({ evento, cantidad, maximo, onCambiar, onBorrar }: FilaEvent
       <div className="flex flex-col flex-1 min-w-0">
         <span className={`text-[11px] font-semibold truncate ${colorTexto}`}>
           {evento.etiqueta}{' '}
-          <span className="text-[9px] text-amber-400 font-bold">
+          <span className="text-[11px] text-amber-400 font-bold">
             +{evento.puntos} pts · máx {maximo}
           </span>
         </span>
@@ -131,7 +131,7 @@ function FilaEvento({ evento, cantidad, maximo, onCambiar, onBorrar }: FilaEvent
           <button
             type="button"
             onClick={onBorrar}
-            className="text-[10px] text-red-400 hover:text-red-300 font-bold px-1.5 py-0.5 rounded bg-slate-800"
+            className="text-[11px] text-red-400 hover:text-red-300 font-bold px-1.5 py-0.5 rounded bg-slate-800"
             title="Borrar"
           >
             ✕
@@ -143,7 +143,7 @@ function FilaEvento({ evento, cantidad, maximo, onCambiar, onBorrar }: FilaEvent
           onIncrementar={() => onCambiar(1)}
           decrementarDisabled={cantidad <= 0}
           incrementarDisabled={enMaximo}
-          colorValor={estaEnCero ? 'text-slate-500' : 'text-amber-300'}
+          colorValor={estaEnCero ? 'text-slate-400' : 'text-amber-300'}
           tamanoBoton="sm"
           resaltar={!estaEnCero}
         />

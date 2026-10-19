@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { calcularPromedioPuntos } from '../../dominio/estadisticas';
+import { calcularRendimientos, construirSeriesEvolucion } from '../../dominio/comparativas';
+import { GraficoEvolucion } from '../../ui/GraficoEvolucion';
 import type { JugadorPermanente } from '../../tipos';
 import { ModalConfirmarEliminacionJugador } from './ModalConfirmarEliminacionJugador';
 
@@ -116,7 +118,7 @@ export function PantallaJugadores() {
                   <>
                     <button onClick={() => verEstadisticasJugador(jug)} className="flex-1 text-left">
                       <span className="font-black text-white text-base block">🏴‍☠️ {jug.nombre}</span>
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[11px] text-slate-400">
                         {jug.estadisticas.partidasJugadas} partida
                         {jug.estadisticas.partidasJugadas === 1 ? '' : 's'} · 🏆{' '}
                         {jug.estadisticas.victorias} · Prom. {calcularPromedioPuntos(jug)} pts
@@ -149,6 +151,7 @@ export function PantallaJugadores() {
 
       {vista === 'estadisticas' && (
         <div className="flex flex-col gap-3">
+          <TablaComparativa />
           {jugadoresPermanentes.length === 0 ? (
             <div className="tarjeta-marron p-8 text-center text-slate-300 text-sm">
               Creá tarjetas de jugadores para ver sus estadísticas.
@@ -162,13 +165,13 @@ export function PantallaJugadores() {
               >
                 <div>
                   <span className="font-black text-white text-base block">🏴‍☠️ {jug.nombre}</span>
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[11px] text-slate-400">
                     {jug.estadisticas.partidasJugadas} partidas · 🥇 {jug.estadisticas.victorias} · 🥈{' '}
                     {jug.estadisticas.segundoPuesto} · 🥉 {jug.estadisticas.tercerPuesto}
                   </span>
                 </div>
                 <span className="text-amber-300 font-black text-lg">
-                  {calcularPromedioPuntos(jug)} <span className="text-[10px] font-normal">pts prom.</span>
+                  {calcularPromedioPuntos(jug)} <span className="text-[11px] font-normal">pts prom.</span>
                 </span>
               </button>
             ))
@@ -187,9 +190,99 @@ export function PantallaJugadores() {
   );
 }
 
+function TablaComparativa() {
+  const { jugadoresPermanentes, partida, verEstadisticasJugador } = useApp();
+  const rendimientos = useMemo(
+    () =>
+      calcularRendimientos(partida.historialPartidas, jugadoresPermanentes)
+        .filter((r) => r.partidas > 0)
+        .sort(
+          (a, b) =>
+            b.porcentajeVictorias - a.porcentajeVictorias ||
+            b.promedioPuntos - a.promedioPuntos ||
+            a.nombre.localeCompare(b.nombre)
+        ),
+    [partida.historialPartidas, jugadoresPermanentes]
+  );
+
+  if (rendimientos.length === 0) return null;
+
+  return (
+    <section className="tarjeta-marron p-3.5">
+      <h3 className="mb-1 text-sm font-black text-amber-300">⚔️ Comparativa de la tripulación</h3>
+      <p className="mb-3 text-[11px] leading-relaxed text-slate-400">
+        Ordenada por victorias y puntos. Tocá un nombre para ver su perfil completo contra el resto.
+      </p>
+      <div className="-mx-1 overflow-x-auto">
+        <table className="w-full min-w-[19rem] border-collapse text-xs">
+          <thead>
+            <tr className="text-left text-[11px] uppercase tracking-wide text-slate-400">
+              <th className="px-1 pb-2 font-bold">Pirata</th>
+              <th className="px-1 pb-2 text-right font-bold">PJ</th>
+              <th className="px-1 pb-2 text-right font-bold">Vict.</th>
+              <th className="px-1 pb-2 text-right font-bold">Prom.</th>
+              <th className="px-1 pb-2 text-right font-bold">Envites</th>
+              <th className="px-1 pb-2 text-right font-bold">Racha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rendimientos.map((r) => {
+              const tarjeta = jugadoresPermanentes.find(
+                (j) => r.clave === `id:${j.id}` || r.clave === `n:${j.nombre.trim().toLowerCase()}`
+              );
+              return (
+                <tr key={r.clave} className="border-t border-slate-800">
+                  <td className="max-w-[7rem] px-1 py-2 font-bold text-white">
+                    {tarjeta ? (
+                      <button
+                        type="button"
+                        onClick={() => verEstadisticasJugador(tarjeta)}
+                        className="block max-w-full truncate text-left text-amber-200 underline decoration-dotted underline-offset-2"
+                      >
+                        {r.nombre}
+                      </button>
+                    ) : (
+                      <span className="block truncate">{r.nombre}</span>
+                    )}
+                  </td>
+                  <td className="px-1 py-2 text-right text-slate-300">{r.partidas}</td>
+                  <td className="px-1 py-2 text-right text-slate-300">
+                    {r.victorias} <span className="text-slate-400">({r.porcentajeVictorias}%)</span>
+                  </td>
+                  <td className="px-1 py-2 text-right font-bold text-white">{r.promedioPuntos}</td>
+                  <td className="px-1 py-2 text-right text-slate-300">{r.precisionEnvites}%</td>
+                  <td className="px-1 py-2 text-right text-slate-300">{r.mejorRacha}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function GraficoPartidaHistorial({
+  jugadores,
+}: {
+  jugadores: { nombre: string; historial: import('../../tipos').EntradaHistorialRonda[] }[];
+}) {
+  const evolucion = useMemo(() => construirSeriesEvolucion(jugadores), [jugadores]);
+  return <GraficoEvolucion series={evolucion.series} etiquetas={evolucion.etiquetas} />;
+}
+
 function VistaHistorial() {
   const { partida, verHistorialJugador } = useApp();
   const { historialPartidas, eliminarPartidaHistorial, borrarTodoElHistorial } = partida;
+  const [graficosAbiertos, setGraficosAbiertos] = useState<Set<number>>(new Set());
+
+  const alternarGrafico = (indice: number) =>
+    setGraficosAbiertos((previos) => {
+      const siguiente = new Set(previos);
+      if (siguiente.has(indice)) siguiente.delete(indice);
+      else siguiente.add(indice);
+      return siguiente;
+    });
 
   return (
     <div className="flex flex-col gap-4">
@@ -235,12 +328,27 @@ function VistaHistorial() {
                       {jIndex === 0 ? '🥇' : jIndex === 1 ? '🥈' : jIndex === 2 ? '🥉' : `${jIndex + 1}.`}{' '}
                       {jug.nombre}
                     </span>
-                    <span className="text-[9px] opacity-75">🔍 Toca para ver historial</span>
+                    <span className="text-[11px] opacity-80">🔍 Tocá para ver historial</span>
                   </div>
                   <span className="font-extrabold text-amber-300">{jug.puntos} pts</span>
                 </div>
               ))}
             </div>
+            {partidaGuardada.ranking.some((jug) => jug.historial.length > 1) && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => alternarGrafico(hIndex)}
+                  aria-expanded={graficosAbiertos.has(hIndex)}
+                  className="btn-marron-oscuro rounded-xl py-2.5 text-xs"
+                >
+                  {graficosAbiertos.has(hIndex) ? '▲ Ocultar evolución' : '📈 Ver evolución por ronda'}
+                </button>
+                {graficosAbiertos.has(hIndex) && (
+                  <GraficoPartidaHistorial jugadores={partidaGuardada.ranking} />
+                )}
+              </>
+            )}
           </div>
         ))
       )}

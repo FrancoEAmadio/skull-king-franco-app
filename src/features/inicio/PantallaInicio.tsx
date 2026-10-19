@@ -1,7 +1,7 @@
 import { useApp } from '../../estado/AppProvider';
 
 export function PantallaInicio() {
-  const { setPantallaActual, partida } = useApp();
+  const { setPantallaActual, partida, setAjustesAbiertos } = useApp();
 
   return (
     <main className="flex flex-col items-center justify-center my-auto text-center py-4 w-full">
@@ -47,6 +47,12 @@ export function PantallaInicio() {
           className="w-full py-4 btn-marron-oscuro text-lg rounded-2xl font-semibold"
         >
           📖 Manual, Cartas y Reglas
+        </button>
+        <button
+          onClick={() => setAjustesAbiertos(true)}
+          className="w-full py-3 btn-marron-oscuro text-sm rounded-2xl font-semibold text-slate-200"
+        >
+          💾 Copia de seguridad e información
         </button>
       </div>
     </main>

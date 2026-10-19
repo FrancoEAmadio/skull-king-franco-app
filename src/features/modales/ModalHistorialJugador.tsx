@@ -78,7 +78,7 @@ export function ModalHistorialJugador() {
                   ))}
 
                   {ronda.bonosNoCobradas.map((b, i) => (
-                    <div key={`bn-${i}`} className="flex justify-between text-slate-500 line-through">
+                    <div key={`bn-${i}`} className="flex justify-between text-slate-400 line-through">
                       <span>{b.etiqueta}:</span>
                       <span>+{b.subtotal} pts</span>
                     </div>
@@ -87,7 +87,7 @@ export function ModalHistorialJugador() {
 
                 <div className="mt-2 pt-2 border-t border-slate-700/80 pl-3 flex justify-between items-end">
                   <div>
-                    <span className="text-[9px] text-slate-400 uppercase font-bold">
+                    <span className="text-[11px] text-slate-400 uppercase font-bold">
                       Total ronda
                     </span>
                     <span
@@ -100,7 +100,7 @@ export function ModalHistorialJugador() {
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[9px] text-amber-300/70 uppercase font-bold">
+                    <span className="text-[11px] text-amber-300/70 uppercase font-bold">
                       Acumulado
                     </span>
                     <span className="font-black text-xl text-amber-400 block">

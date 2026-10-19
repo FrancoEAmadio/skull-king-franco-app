@@ -8,28 +8,29 @@ import { ModalPodio } from './features/modales/ModalPodio';
 import { ModalHistorialJugador } from './features/modales/ModalHistorialJugador';
 import { ModalEstadisticasJugador } from './features/modales/ModalEstadisticasJugador';
 import { ModalMenuHamburguesa } from './features/modales/ModalMenuHamburguesa';
+import { ModalAjustes } from './features/ajustes/ModalAjustes';
+import { InsigniaAutoria } from './ui/InsigniaAutoria';
 
 function ContenidoApp() {
   const { pantallaActual } = useApp();
 
   return (
-    <div className="max-w-md mx-auto min-h-screen flex flex-col justify-between p-4">
+    <div className="contenedor-app max-w-md mx-auto min-h-dvh flex flex-col justify-between">
       {pantallaActual === 'inicio' && <PantallaInicio />}
       {pantallaActual === 'nueva_partida' && <PantallaNuevaPartida />}
       {pantallaActual === 'partida' && <PantallaPartida />}
       {pantallaActual === 'jugadores' && <PantallaJugadores />}
       {pantallaActual === 'reglas' && <PantallaReglas />}
 
-      <footer className="mt-6 py-3 text-center border-t border-slate-800/80 w-full">
-        <p className="text-[11px] text-slate-500 font-medium">
-          Desarrollado por FrancoEAmadio y MATEAV23 © 2026
-        </p>
+      <footer className="mt-6 w-full border-t border-slate-800/80 py-4">
+        <InsigniaAutoria />
       </footer>
 
       <ModalPodio />
       <ModalHistorialJugador />
       <ModalEstadisticasJugador />
       <ModalMenuHamburguesa />
+      <ModalAjustes />
     </div>
   );
 }

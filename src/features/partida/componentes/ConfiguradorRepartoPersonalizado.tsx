@@ -80,7 +80,7 @@ export function ConfiguradorRepartoPersonalizado({
       {paso === 'rondas' ? (
         <div className="flex flex-col gap-5">
           <div>
-            <span className="text-[10px] uppercase tracking-widest text-amber-400 font-bold block">
+            <span className="text-[11px] uppercase tracking-widest text-amber-400 font-bold block">
               Paso 1 de 2
             </span>
             <p className="text-sm text-slate-300 mt-1">
@@ -99,7 +99,7 @@ export function ConfiguradorRepartoPersonalizado({
             />
           </div>
 
-          <span className="text-[10px] text-slate-400 text-center">
+          <span className="text-[11px] text-slate-400 text-center">
             Mínimo 1, máximo {maxRondas} rondas
           </span>
 
@@ -114,7 +114,7 @@ export function ConfiguradorRepartoPersonalizado({
       ) : (
         <div className="flex flex-col gap-4">
           <div>
-            <span className="text-[10px] uppercase tracking-widest text-amber-400 font-bold block">
+            <span className="text-[11px] uppercase tracking-widest text-amber-400 font-bold block">
               Paso 2 de 2
             </span>
             <p className="text-sm text-slate-300 mt-1">

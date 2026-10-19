@@ -170,7 +170,7 @@ export function PantallaReglas() {
                           className="w-full text-left font-bold text-white flex justify-between items-center py-1"
                         >
                           <span>{regla.titulo}</span>
-                          <span className="text-[10px] text-amber-400 font-normal">
+                          <span className="text-[11px] text-amber-400 font-normal">
                             {abierta ? '−' : '+'}
                           </span>
                         </button>
@@ -198,7 +198,7 @@ export function PantallaReglas() {
             <article key={carta.id} className="tarjeta-marron p-3.5 flex flex-col gap-3">
               <div className="flex items-start justify-between">
                 <span
-                  className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${estiloBadgeModo(
+                  className={`text-[11px] font-extrabold px-2 py-0.5 rounded-md border ${estiloBadgeModo(
                     carta.modo
                   )}`}
                 >
