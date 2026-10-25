@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
+import { useWakeLock } from '../../ui/useWakeLock';
+import { ModalAviso } from '../../ui/ModalAviso';
 import { PasoApuestas } from './pasos/PasoApuestas';
 import { PasoBazas } from './pasos/PasoBazas';
 import { PasoBonos } from './pasos/PasoBonos';
@@ -6,16 +9,14 @@ import { PasoResumen } from './pasos/PasoResumen';
 import type { PasoPartida } from '../../tipos';
 
 const PASOS: [PasoPartida, string][] = [
-  ['apuestas', '2. Envite'],
-  ['bazas', '3. Bazas'],
-  ['bonos', '4. Bonos'],
-  ['resumen', '5. Resumen'],
+  ['apuestas', 'Envite'],
+  ['bazas', 'Bazas'],
+  ['bonos', 'Bonos'],
+  ['resumen', 'Resumen'],
 ];
 
-const ORDEN_PASOS: PasoPartida[] = ['apuestas', 'bazas', 'bonos', 'resumen'];
-
 export function PantallaPartida() {
-  const { partida, setMenuHamburguesaAbierto, abrirPodio, setPantallaActual } = useApp();
+  const { partida, ajustes, setMenuHamburguesaAbierto, abrirPodio } = useApp();
   const {
     rondaActual,
     rondaVisible,
@@ -32,89 +33,97 @@ export function PantallaPartida() {
     cancelarModificacionRondaAnterior,
   } = partida;
 
+  useWakeLock(ajustes.mantenerPantallaEncendida);
+  const [avisoRonda, setAvisoRonda] = useState<number | null>(null);
+
   const jugadorInicial = jugadores[indiceJugadorInicial];
-  const indiceReparte = indiceJugadorInicial > 0
-    ? indiceJugadorInicial - 1
-    : jugadores.length - 1;
+  const indiceReparte = indiceJugadorInicial > 0 ? indiceJugadorInicial - 1 : jugadores.length - 1;
   const jugadorReparte = jugadores[indiceReparte];
 
+  const tocarRonda = (numero: number) => {
+    if (numero === rondaVisible - 1 && puedeModificarRondaAnterior) {
+      iniciarModificacionRondaAnterior();
+      return;
+    }
+    if (numero < rondaVisible) setAvisoRonda(numero);
+  };
+
   return (
-    <main className="py-4 flex flex-col gap-4 w-full flex-1 overflow-hidden">
+    <main className="flex w-full flex-1 flex-col gap-3 py-3">
       <header className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => setPantallaActual('inicio')}
-            className="text-sm text-amber-300 hover:text-white font-bold"
+            type="button"
+            onClick={() => setMenuHamburguesaAbierto(true)}
+            aria-label="Abrir menú de la partida"
+            className="btn-marron-oscuro flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-amber-300"
           >
-            ← Menú
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
-          <span className="text-[11px] uppercase tracking-widest text-amber-400 font-bold">
-            Partida en curso
-          </span>
+          <div className="min-w-0 flex-1 text-center">
+            <h2 className="titulo-pirata whitespace-nowrap text-2xl leading-none text-amber-300">
+              Ronda {rondaVisible} <span className="text-slate-300">de {totalRondas}</span>
+            </h2>
+            <span className="text-base font-bold text-white">
+              {cartasPorJugadorVisibles} carta{cartasPorJugadorVisibles > 1 ? 's' : ''} en juego
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={abrirPodio}
+            aria-label="Ver podio y puntajes"
+            className="flex h-12 shrink-0 items-center gap-1.5 rounded-xl border border-emerald-500/60 bg-emerald-950/80 px-3 text-base font-bold text-emerald-200"
+          >
+            🏆 Podio
+          </button>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMenuHamburguesaAbierto(true)}
-              className="p-2 bg-slate-900 border border-slate-800 rounded-xl text-amber-300 hover:text-white"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-            <div>
-              <span className="text-xs uppercase tracking-widest text-amber-300 font-bold block">
-                Ronda {rondaVisible} / {totalRondas}
-              </span>
-              <h2 className="text-lg font-extrabold text-white leading-tight">
-                {cartasPorJugadorVisibles} carta{cartasPorJugadorVisibles > 1 ? 's' : ''} en juego
-              </h2>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {puedeModificarRondaAnterior && (
+        {/* Rondas: tocá la anterior para corregirla */}
+        <div className="scroll-oculto -mx-1 flex gap-2 overflow-x-auto px-1 py-1" aria-label="Rondas">
+          {Array.from({ length: totalRondas }, (_, i) => i + 1).map((numero) => {
+            const esActual = numero === rondaVisible;
+            const esPasada = numero < rondaVisible;
+            const esCorregible = numero === rondaVisible - 1 && puedeModificarRondaAnterior;
+            return (
               <button
-                onClick={iniciarModificacionRondaAnterior}
-                className="btn-secundario-retroceder"
-                title="Modificar ronda inmediatamente anterior"
+                key={numero}
+                type="button"
+                disabled={!esPasada}
+                onClick={() => tocarRonda(numero)}
+                aria-current={esActual ? 'step' : undefined}
+                aria-label={
+                  esActual ? `Ronda ${numero}, en curso` : esPasada ? `Corregir ronda ${numero}` : `Ronda ${numero}`
+                }
+                className={`flex h-12 min-w-12 shrink-0 items-center justify-center rounded-full text-xl font-black ${
+                  esActual
+                    ? 'ficha-elegida !h-12 !w-12 !text-xl'
+                    : esCorregible
+                      ? 'border-2 border-amber-300 bg-amber-950/60 text-amber-200'
+                      : esPasada
+                        ? 'border border-emerald-600/70 bg-emerald-950/60 text-emerald-300'
+                        : 'border border-slate-700 bg-slate-900/60 text-slate-500'
+                }`}
               >
-                ↩ Modificar R{rondaActual - 1}
+                {numero}
               </button>
-            )}
-            <button
-              onClick={abrirPodio}
-              className="text-xs bg-emerald-950/80 border border-emerald-600/70 text-emerald-200 px-3.5 py-2.5 rounded-xl font-bold shadow-sm hover:bg-emerald-900 transition-all"
-            >
-              🏆 Podio
-            </button>
-          </div>
+            );
+          })}
         </div>
 
         {pasoPartida !== 'resumen' && jugadorInicial && jugadorReparte && (
-          <div className="flex items-center justify-between tarjeta-marron p-2.5 text-xs">
-            <div className="text-amber-300 font-semibold">
-              ⚓ Arranca: <strong className="text-white">{jugadorInicial.nombre}</strong>
+          <div className="tarjeta-marron flex items-center justify-between gap-2 px-4 py-3 text-base">
+            <div className="font-semibold text-amber-300">
+              ⚓ Arranca <strong className="text-white">{jugadorInicial.nombre}</strong>
             </div>
-            <div className="text-slate-300">
-              🃏 Reparte: <strong className="text-white">{jugadorReparte.nombre}</strong>
+            <div className="font-semibold text-slate-300">
+              🃏 Reparte <strong className="text-white">{jugadorReparte.nombre}</strong>
             </div>
           </div>
         )}
 
-        <div className="flex items-center justify-between px-1">
+        <div className="flex items-stretch gap-2">
           {PASOS.map(([pasoId, etiqueta]) => {
             const esActual = pasoPartida === pasoId;
             const puedeVolver = puedeIrAPasoAnterior(pasoId);
@@ -124,18 +133,15 @@ export function PantallaPartida() {
                 type="button"
                 onClick={() => irAPasoAnterior(pasoId)}
                 disabled={!puedeVolver}
-                title={puedeVolver ? `Volver a ${etiqueta}` : undefined}
-                className={`flex flex-1 flex-col items-center gap-1 rounded-lg px-0.5 py-1 ${
-                  puedeVolver ? 'cursor-pointer hover:bg-slate-800/70' : 'cursor-default'
-                }`}
+                className="flex flex-1 flex-col items-center gap-1.5 rounded-lg py-1"
               >
                 <span
-                  className={`h-1.5 w-full rounded-full ${
-                    esActual ? 'bg-amber-400' : puedeVolver ? 'bg-emerald-600' : 'bg-slate-800'
+                  className={`h-2 w-full rounded-full ${
+                    esActual ? 'bg-amber-400' : puedeVolver ? 'bg-emerald-500' : 'bg-slate-700'
                   }`}
                 />
                 <span
-                  className={`text-[11px] font-bold uppercase ${
+                  className={`text-base font-bold ${
                     esActual ? 'text-amber-300' : puedeVolver ? 'text-emerald-300' : 'text-slate-400'
                   }`}
                 >
@@ -146,21 +152,15 @@ export function PantallaPartida() {
           })}
         </div>
 
-        {ORDEN_PASOS.indexOf(pasoPartida) > 0 && !partida.partidaFinalizada && (
-          <span className="text-center text-[11px] font-medium text-slate-400">
-            Tocá una fase completada para corregir datos anteriores.
-          </span>
-        )}
-
         {editandoRondaAnterior && (
-          <div className="flex items-center justify-between rounded-xl border border-amber-700/60 bg-amber-950/40 px-3 py-2">
-            <span className="text-xs font-bold text-amber-200">Editando Ronda {rondaActual}</span>
+          <div className="flex items-center justify-between gap-2 rounded-xl border border-amber-500/70 bg-amber-950/50 px-4 py-3">
+            <span className="text-base font-bold text-amber-200">Corrigiendo la ronda {rondaActual}</span>
             <button
               type="button"
               onClick={cancelarModificacionRondaAnterior}
-              className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 text-[11px] font-bold text-slate-300 hover:text-white"
+              className="btn-marron-oscuro rounded-lg px-3 py-2 text-base font-bold"
             >
-              Cancelar corrección
+              Cancelar
             </button>
           </div>
         )}
@@ -170,6 +170,14 @@ export function PantallaPartida() {
       {pasoPartida === 'bazas' && <PasoBazas />}
       {pasoPartida === 'bonos' && <PasoBonos />}
       {pasoPartida === 'resumen' && <PasoResumen />}
+
+      <ModalAviso
+        abierto={avisoRonda !== null}
+        titulo={`Ronda ${avisoRonda ?? ''}`}
+        mensaje="Por ahora solo se puede corregir la ronda inmediatamente anterior a la que estás jugando."
+        textoBoton="Entendido"
+        onCerrar={() => setAvisoRonda(null)}
+      />
     </main>
   );
 }

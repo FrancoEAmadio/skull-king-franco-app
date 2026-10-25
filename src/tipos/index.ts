@@ -88,8 +88,11 @@ export interface ResumenRondaJugador extends EntradaHistorialRonda {
 export interface Jugador {
   permanenteId: string;
   nombre: string;
+  avatar?: string;
   puntos: number;
   apuesta: number;
+  /** true cuando el jugador ya tocó su envite en esta ronda (evita confirmar con un 0 sin querer). */
+  apuestaElegida?: boolean;
   ganadas: number;
   modoEnvite: ModoEnvite;
   bribonHabilidadPts: number | null;
@@ -176,6 +179,7 @@ export interface EntradaEvolucion {
 export interface JugadorPermanente {
   id: string;
   nombre: string;
+  avatar?: string;
   estadisticas: EstadisticasJugador;
   evolucion: EntradaEvolucion[];
 }
@@ -195,6 +199,7 @@ export interface EntradaHistorialPartida {
 
 export interface BackupRondaJugador {
   apuesta: number;
+  apuestaElegida?: boolean;
   ganadas: number;
   modoEnvite: ModoEnvite;
   bribonHabilidadPts: number | null;

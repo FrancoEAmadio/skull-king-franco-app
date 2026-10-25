@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ContadorMasMenos } from '../../../ui/ContadorMasMenos';
+import { FichasNumero } from '../../../ui/FichasNumero';
 import { CARTAS_POR_RONDA_DEFECTO } from '../../../constantes';
 
 interface Props {
@@ -67,11 +67,11 @@ export function ConfiguradorRepartoPersonalizado({
   return (
     <section className="tarjeta-marron p-4 flex flex-col gap-4">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h2 className="text-lg font-bold text-white">Reparto personalizado</h2>
+        <h2 className="text-xl font-bold text-white">Reparto personalizado</h2>
         <button
           type="button"
           onClick={onCancelar}
-          className="text-xs font-bold text-amber-300 hover:text-white"
+          className="text-sm font-bold text-amber-300 hover:text-white"
         >
           Cancelar
         </button>
@@ -80,26 +80,23 @@ export function ConfiguradorRepartoPersonalizado({
       {paso === 'rondas' ? (
         <div className="flex flex-col gap-5">
           <div>
-            <span className="text-[11px] uppercase tracking-widest text-amber-400 font-bold block">
+            <span className="text-sm uppercase tracking-widest text-amber-400 font-bold block">
               Paso 1 de 2
             </span>
-            <p className="text-sm text-slate-300 mt-1">
+            <p className="text-base text-slate-300 mt-1">
               ¿Cuántas rondas tendrá la partida?
             </p>
           </div>
 
-          <div className="flex justify-center py-2">
-            <ContadorMasMenos
-              valor={cantidadRondas}
-              colorValor="text-amber-300"
-              onDecrementar={() => ajustarCantidadRondas(cantidadRondas - 1)}
-              onIncrementar={() => ajustarCantidadRondas(cantidadRondas + 1)}
-              decrementarDisabled={cantidadRondas <= 1}
-              incrementarDisabled={cantidadRondas >= maxRondas}
-            />
-          </div>
+          <FichasNumero
+            etiqueta="Cantidad de rondas"
+            min={1}
+            max={maxRondas}
+            valor={cantidadRondas}
+            onElegir={ajustarCantidadRondas}
+          />
 
-          <span className="text-[11px] text-slate-400 text-center">
+          <span className="text-sm text-slate-400 text-center">
             Mínimo 1, máximo {maxRondas} rondas
           </span>
 
@@ -114,10 +111,10 @@ export function ConfiguradorRepartoPersonalizado({
       ) : (
         <div className="flex flex-col gap-4">
           <div>
-            <span className="text-[11px] uppercase tracking-widest text-amber-400 font-bold block">
+            <span className="text-sm uppercase tracking-widest text-amber-400 font-bold block">
               Paso 2 de 2
             </span>
-            <p className="text-sm text-slate-300 mt-1">
+            <p className="text-base text-slate-300 mt-1">
               Configurá las cartas por ronda:
             </p>
           </div>
@@ -126,19 +123,17 @@ export function ConfiguradorRepartoPersonalizado({
             {cartasPorRonda.map((cantidad, indice) => (
               <div
                 key={indice}
-                className="flex items-center justify-between py-2.5 border-b border-slate-800/60 last:border-b-0"
+                className="flex flex-col gap-2 py-3 border-b border-slate-800/60 last:border-b-0"
               >
-                <span className="text-sm font-bold text-slate-200">
+                <span className="text-base font-bold text-slate-200">
                   Ronda - {indice + 1}
                 </span>
-                <ContadorMasMenos
-                  tamanoBoton="sm"
-                  colorValor="text-amber-300"
+                <FichasNumero
+                  etiqueta={`Cartas de la ronda ${indice + 1}`}
+                  min={1}
+                  max={maxCartasPorRonda}
                   valor={cantidad}
-                  onDecrementar={() => cambiarCartasRonda(indice, cantidad - 1)}
-                  onIncrementar={() => cambiarCartasRonda(indice, cantidad + 1)}
-                  decrementarDisabled={cantidad <= 1}
-                  incrementarDisabled={cantidad >= maxCartasPorRonda}
+                  onElegir={(numero) => cambiarCartasRonda(indice, numero)}
                 />
               </div>
             ))}

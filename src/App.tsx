@@ -9,7 +9,6 @@ import { ModalHistorialJugador } from './features/modales/ModalHistorialJugador'
 import { ModalEstadisticasJugador } from './features/modales/ModalEstadisticasJugador';
 import { ModalMenuHamburguesa } from './features/modales/ModalMenuHamburguesa';
 import { ModalAjustes } from './features/ajustes/ModalAjustes';
-import { InsigniaAutoria } from './ui/InsigniaAutoria';
 
 function ContenidoApp() {
   const { pantallaActual } = useApp();
@@ -22,8 +21,8 @@ function ContenidoApp() {
       {pantallaActual === 'jugadores' && <PantallaJugadores />}
       {pantallaActual === 'reglas' && <PantallaReglas />}
 
-      <footer className="mt-6 w-full border-t border-slate-800/80 py-4">
-        <InsigniaAutoria />
+      <footer className="pie-pagina mt-6 w-full border-t border-slate-700 pt-3 text-center">
+        <p className="text-base font-semibold text-slate-300">Desarrollado por Franco Ezequiel Amadio</p>
       </footer>
 
       <ModalPodio />

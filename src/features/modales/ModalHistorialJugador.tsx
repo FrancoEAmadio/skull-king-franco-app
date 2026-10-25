@@ -17,16 +17,16 @@ export function ModalHistorialJugador() {
         <>
           <div className="flex justify-between items-center bg-slate-900 border-b border-amber-900/60 p-4 shrink-0 shadow-md">
             <div>
-              <h3 className="text-sm font-black text-amber-300 tracking-widest uppercase">
+              <h3 className="text-base font-black text-amber-300 tracking-widest uppercase">
                 Auditoría de Puntaje
               </h3>
-              <span className="text-white font-bold text-2xl">
+              <span className="text-white font-bold text-3xl">
                 {jugadorViendoHistorial.nombre}
               </span>
             </div>
             <button
               onClick={cerrarHistorialJugador}
-              className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl w-10 h-10 flex items-center justify-center font-bold text-xl"
+              className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl w-10 h-10 flex items-center justify-center font-bold text-2xl"
             >
               ✕
             </button>
@@ -36,7 +36,7 @@ export function ModalHistorialJugador() {
             {(jugadorViendoHistorial.historial as EntradaHistorialRonda[]).map((ronda) => (
               <div
                 key={ronda.ronda}
-                className="bg-slate-900 border border-slate-700 p-3.5 rounded-xl text-xs relative shadow-lg"
+                className="bg-slate-900 border border-slate-700 p-3.5 rounded-xl text-sm relative shadow-lg"
               >
                 <div
                   className={`absolute left-0 top-0 bottom-0 w-1.5 ${
@@ -44,11 +44,11 @@ export function ModalHistorialJugador() {
                   }`}
                 />
                 <div className="flex justify-between items-center border-b border-slate-700/60 pb-2 mb-2 pl-3">
-                  <span className="font-black text-amber-400 text-lg">
+                  <span className="font-black text-amber-400 text-xl">
                     RONDA {ronda.ronda}
                   </span>
                   <span
-                    className={`font-bold text-xs px-2 py-0.5 rounded ${
+                    className={`font-bold text-sm px-2 py-0.5 rounded ${
                       ronda.acierto
                         ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
                         : 'bg-red-950 text-red-400 border border-red-800'
@@ -87,11 +87,11 @@ export function ModalHistorialJugador() {
 
                 <div className="mt-2 pt-2 border-t border-slate-700/80 pl-3 flex justify-between items-end">
                   <div>
-                    <span className="text-[11px] text-slate-400 uppercase font-bold">
+                    <span className="text-sm text-slate-400 uppercase font-bold">
                       Total ronda
                     </span>
                     <span
-                      className={`font-black text-lg block ${
+                      className={`font-black text-xl block ${
                         ronda.totalRonda >= 0 ? 'text-emerald-400' : 'text-red-400'
                       }`}
                     >
@@ -100,10 +100,10 @@ export function ModalHistorialJugador() {
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[11px] text-amber-300/70 uppercase font-bold">
+                    <span className="text-sm text-amber-300/70 uppercase font-bold">
                       Acumulado
                     </span>
-                    <span className="font-black text-xl text-amber-400 block">
+                    <span className="font-black text-2xl text-amber-400 block">
                       {ronda.acumuladoNuevo}
                     </span>
                   </div>

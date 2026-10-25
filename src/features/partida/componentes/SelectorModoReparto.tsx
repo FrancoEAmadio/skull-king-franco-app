@@ -28,14 +28,14 @@ export function SelectorModoReparto({
 
   return (
     <section className="tarjeta-marron p-4">
-      <label className="block text-xs uppercase tracking-wider text-amber-300 font-bold mb-3">
+      <label className="block text-sm uppercase tracking-wider text-amber-300 font-bold mb-3">
         🃏 Modo de Reparto de Cartas
       </label>
 
       <select
         value={configuracion.modoReparto}
         onChange={(e) => onCambiarModo(e.target.value as ModoRepartoId)}
-        className="w-full font-bold text-xs sm:text-sm"
+        className="w-full font-bold text-sm sm:text-base"
       >
         {MODOS_REPARTO.map((modo) => (
           <option key={modo.id} value={modo.id}>
@@ -44,9 +44,9 @@ export function SelectorModoReparto({
         ))}
       </select>
 
-      <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">{modoSeleccionado?.descripcion}</p>
+      <p className="text-sm text-slate-400 mt-2 leading-relaxed">{modoSeleccionado?.descripcion}</p>
 
-      <div className="mt-2 p-2.5 bg-slate-900/90 border border-amber-900/40 rounded-xl flex items-center justify-between text-xs">
+      <div className="mt-2 p-2.5 bg-slate-900/90 border border-amber-900/40 rounded-xl flex items-center justify-between text-sm">
         <span className="text-slate-300 font-semibold">Esta partida tendrá:</span>
         <span className="font-black text-amber-300 text-right ml-3">
           {vistaPrevia.length} ronda{vistaPrevia.length === 1 ? '' : 's'} ({textoVistaPrevia(vistaPrevia)}{' '}
@@ -58,7 +58,7 @@ export function SelectorModoReparto({
         <button
           type="button"
           onClick={onConfigurarPersonalizado}
-          className="w-full mt-3 py-3 btn-marron-oscuro rounded-2xl font-bold text-sm border border-amber-700/50 hover:border-amber-500/50"
+          className="w-full mt-3 py-3 btn-marron-oscuro rounded-2xl font-bold text-base border border-amber-700/50 hover:border-amber-500/50"
         >
           ⚙️ Configurar reparto
         </button>

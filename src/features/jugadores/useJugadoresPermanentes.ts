@@ -19,10 +19,10 @@ export function useJugadoresPermanentes() {
   }, []);
 
   const crear = useCallback(
-    (nombre: string): JugadorPermanente | null => {
+    (nombre: string, avatar?: string): JugadorPermanente | null => {
       const nombreLimpio = nombre.trim();
       if (!nombreLimpio) return null;
-      const nuevo = crearJugadorPermanente(nombreLimpio);
+      const nuevo = crearJugadorPermanente(nombreLimpio, avatar);
       persistir([...jugadores, nuevo]);
       return nuevo;
     },
@@ -36,6 +36,13 @@ export function useJugadoresPermanentes() {
       persistir(
         jugadores.map((jug) => (jug.id === id ? { ...jug, nombre: nombreLimpio } : jug))
       );
+    },
+    [jugadores, persistir]
+  );
+
+  const cambiarAvatar = useCallback(
+    (id: string, avatar: string) => {
+      persistir(jugadores.map((jug) => (jug.id === id ? { ...jug, avatar } : jug)));
     },
     [jugadores, persistir]
   );
@@ -54,5 +61,5 @@ export function useJugadoresPermanentes() {
     [persistir]
   );
 
-  return { jugadores, crear, renombrar, eliminar, reemplazarLista };
+  return { jugadores, crear, renombrar, cambiarAvatar, eliminar, reemplazarLista };
 }

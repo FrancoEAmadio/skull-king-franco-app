@@ -285,3 +285,27 @@ export async function compartirTarjetaResultado(datos: DatosResultado): Promise<
   descargarArchivo(nombreArchivo, blob);
   return 'descargado';
 }
+
+/** Copia el link de la app al portapapeles (con alternativa para navegadores viejos). */
+export async function copiarLink(): Promise<boolean> {
+  const link = `${window.location.origin}${window.location.pathname}`;
+  try {
+    await navigator.clipboard.writeText(link);
+    return true;
+  } catch {
+    try {
+      const campo = document.createElement('textarea');
+      campo.value = link;
+      campo.setAttribute('readonly', '');
+      campo.style.position = 'fixed';
+      campo.style.opacity = '0';
+      document.body.appendChild(campo);
+      campo.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(campo);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+}

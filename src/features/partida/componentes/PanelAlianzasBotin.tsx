@@ -33,12 +33,12 @@ export function PanelAlianzasBotin() {
 
   return (
     <div className="tarjeta-marron p-3">
-      <label className="block text-xs uppercase tracking-wider text-amber-300 font-bold mb-2">
+      <label className="block text-sm uppercase tracking-wider text-amber-300 font-bold mb-2">
         🤝 Alianzas de Botín
       </label>
 
       {limiteAlcanzado ? (
-        <p className="text-xs text-slate-400 text-center py-2">
+        <p className="text-sm text-slate-400 text-center py-2">
           Ya se registraron las {MAX_ALIANZAS_POR_RONDA} alianzas máximas de esta ronda.
         </p>
       ) : (
@@ -47,7 +47,7 @@ export function PanelAlianzasBotin() {
             <select
               value={idxA}
               onChange={(e) => setIdxA(Number(e.target.value))}
-              className="w-full text-amber-300 text-xs bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
+              className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
             >
               {jugadores.map((jug, idx) => (
                 <option key={idx} value={idx}>
@@ -58,7 +58,7 @@ export function PanelAlianzasBotin() {
             <select
               value={idxB}
               onChange={(e) => setIdxB(Number(e.target.value))}
-              className="w-full text-amber-300 text-xs bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
+              className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
             >
               {jugadores.map((jug, idx) => (
                 <option key={idx} value={idx}>
@@ -79,13 +79,13 @@ export function PanelAlianzasBotin() {
 
       {alianzasBotinRonda.length > 0 && (
         <div className="flex flex-col gap-1.5 mt-2">
-          <span className="text-[11px] text-slate-400 font-bold uppercase">
+          <span className="text-sm text-slate-400 font-bold uppercase">
             Alianzas en esta ronda:
           </span>
           {alianzasBotinRonda.map((alianza, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between p-2.5 bg-slate-900/90 border border-amber-900/60 rounded-xl text-xs"
+              className="flex items-center justify-between p-2.5 bg-slate-900/90 border border-amber-900/60 rounded-xl text-sm"
             >
               <span className="font-bold text-amber-300">
                 {alianza.nombreA} 🤝 {alianza.nombreB}
@@ -93,7 +93,7 @@ export function PanelAlianzasBotin() {
               <button
                 type="button"
                 onClick={() => eliminarAlianzaBotin(idx)}
-                className="text-xs text-red-400 hover:text-red-300 font-bold px-2 py-1 rounded bg-slate-800"
+                className="text-sm text-red-400 hover:text-red-300 font-bold px-2 py-1 rounded bg-slate-800"
               >
                 ✕
               </button>

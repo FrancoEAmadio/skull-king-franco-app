@@ -19,10 +19,10 @@ export function PasoResumen() {
   return (
     <section className="flex flex-col gap-4 flex-1 overflow-y-auto">
       <div className="tarjeta-marron p-3.5 border-l-4 border-amber-500">
-        <span className="text-xs font-bold text-amber-300 uppercase block">
+        <span className="text-sm font-bold text-amber-300 uppercase block">
           5. Resumen de la Ronda {rondaVisible}
         </span>
-        <span className="text-[11px] text-slate-300 block mt-0.5">
+        <span className="text-sm text-slate-300 block mt-0.5">
           {partidaFinalizada
             ? '¡Partida finalizada! Resultados acumulados.'
             : partidaPendienteFinalizar
@@ -34,9 +34,9 @@ export function PasoResumen() {
       {resumenRondaActual.map((res) => (
         <div key={res.nombre} className="tarjeta-marron p-3.5 flex flex-col gap-2">
           <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-            <span className="font-black text-white text-lg">{res.nombre}</span>
+            <span className="font-black text-white text-xl">{res.nombre}</span>
             <span
-              className={`text-xs font-bold px-2 py-1 rounded-full ${
+              className={`text-sm font-bold px-2 py-1 rounded-full ${
                 res.acierto
                   ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
                   : 'bg-red-950 text-red-400 border border-red-800'
@@ -46,7 +46,7 @@ export function PasoResumen() {
             </span>
           </div>
 
-          <div className="flex justify-between text-xs text-slate-300">
+          <div className="flex justify-between text-sm text-slate-300">
             <span>Puntaje base:</span>
             <span className="font-bold text-white">
               {res.puntajeBase > 0 ? '+' : ''}
@@ -56,13 +56,13 @@ export function PasoResumen() {
 
           {res.bonosCobradas && res.bonosCobradas.length > 0 && (
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-emerald-400 font-bold uppercase">
+              <span className="text-sm text-emerald-400 font-bold uppercase">
                 ✓ Bonificaciones y Apuestas:
               </span>
               {res.bonosCobradas.map((b, i) => (
                 <div
                   key={`rc-${i}`}
-                  className={`flex justify-between text-[11px] px-2 py-1 rounded-lg border ${
+                  className={`flex justify-between text-sm px-2 py-1 rounded-lg border ${
                     b.subtotal >= 0
                       ? 'text-emerald-300 bg-emerald-950/30 border-emerald-900/40'
                       : 'text-red-300 bg-red-950/30 border-red-900/40'
@@ -82,13 +82,13 @@ export function PasoResumen() {
 
           {res.bonosNoCobradas && res.bonosNoCobradas.length > 0 && (
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-slate-400 font-bold uppercase">
+              <span className="text-sm text-slate-400 font-bold uppercase">
                 ✕ Bonos no cobrados por fallar envite:
               </span>
               {res.bonosNoCobradas.map((b, i) => (
                 <div
                   key={`rn-${i}`}
-                  className="flex justify-between text-[11px] text-slate-400 bg-slate-900/60 px-2 py-1 rounded-lg border border-slate-800"
+                  className="flex justify-between text-sm text-slate-400 bg-slate-900/60 px-2 py-1 rounded-lg border border-slate-800"
                 >
                   <span className="line-through">
                     {b.etiqueta} {b.cantidad > 1 && `×${b.cantidad}`}
@@ -101,13 +101,13 @@ export function PasoResumen() {
 
           {res.habilidadesRegistradas && res.habilidadesRegistradas.length > 0 && (
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-purple-300 font-bold uppercase">
+              <span className="text-sm text-purple-300 font-bold uppercase">
                 🏴‍☠️ Habilidades usadas:
               </span>
               {res.habilidadesRegistradas.map((hab, i) => (
                 <div
                   key={`rh-${i}`}
-                  className="text-[11px] text-purple-200 bg-purple-950/30 px-2 py-1 rounded-lg border border-purple-900/40"
+                  className="text-sm text-purple-200 bg-purple-950/30 px-2 py-1 rounded-lg border border-purple-900/40"
                 >
                   {hab.etiqueta}
                 </div>
@@ -117,9 +117,9 @@ export function PasoResumen() {
 
           <div className="flex justify-between items-end pt-2 border-t border-slate-800">
             <div className="flex flex-col">
-              <span className="text-[11px] text-slate-400 uppercase font-bold">Total ronda</span>
+              <span className="text-sm text-slate-400 uppercase font-bold">Total ronda</span>
               <span
-                className={`font-black text-xl ${
+                className={`font-black text-2xl ${
                   res.totalRonda >= 0 ? 'text-emerald-400' : 'text-red-400'
                 }`}
               >
@@ -128,8 +128,8 @@ export function PasoResumen() {
               </span>
             </div>
             <div className="flex flex-col text-right">
-              <span className="text-[11px] text-amber-300/70 uppercase font-bold">Acumulado</span>
-              <span className="font-black text-2xl text-amber-400">{res.acumuladoNuevo}</span>
+              <span className="text-sm text-amber-300/70 uppercase font-bold">Acumulado</span>
+              <span className="font-black text-3xl text-amber-400">{res.acumuladoNuevo}</span>
             </div>
           </div>
         </div>
@@ -138,21 +138,21 @@ export function PasoResumen() {
       {partidaFinalizada ? (
         <button
           onClick={abrirPodio}
-          className="w-full mt-1 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
+          className="w-full mt-1 py-4 btn-blanco-marron text-xl rounded-2xl font-black shadow-xl"
         >
           🏁 Ver Resultado Final
         </button>
       ) : partidaPendienteFinalizar ? (
         <button
           onClick={confirmarResultadoFinal}
-          className="w-full mt-1 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
+          className="w-full mt-1 py-4 btn-blanco-marron text-xl rounded-2xl font-black shadow-xl"
         >
           Confirmar Resultado Final
         </button>
       ) : (
         <button
           onClick={irASiguienteRonda}
-          className="w-full mt-1 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
+          className="w-full mt-1 py-4 btn-blanco-marron text-xl rounded-2xl font-black shadow-xl"
         >
           Siguiente Ronda ➔
         </button>

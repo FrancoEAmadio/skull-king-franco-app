@@ -98,21 +98,21 @@ export function PantallaNuevaPartida() {
     <main className="py-6 flex flex-col gap-6 w-full overflow-y-auto">
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-[11px] uppercase tracking-widest text-amber-400 font-bold block">
+          <span className="text-sm uppercase tracking-widest text-amber-400 font-bold block">
             Paso 1 de 5
           </span>
-          <h2 className="text-2xl font-bold text-white">Configurar Mesa</h2>
+          <h2 className="text-3xl font-bold text-white">Configurar Mesa</h2>
         </div>
         <button
           onClick={() => setPantallaActual('inicio')}
-          className="text-sm text-amber-300 hover:text-white font-bold"
+          className="text-base text-amber-300 hover:text-white font-bold"
         >
           ✕ Cancelar
         </button>
       </div>
 
       <section className="tarjeta-marron p-4">
-        <label className="block text-xs uppercase tracking-wider text-amber-300 font-bold mb-3">
+        <label className="block text-sm uppercase tracking-wider text-amber-300 font-bold mb-3">
           📦 Modo de Contenido de la Mesa
         </label>
         <div className="flex flex-col gap-2">
@@ -122,12 +122,12 @@ export function PantallaNuevaPartida() {
               <button
                 key={modo.id}
                 onClick={() => cambiarModoContenido(modo.id)}
-                className={`p-3 rounded-xl font-bold text-left text-xs border flex items-center justify-between transition-all ${
+                className={`p-3 rounded-xl font-bold text-left text-sm border flex items-center justify-between transition-all ${
                   seleccionado ? 'btn-blanco-marron' : 'btn-marron-oscuro'
                 }`}
               >
                 <span>{modo.etiqueta}</span>
-                <span className="text-sm">{seleccionado ? '✓' : ''}</span>
+                <span className="text-base">{seleccionado ? '✓' : ''}</span>
               </button>
             );
           })}
@@ -177,7 +177,7 @@ export function PantallaNuevaPartida() {
 
       <button
         onClick={intentarComenzarPartida}
-        className="w-full mt-2 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
+        className="w-full mt-2 py-4 btn-blanco-marron text-xl rounded-2xl font-black shadow-xl"
       >
         Empezar Partida ➔
       </button>
@@ -205,11 +205,11 @@ function TarjetaToggle({ titulo, activo, onChange, ayuda, ayudaSiempreVisible }:
   return (
     <div className="p-4 tarjeta-marron">
       <label className="flex items-center justify-between cursor-pointer">
-        <span className="font-bold text-sm text-white">{titulo}</span>
+        <span className="font-bold text-base text-white">{titulo}</span>
         <Toggle checked={activo} onChange={onChange} />
       </label>
       {mostrarAyuda && (
-        <p className="text-xs text-slate-300 leading-relaxed mt-2 border-t border-amber-900/50 pt-2">
+        <p className="text-sm text-slate-300 leading-relaxed mt-2 border-t border-amber-900/50 pt-2">
           {ayuda}
         </p>
       )}

@@ -20,8 +20,8 @@ function Dato({
 }) {
   return (
     <div className="tarjeta-marron p-3 text-center">
-      <span className={`block text-xl font-black ${color}`}>{valor}</span>
-      <span className="text-[11px] font-bold uppercase leading-tight text-slate-400">{etiqueta}</span>
+      <span className={`block text-2xl font-black ${color}`}>{valor}</span>
+      <span className="text-sm font-bold uppercase leading-tight text-slate-400">{etiqueta}</span>
     </div>
   );
 }
@@ -35,8 +35,8 @@ function FilaComparativa({ fila }: { fila: FilaComparacion }) {
   return (
     <div className="flex flex-col gap-1.5 border-b border-slate-800 pb-3 last:border-none last:pb-0">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-xs font-bold text-slate-200">{fila.etiqueta}</span>
-        <span className="text-[11px] font-bold text-slate-400">
+        <span className="text-sm font-bold text-slate-200">{fila.etiqueta}</span>
+        <span className="text-sm font-bold text-slate-400">
           Puesto <span className="text-amber-300">#{fila.puesto}</span> de {fila.de}
         </span>
       </div>
@@ -47,7 +47,7 @@ function FilaComparativa({ fila }: { fila: FilaComparacion }) {
             style={{ width: `${anchoJugador}%` }}
           />
         </div>
-        <span className="w-16 shrink-0 text-right text-sm font-black text-white">
+        <span className="w-16 shrink-0 text-right text-base font-black text-white">
           {fila.jugador}
           {fila.sufijo}
         </span>
@@ -57,7 +57,7 @@ function FilaComparativa({ fila }: { fila: FilaComparacion }) {
           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
             <div className="h-full rounded-full bg-slate-500" style={{ width: `${anchoResto}%` }} />
           </div>
-          <span className="w-16 shrink-0 text-right text-[11px] font-semibold text-slate-400">
+          <span className="w-16 shrink-0 text-right text-sm font-semibold text-slate-400">
             {fila.resto}
             {fila.sufijo}
           </span>
@@ -96,14 +96,14 @@ export function ModalEstadisticasJugador() {
         <>
           <div className="flex shrink-0 items-center justify-between border-b border-amber-900/60 bg-slate-900 p-4">
             <div className="min-w-0">
-              <h3 className="text-xs font-black uppercase tracking-widest text-amber-300">Perfil Pirata</h3>
-              <span className="block truncate text-2xl font-bold text-white">🏴‍☠️ {jugador.nombre}</span>
+              <h3 className="text-sm font-black uppercase tracking-widest text-amber-300">Perfil Pirata</h3>
+              <span className="block truncate text-3xl font-bold text-white">🏴‍☠️ {jugador.nombre}</span>
             </div>
             <button
               type="button"
               onClick={cerrarEstadisticasJugador}
               aria-label="Cerrar perfil"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-xl font-bold text-slate-300 hover:bg-slate-700 hover:text-white"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-2xl font-bold text-slate-300 hover:bg-slate-700 hover:text-white"
             >
               ✕
             </button>
@@ -143,31 +143,31 @@ export function ModalEstadisticasJugador() {
             )}
 
             <section className="rounded-2xl border border-slate-700 bg-slate-900/60 p-3.5">
-              <h4 className="mb-1 text-xs font-black uppercase tracking-wider text-amber-300">
+              <h4 className="mb-1 text-sm font-black uppercase tracking-wider text-amber-300">
                 Comparativa con el resto de la mesa
               </h4>
               {propio && propio.rondasJugadas > 0 ? (
                 <>
-                  <p className="mb-3 text-[11px] leading-relaxed text-slate-400">
+                  <p className="mb-3 text-sm leading-relaxed text-slate-400">
                     Barra de color: {jugador.nombre}. Barra gris: promedio del resto de los jugadores.
                     {!hayOtros && ' Todavía no hay otros jugadores con partidas para comparar.'}
                   </p>
                   <div className="mb-3 grid grid-cols-3 gap-2 text-center">
                     <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-2">
-                      <span className="block text-lg font-black text-white">{propio.mejorRacha}</span>
-                      <span className="text-[11px] font-bold uppercase leading-tight text-slate-400">
+                      <span className="block text-xl font-black text-white">{propio.mejorRacha}</span>
+                      <span className="text-sm font-bold uppercase leading-tight text-slate-400">
                         Racha de aciertos
                       </span>
                     </div>
                     <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-2">
-                      <span className="block text-lg font-black text-white">{propio.bonosPorRonda}</span>
-                      <span className="text-[11px] font-bold uppercase leading-tight text-slate-400">
+                      <span className="block text-xl font-black text-white">{propio.bonosPorRonda}</span>
+                      <span className="text-sm font-bold uppercase leading-tight text-slate-400">
                         Bonos por ronda
                       </span>
                     </div>
                     <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-2">
-                      <span className="block text-lg font-black text-white">{propio.efectividadBonos}%</span>
-                      <span className="text-[11px] font-bold uppercase leading-tight text-slate-400">
+                      <span className="block text-xl font-black text-white">{propio.efectividadBonos}%</span>
+                      <span className="text-sm font-bold uppercase leading-tight text-slate-400">
                         Bonos cobrados
                       </span>
                     </div>
@@ -177,14 +177,14 @@ export function ModalEstadisticasJugador() {
                       <FilaComparativa key={fila.metrica} fila={fila} />
                     ))}
                   </div>
-                  <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
+                  <p className="mt-3 text-sm leading-relaxed text-slate-400">
                     “Bonos cobrados” mide qué parte de las bonificaciones se llegó a sumar (solo se cobran
                     acertando el envite). Se calcula con las {propio.rondasJugadas} rondas guardadas en el
                     historial.
                   </p>
                 </>
               ) : (
-                <p className="text-xs leading-relaxed text-slate-400">
+                <p className="text-sm leading-relaxed text-slate-400">
                   Todavía no hay rondas guardadas en el historial para {jugador.nombre}. Terminá una partida
                   para ver cómo rinde frente al resto.
                 </p>
@@ -193,7 +193,7 @@ export function ModalEstadisticasJugador() {
 
             {jugador.evolucion.length > 0 && (
               <section className="rounded-2xl border border-slate-700 bg-slate-900/60 p-3.5">
-                <h4 className="mb-2 text-xs font-black uppercase tracking-wider text-amber-300">
+                <h4 className="mb-2 text-sm font-black uppercase tracking-wider text-amber-300">
                   Últimas partidas
                 </h4>
                 <ul className="flex flex-col gap-1.5">
@@ -203,7 +203,7 @@ export function ModalEstadisticasJugador() {
                     .map((entrada, indice) => (
                       <li
                         key={`${entrada.fecha}-${indice}`}
-                        className="flex items-center justify-between gap-2 text-xs"
+                        className="flex items-center justify-between gap-2 text-sm"
                       >
                         <span className="text-slate-400">{entrada.fecha}</span>
                         <span className="shrink-0 font-bold text-white">

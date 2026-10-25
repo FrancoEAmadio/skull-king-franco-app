@@ -10,6 +10,8 @@ import {
 import { PanelHabilidades } from '../componentes/PanelHabilidades';
 import { PanelEventosBono } from '../componentes/PanelEventosBono';
 import { PanelAlianzasBotin } from '../componentes/PanelAlianzasBotin';
+import { CarruselJugadores } from '../../../ui/CarruselJugadores';
+import { PildoraBono } from '../../../ui/PildoraBono';
 
 export function PasoBonos() {
   const { partida } = useApp();
@@ -21,7 +23,7 @@ export function PasoBonos() {
     indiceVisualActual,
     configuracionMesa,
     limiteComodines,
-    cambiarCartasBlancas,
+    fijarCartasBlancas,
     puntajeProyectadoActual,
     textoBotonAvanzar,
     guardarJugadorYContinuar,
@@ -67,39 +69,32 @@ export function PasoBonos() {
     <section
       onTouchStart={iniciarTouch}
       onTouchEnd={finalizarTouch}
-      className="flex flex-col h-full select-none"
+      className="flex h-full select-none flex-col"
     >
-      <nav className="flex gap-2 overflow-x-auto pb-2 border-b border-amber-900/60 scroll-oculto">
-        {jugadoresOrdenados.map(({ jugador, originalIndex }) => (
-          <button
-            key={originalIndex}
-            onClick={() => setJugadorSeleccionadoIdx(originalIndex)}
-            className={`px-4 py-2.5 rounded-xl font-bold whitespace-nowrap text-sm flex items-center gap-1.5 transition-all ${
-              jugadorSeleccionadoIdx === originalIndex
-                ? 'btn-blanco-marron shadow-lg scale-[1.02]'
-                : 'btn-marron-oscuro opacity-70'
-            }`}
-          >
-            <span>{jugador.nombre}</span>
-            <span className="text-[11px] px-1.5 py-0.5 rounded bg-black/30">
-              {jugador.ganadas}/{jugador.apuesta}
-            </span>
-          </button>
-        ))}
-      </nav>
+      <CarruselJugadores
+        seleccionado={jugadorSeleccionadoIdx}
+        onSeleccionar={setJugadorSeleccionadoIdx}
+        items={jugadoresOrdenados.map(({ jugador, originalIndex }) => ({
+          indice: originalIndex,
+          id: jugador.permanenteId,
+          nombre: jugador.nombre,
+          avatar: jugador.avatar,
+          detalle: `${jugador.ganadas}/${jugador.apuesta}`,
+        }))}
+      />
 
-      <div className="tarjeta-marron p-3 flex items-center justify-between border-l-4 border-amber-500">
+      <div className="tarjeta-marron mt-3 flex items-center justify-between border-l-4 border-amber-500 p-4">
         <div>
-          <span className="text-[11px] text-slate-400 uppercase font-bold block">Puntos totales</span>
-          <span className="text-2xl font-black text-white leading-none">
+          <span className="text-sm text-slate-400 uppercase font-bold block">Puntos totales</span>
+          <span className="text-3xl font-black text-white leading-none">
             {jugadorActual.puntos}{' '}
-            <span className="text-sm text-amber-300 font-bold">pts</span>
+            <span className="text-base text-amber-300 font-bold">pts</span>
           </span>
         </div>
         <div className="text-right">
-          <span className="text-[11px] text-slate-400 uppercase font-bold block">Ronda</span>
+          <span className="text-sm text-slate-400 uppercase font-bold block">Ronda</span>
           <span
-            className={`text-lg font-black px-2.5 py-0.5 rounded-full inline-block ${
+            className={`text-xl font-black px-2.5 py-0.5 rounded-full inline-block ${
               puntajeProyectadoActual >= 0
                 ? 'text-emerald-300 bg-emerald-950/60 border border-emerald-800'
                 : 'text-red-300 bg-red-950/60 border border-red-800'
@@ -113,37 +108,21 @@ export function PasoBonos() {
 
       <div className="flex-1 overflow-y-auto flex flex-col gap-4 pt-3">
         {configuracionMesa.usarComodinesBonificacion && (
-          <div className="p-3 bg-amber-950/40 border border-amber-700/50 rounded-xl flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-amber-300 uppercase block">
-                🃏 Comodines de Bonificación
-              </span>
-              <p className="text-xs text-slate-300">
-                Disponibles mesa:{' '}
-                <strong className="text-white">
-                  {limiteComodines.comodinesDisponibles} / {limiteComodines.maxComodinesPermitidos}
-                </strong>
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => cambiarCartasBlancas(jugadorSeleccionadoIdx, -1)}
-                disabled={!jugadorActual.cartasBlancas}
-                className="w-8 h-8 btn-marron-oscuro rounded-lg font-bold disabled:opacity-20"
-              >
-                -
-              </button>
-              <span className="text-lg font-bold text-white px-1">
-                {jugadorActual.cartasBlancas || 0}
-              </span>
-              <button
-                onClick={() => cambiarCartasBlancas(jugadorSeleccionadoIdx, 1)}
-                disabled={limiteComodines.comodinesBloqueados}
-                className="w-8 h-8 btn-blanco-marron rounded-lg font-bold text-black disabled:opacity-20"
-              >
-                +
-              </button>
-            </div>
+          <div className="tarjeta-marron flex flex-col gap-2 p-4">
+            <span className="block text-sm font-bold uppercase tracking-widest text-amber-300">
+              🃏 Comodines de bonificación
+            </span>
+            <PildoraBono
+              nombre="Comodín"
+              detalle={`En mesa: ${limiteComodines.comodinesDisponibles} / ${limiteComodines.maxComodinesPermitidos}`}
+              cantidad={jugadorActual.cartasBlancas || 0}
+              maximo={limiteComodines.comodinesBloqueados ? 0 : 1}
+              onTocar={() =>
+                limiteComodines.comodinesBloqueados
+                  ? fijarCartasBlancas(jugadorSeleccionadoIdx, 0)
+                  : fijarCartasBlancas(jugadorSeleccionadoIdx, (jugadorActual.cartasBlancas || 0) + 1)
+              }
+            />
           </div>
         )}
 
@@ -164,7 +143,7 @@ export function PasoBonos() {
 
         <button
           onClick={guardarJugadorYContinuar}
-          className="w-full mt-1 py-4 btn-blanco-marron text-lg rounded-2xl shadow-lg font-black"
+          className="w-full mt-1 py-4 btn-blanco-marron text-xl rounded-2xl shadow-lg font-black"
         >
           {textoBotonAvanzar}
         </button>

@@ -38,14 +38,14 @@ export function PanelReglasOpcionales({ configuracion, onCambiar }: Props) {
         className="w-full flex justify-between items-center text-left"
       >
         <div>
-          <h3 className="text-base font-extrabold text-amber-300 uppercase tracking-wider">
+          <h3 className="text-lg font-extrabold text-amber-300 uppercase tracking-wider">
             ⚙️ Reglas y Cartas Opcionales
           </h3>
-          <p className="text-xs text-slate-300 mt-0.5 font-normal">
+          <p className="text-sm text-slate-300 mt-0.5 font-normal">
             Activá o desactivá los elementos en juego.
           </p>
         </div>
-        <span className="text-amber-400 font-bold text-base px-2">{abierto ? '▲' : '▼'}</span>
+        <span className="text-amber-400 font-bold text-lg px-2">{abierto ? '▲' : '▼'}</span>
       </button>
 
       {abierto && (
@@ -89,13 +89,13 @@ function GrupoOpciones({ titulo, color, opciones, configuracion, onCambiar }: Gr
   return (
     <div className={clasesContenedor}>
       <div className="flex items-center justify-between border-b border-slate-800 pb-1">
-        <span className={`text-xs font-bold ${color} uppercase tracking-wider`}>{titulo}</span>
+        <span className={`text-sm font-bold ${color} uppercase tracking-wider`}>{titulo}</span>
       </div>
       {opciones.map(([clave, etiqueta]) => {
         const deshabilitada = !modoPermiteRegla(configuracion.modoContenido, clave);
         return (
           <label key={clave} className="flex items-center justify-between cursor-pointer py-1">
-            <span className="font-semibold text-xs text-slate-200">{etiqueta}</span>
+            <span className="font-semibold text-sm text-slate-200">{etiqueta}</span>
             <Toggle
               tamano="sm"
               checked={configuracion.reglasOpcionales[clave]}

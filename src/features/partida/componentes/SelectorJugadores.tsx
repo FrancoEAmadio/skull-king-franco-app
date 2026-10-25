@@ -14,8 +14,8 @@ export function SelectorJugadores() {
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-semibold text-slate-200">¿Quiénes juegan?</label>
-        <span className="text-[11px] font-medium text-amber-300/80">
+        <label className="block text-base font-semibold text-slate-200">¿Quiénes juegan?</label>
+        <span className="text-sm font-medium text-amber-300/80">
           El orden de toque define el turno
         </span>
       </div>
@@ -28,8 +28,8 @@ export function SelectorJugadores() {
         }`}
       >
         <div>
-          <span className="block text-base font-black text-white">Seleccionar jugadores</span>
-          <span className="mt-0.5 block text-[11px] font-bold uppercase tracking-wide text-slate-400">
+          <span className="block text-lg font-black text-white">Seleccionar jugadores</span>
+          <span className="mt-0.5 block text-sm font-bold uppercase tracking-wide text-slate-400">
             Abrir listado de piratas
           </span>
         </div>

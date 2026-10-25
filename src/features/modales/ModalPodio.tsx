@@ -50,10 +50,10 @@ export function ModalPodio() {
       <Modal abierto={mostrarPodio} onCerrar={cerrarPodio} ancho="max-w-sm" cerrarAlHacerClickAfuera={!partidaFinalizada}>
         <div className="flex shrink-0 items-center justify-between border-b border-amber-900/60 p-4">
           <div>
-            <h3 className="text-xl font-bold text-amber-300">
+            <h3 className="text-2xl font-bold text-amber-300">
               🏆 {partidaFinalizada ? 'Resultado Final' : 'Tabla General'}
             </h3>
-            <span className="text-xs text-slate-400">
+            <span className="text-sm text-slate-400">
               {rondasJugadas} ronda{rondasJugadas === 1 ? '' : 's'} jugada{rondasJugadas === 1 ? '' : 's'}
             </span>
           </div>
@@ -61,7 +61,7 @@ export function ModalPodio() {
             type="button"
             onClick={cerrarPodio}
             aria-label="Cerrar tabla general"
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-lg font-bold text-slate-300 hover:bg-slate-700 hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-xl font-bold text-slate-300 hover:bg-slate-700 hover:text-white"
           >
             ✕
           </button>
@@ -78,28 +78,28 @@ export function ModalPodio() {
               }`}
             >
               <span className="flex min-w-0 items-center gap-3">
-                <span className="w-7 shrink-0 text-center text-lg font-bold">
+                <span className="w-7 shrink-0 text-center text-xl font-bold">
                   {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`}
                 </span>
                 <span className="flex min-w-0 flex-col">
                   <span className="block truncate font-bold">{jugador.nombre}</span>
-                  <span className="mt-0.5 text-[11px] opacity-80">🔍 Ver auditoría</span>
+                  <span className="mt-0.5 text-sm opacity-80">🔍 Ver auditoría</span>
                 </span>
               </span>
-              <span className={`shrink-0 pl-2 text-xl font-extrabold ${index === 0 ? '' : 'text-amber-300'}`}>
+              <span className={`shrink-0 pl-2 text-2xl font-extrabold ${index === 0 ? '' : 'text-amber-300'}`}>
                 {jugador.puntos} pts
               </span>
             </button>
           ))}
 
           <div className="mt-2 rounded-xl border border-slate-700 bg-slate-900/60 p-3">
-            <h4 className="mb-2 text-xs font-black uppercase tracking-wider text-amber-300">
+            <h4 className="mb-2 text-sm font-black uppercase tracking-wider text-amber-300">
               Evolución por ronda
             </h4>
             {rondasJugadas >= 1 ? (
               <GraficoEvolucion series={evolucion.series} etiquetas={evolucion.etiquetas} />
             ) : (
-              <p className="text-xs text-slate-400">Todavía no hay rondas cerradas.</p>
+              <p className="text-sm text-slate-400">Todavía no hay rondas cerradas.</p>
             )}
           </div>
         </div>
@@ -111,7 +111,7 @@ export function ModalPodio() {
                 type="button"
                 disabled={trabajando}
                 onClick={() => void ejecutar(() => compartirTexto('Skull King', textoResultado(datos)))}
-                className="btn-marron-oscuro rounded-xl py-3 text-sm disabled:opacity-60"
+                className="btn-marron-oscuro rounded-xl py-3 text-base disabled:opacity-60"
               >
                 📤 Compartir
               </button>
@@ -119,7 +119,7 @@ export function ModalPodio() {
                 type="button"
                 disabled={trabajando}
                 onClick={() => void ejecutar(() => compartirTarjetaResultado(datos))}
-                className="btn-marron-oscuro rounded-xl py-3 text-sm disabled:opacity-60"
+                className="btn-marron-oscuro rounded-xl py-3 text-base disabled:opacity-60"
               >
                 🖼️ Tarjeta (PNG)
               </button>
@@ -128,7 +128,7 @@ export function ModalPodio() {
           <button
             type="button"
             onClick={cerrarPodio}
-            className="btn-blanco-marron w-full rounded-2xl py-3.5 text-base font-bold"
+            className="btn-blanco-marron w-full rounded-2xl py-3.5 text-lg font-bold"
           >
             {partidaFinalizada ? '🏁 Finalizar y Guardar' : '← Volver a la Partida'}
           </button>

@@ -19,6 +19,7 @@ export function crearBackupJugador(
 ): BackupRondaJugador {
   return {
     apuesta: jugador.apuesta,
+    apuestaElegida: jugador.apuestaElegida,
     ganadas: jugador.ganadas,
     modoEnvite: jugador.modoEnvite,
     bribonHabilidadPts: jugador.bribonHabilidadPts,
@@ -33,6 +34,7 @@ export function aplicarBackupJugador(jugador: Jugador, backup: BackupRondaJugado
   return {
     ...jugador,
     apuesta: backup.apuesta,
+    apuestaElegida: backup.apuestaElegida ?? jugador.apuestaElegida,
     ganadas: backup.ganadas,
     modoEnvite: backup.modoEnvite,
     bribonHabilidadPts: backup.bribonHabilidadPts,

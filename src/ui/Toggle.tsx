@@ -8,8 +8,8 @@ interface Props {
 export function Toggle({ checked, onChange, disabled, tamano = 'md' }: Props) {
   const clasesContenedor =
     tamano === 'sm'
-      ? "w-9 h-5 after:h-4 after:w-4"
-      : "w-11 h-6 after:h-5 after:w-5";
+      ? "w-12 h-7 after:h-6 after:w-6"
+      : "w-[3.75rem] h-8 after:h-7 after:w-7";
 
   return (
     <div className="relative inline-flex items-center">
