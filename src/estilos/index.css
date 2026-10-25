@@ -1,15 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg-dark: #090d16;
+  --color-bg-dark: #07142b;
+  --color-slate-950: #06122a;
+  --color-slate-900: #0c2044;
+  --color-slate-800: #153164;
+  --color-slate-700: #204780;
+  --color-slate-600: #34609f;
+  --color-slate-500: #6d8bbd;
+  --color-slate-400: #9fb5d9;
+  --color-slate-300: #c6d4ea;
+  --color-slate-200: #dde6f3;
   --font-display: 'Pirata One', 'Cinzel', system-ui, serif;
   --font-heading: 'Cinzel', system-ui, serif;
 }
 
 :root {
-  --bg-dark: #090d16;
-  --bg-card: rgba(17, 24, 39, 0.92);
-  --border-card: rgba(55, 65, 81, 0.75);
+  --bg-dark: #07142b;
+  --bg-card: rgba(12, 32, 68, 0.92);
+  --border-card: rgba(120, 160, 220, 0.22);
   --accent-gold: #f59e0b;
   --accent-gold-hover: #fbbf24;
   --text-main: #f3f4f6;
@@ -28,8 +37,8 @@ body {
 
 body {
   background:
-    radial-gradient(ellipse at top center, rgba(245, 158, 11, 0.06) 0%, transparent 55%),
-    radial-gradient(circle at top center, #131c2e 0%, var(--bg-dark) 100%);
+    radial-gradient(ellipse at top center, rgba(245, 180, 40, 0.10) 0%, transparent 50%),
+    linear-gradient(180deg, #1b4a8f 0%, #12336a 38%, #0a1d40 100%);
   background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
@@ -37,6 +46,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 17px;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
   position: relative;
@@ -109,16 +119,16 @@ button {
 }
 
 .btn-marron-oscuro {
-  background: linear-gradient(180deg, #263243 0%, #1f2937 100%);
+  background: linear-gradient(180deg, #1f4278 0%, #17325f 100%);
   color: var(--text-main);
   font-weight: 700;
-  border: 1px solid #374151;
+  border: 1px solid #34609f;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .btn-marron-oscuro:hover:not(:disabled) {
-  background: linear-gradient(180deg, #374151 0%, #2c3947 100%);
-  border-color: #4b5563;
+  background: linear-gradient(180deg, #2a5495 0%, #1f4278 100%);
+  border-color: #4a78b8;
 }
 
 .btn-secundario-retroceder {
@@ -165,8 +175,8 @@ button {
 input[type="text"],
 input[type="number"],
 select {
-  background-color: #0f172a;
-  border: 1.5px solid #334155;
+  background-color: #0a1b3b;
+  border: 1.5px solid #34609f;
   color: #f8fafc;
   border-radius: 0.65rem;
   padding: 0.75rem 0.95rem;
@@ -174,7 +184,7 @@ select {
   /* 16px evita el zoom automático de iOS al enfocar un campo */
   font-size: 1rem;
   line-height: 1.35;
-  min-height: 2.75rem;
+  min-height: 3.25rem;
   max-width: 100%;
   transition: all 0.2s ease;
 }
@@ -363,4 +373,203 @@ button:disabled {
 
 table {
   font-variant-numeric: tabular-nums;
+}
+
+
+/* ── Identidad pirata: fichas, avatares y píldoras ──────────────────── */
+
+.titulo-pirata {
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  font-weight: 400;
+}
+
+.avatar-pirata {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 30%, #1f4278 0%, #0c2044 100%);
+  border: 2px solid rgba(245, 158, 11, 0.55);
+  line-height: 1;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.avatar-pirata-activo {
+  border-color: #fcd34d;
+  box-shadow: 0 0 0 3px rgba(252, 211, 77, 0.25), 0 0 18px rgba(252, 211, 77, 0.55);
+}
+
+/* Ficha / moneda grande y tocable (envites y bazas) */
+.ficha {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.1rem;
+  height: 4.1rem;
+  border-radius: 9999px;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.85rem;
+  line-height: 1;
+  color: #3b2204;
+  background: radial-gradient(circle at 35% 30%, #d9a94a 0%, #a8741f 55%, #6e4710 100%);
+  border: 3px solid #8a5a14;
+  box-shadow: inset 0 2px 3px rgba(255, 235, 170, 0.45), 0 4px 8px rgba(0, 0, 0, 0.45);
+  opacity: 0.62;
+  filter: saturate(0.75);
+}
+
+.ficha:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.ficha-elegida {
+  opacity: 1;
+  filter: none;
+  color: #2a1700;
+  background: radial-gradient(circle at 35% 30%, #fff3b0 0%, #fcd34d 45%, #e8a413 100%);
+  border-color: #fff0a8;
+  box-shadow:
+    0 0 0 3px rgba(252, 211, 77, 0.35),
+    0 0 22px rgba(252, 211, 77, 0.75),
+    inset 0 2px 3px rgba(255, 255, 255, 0.7);
+  transform: scale(1.06);
+}
+
+.ficha:disabled {
+  opacity: 0.2;
+  filter: grayscale(1);
+}
+
+/* Marca que indica cuál fue el envite dentro de las fichas de bazas */
+.ficha-meta::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  border: 2px dashed rgba(252, 211, 77, 0.9);
+}
+
+.ficha-ok {
+  border-color: #6ee7b7;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.35), 0 0 22px rgba(52, 211, 153, 0.7), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+}
+
+.ficha-mal {
+  border-color: #fca5a5;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.3), 0 0 18px rgba(248, 113, 113, 0.55), inset 0 2px 3px rgba(255, 255, 255, 0.5);
+}
+
+/* Botón cuadrado de selección (avatares, opciones) */
+.ficha-activa {
+  background: linear-gradient(180deg, #fcd34d 0%, #f59e0b 100%);
+  border: 2px solid #fff0a8;
+  box-shadow: 0 0 16px rgba(252, 211, 77, 0.55);
+}
+
+.ficha-inactiva {
+  background: #0c2044;
+  border: 2px solid #204780;
+}
+
+/* Píldora de bono: toque = suma, al llegar al máximo vuelve a cero */
+.pildora-bono {
+  position: relative;
+  display: inline-flex;
+  min-height: 3.5rem;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.1rem;
+  border-radius: 1rem;
+  border: 1.5px solid #34609f;
+  background: linear-gradient(180deg, #17325f 0%, #10264d 100%);
+  padding: 0.55rem 0.95rem;
+  padding-right: 3.4rem;
+  text-align: left;
+  color: #dde6f3;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.pildora-bono:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.pildora-bono-activa {
+  background: linear-gradient(180deg, #fcd34d 0%, #e8a413 100%);
+  border-color: #fff0a8;
+  color: #2a1700;
+  box-shadow: 0 0 14px rgba(252, 211, 77, 0.45);
+}
+
+.pildora-bono:disabled {
+  opacity: 0.3;
+}
+
+.pildora-contador {
+  position: absolute;
+  right: 0.55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  min-width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: #0a1b3b;
+  color: #fcd34d;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.pildora-bono-activa .pildora-contador {
+  background: #2a1700;
+  color: #fcd34d;
+}
+
+/* Carrusel fijo de jugadores durante la partida */
+.carrusel-jugadores {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 0.5rem 34%;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.carrusel-jugadores::-webkit-scrollbar {
+  display: none;
+}
+
+.carrusel-item {
+  flex: 0 0 32%;
+  scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  border-radius: 1.1rem;
+  border: 1.5px solid transparent;
+  padding: 0.5rem 0.25rem;
+  opacity: 0.55;
+  transform: scale(0.88);
+  transition: all 0.2s ease;
+}
+
+.carrusel-item-activo {
+  opacity: 1;
+  transform: scale(1);
+  background: linear-gradient(180deg, rgba(252, 211, 77, 0.18) 0%, rgba(252, 211, 77, 0.06) 100%);
+  border-color: rgba(252, 211, 77, 0.75);
+  box-shadow: 0 0 18px rgba(252, 211, 77, 0.25);
+}
+
+.pie-pagina {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }

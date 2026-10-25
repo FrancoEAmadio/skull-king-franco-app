@@ -31,21 +31,21 @@ export function ModalConfirmacion({
       cerrarAlHacerClickAfuera
     >
       <div className="flex items-center justify-between border-b border-red-900/60 bg-slate-900 p-4">
-        <h3 className="text-lg font-black text-red-300">{titulo}</h3>
+        <h3 className="text-xl font-black text-red-300">{titulo}</h3>
         <button
           type="button"
           onClick={onCancelar}
           aria-label={`Cancelar: ${titulo}`}
-          className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-xl font-bold text-slate-400 hover:bg-slate-700 hover:text-white"
+          className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-2xl font-bold text-slate-400 hover:bg-slate-700 hover:text-white"
         >
           ×
         </button>
       </div>
 
       <div className="flex flex-col gap-3 p-5">
-        <div className="text-base font-bold text-white">{descripcion}</div>
+        <div className="text-lg font-bold text-white">{descripcion}</div>
         {advertencia && (
-          <div className="rounded-xl border border-red-900/70 bg-red-950/40 p-3 text-sm leading-relaxed text-red-200">
+          <div className="rounded-xl border border-red-900/70 bg-red-950/40 p-3 text-base leading-relaxed text-red-200">
             {advertencia}
           </div>
         )}
@@ -55,14 +55,14 @@ export function ModalConfirmacion({
         <button
           type="button"
           onClick={onCancelar}
-          className="btn-marron-oscuro rounded-xl py-3 text-sm font-bold"
+          className="btn-marron-oscuro rounded-xl py-3 text-base font-bold"
         >
           Cancelar
         </button>
         <button
           type="button"
           onClick={onConfirmar}
-          className="rounded-xl border border-red-700 bg-red-950/90 py-3 text-sm font-black text-red-200 hover:bg-red-900"
+          className="rounded-xl border border-red-700 bg-red-950/90 py-3 text-base font-black text-red-200 hover:bg-red-900"
         >
           {textoConfirmar}
         </button>

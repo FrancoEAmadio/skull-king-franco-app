@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { avatarDe } from '../../datos/avatares';
 import type {
   AlianzaBotin,
   BackupRondaActual,
@@ -73,6 +74,7 @@ function crearJugadorDePartida(permanente: JugadorPermanente): Jugador {
   return {
     permanenteId: permanente.id,
     nombre: permanente.nombre,
+    avatar: avatarDe(permanente.id, permanente.avatar),
     puntos: 0,
     apuesta: 0,
     ganadas: 0,
@@ -391,18 +393,39 @@ export function usePartidaState({
     setPantallaActual,
   ]);
 
-  const cambiarApuesta = useCallback(
-    (indice: number, delta: number) => {
+  const elegirApuesta = useCallback(
+    (indice: number, valor: number) => {
       setJugadores((previos) =>
         previos.map((jugador, idx) => {
           if (idx !== indice) return jugador;
-          const nuevo = Math.max(0, Math.min(cartasPorJugadorEnRonda, jugador.apuesta + delta));
-          return { ...jugador, apuesta: nuevo };
+          const nuevo = Math.max(0, Math.min(cartasPorJugadorEnRonda, valor));
+          return { ...jugador, apuesta: nuevo, apuestaElegida: true };
         })
       );
     },
     [cartasPorJugadorEnRonda]
   );
+
+  const elegirGanadas = useCallback(
+    (indice: number, valor: number) => {
+      const max = calcularMaxGanadasPara(indice, jugadores, cartasPorJugadorEnRonda);
+      setJugadores((previos) =>
+        previos.map((jugador, idx) =>
+          idx === indice ? { ...jugador, ganadas: Math.max(0, Math.min(max, valor)) } : jugador
+        )
+      );
+    },
+    [jugadores, cartasPorJugadorEnRonda]
+  );
+
+  /** Fija la cantidad de comodines de un jugador (sin pasar por +/−). */
+  const fijarCartasBlancas = useCallback((indice: number, valor: number) => {
+    setJugadores((previos) =>
+      previos.map((jugador, idx) =>
+        idx === indice ? { ...jugador, cartasBlancas: Math.max(0, valor) } : jugador
+      )
+    );
+  }, []);
 
   const cambiarModoEnvite = useCallback((indice: number, modo: Jugador['modoEnvite']) => {
     setJugadores((previos) =>
@@ -1080,7 +1103,9 @@ export function usePartidaState({
     irANuevaPartida,
     comenzarPartida,
     // acciones partida
-    cambiarApuesta,
+    elegirApuesta,
+    elegirGanadas,
+    fijarCartasBlancas,
     cambiarModoEnvite,
     cambiarGanadas,
     maxGanadasPara,

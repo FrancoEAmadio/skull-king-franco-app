@@ -5,17 +5,33 @@ import {
   crearCopiaSeguridad,
   interpretarCopiaSeguridad,
 } from '../../infra/almacenamiento';
-import { descargarArchivo } from '../../infra/compartir';
-import { InsigniaAutoria } from '../../ui/InsigniaAutoria';
+import { copiarLink, descargarArchivo } from '../../infra/compartir';
+import { Toggle } from '../../ui/Toggle';
+import { ModalFeedback } from './ModalFeedback';
 import { Modal } from '../../ui/Modal';
 import { ModalAviso } from '../../ui/ModalAviso';
 
 export function ModalAjustes() {
-  const { ajustesAbiertos, setAjustesAbiertos, jugadoresPermanentes, reemplazarJugadoresPermanentes, partida } =
-    useApp();
+  const {
+    ajustesAbiertos,
+    setAjustesAbiertos,
+    ajustes,
+    cambiarAjustes,
+    jugadoresPermanentes,
+    reemplazarJugadoresPermanentes,
+    partida,
+  } = useApp();
   const { historialPartidas, reemplazarHistorial } = partida;
   const archivoRef = useRef<HTMLInputElement>(null);
   const [aviso, setAviso] = useState<{ titulo: string; mensaje: string } | null>(null);
+  const [feedbackAbierto, setFeedbackAbierto] = useState(false);
+  const [linkCopiado, setLinkCopiado] = useState(false);
+
+  const copiar = async () => {
+    const ok = await copiarLink();
+    setLinkCopiado(ok);
+    window.setTimeout(() => setLinkCopiado(false), 2200);
+  };
 
   const cerrar = () => setAjustesAbiertos(false);
 
@@ -76,38 +92,61 @@ export function ModalAjustes() {
       <Modal abierto={ajustesAbiertos} onCerrar={cerrar} ancho="max-w-md" zIndex="z-[60]" cerrarAlHacerClickAfuera>
         <div className="flex shrink-0 items-center justify-between border-b border-amber-900/60 bg-slate-900 p-4">
           <div>
-            <h3 className="text-xs font-black uppercase tracking-widest text-amber-300">Ajustes</h3>
-            <span className="text-xl font-bold text-white">Datos e información</span>
+            <h3 className="text-sm font-black uppercase tracking-widest text-amber-300">Ajustes</h3>
+            <span className="text-2xl font-bold text-white">Preferencias y datos</span>
           </div>
           <button
             type="button"
             onClick={cerrar}
             aria-label="Cerrar ajustes"
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-xl font-bold text-slate-300 hover:bg-slate-700 hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-2xl font-bold text-slate-300 hover:bg-slate-700 hover:text-white"
           >
             ✕
           </button>
         </div>
 
         <div className="scroll-oculto flex flex-1 flex-col gap-4 overflow-y-auto p-4">
+          <section className="flex flex-col gap-4 rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <span className="block text-lg font-black text-white">Pantalla siempre encendida</span>
+                <span className="block text-base text-slate-300">Durante la partida, para que el celu no se bloquee.</span>
+              </div>
+              <Toggle
+                checked={ajustes.mantenerPantallaEncendida}
+                onChange={(valor) => cambiarAjustes({ mantenerPantallaEncendida: valor })}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <span className="block text-lg font-black text-white">Vibración al tocar</span>
+                <span className="block text-base text-slate-300">Solo en celulares compatibles.</span>
+              </div>
+              <Toggle checked={ajustes.vibracion} onChange={(valor) => cambiarAjustes({ vibracion: valor })} />
+            </div>
+            <button type="button" onClick={() => void copiar()} className="btn-marron-oscuro w-full rounded-xl py-3.5 text-lg">
+              {linkCopiado ? '✅ ¡Link copiado!' : '🔗 Copiar link de la página'}
+            </button>
+          </section>
+
           <section className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
-            <h4 className="text-sm font-black text-amber-300">💾 Copia de seguridad</h4>
-            <p className="mb-3 mt-1 text-xs leading-relaxed text-slate-300">
+            <h4 className="text-base font-black text-amber-300">💾 Copia de seguridad</h4>
+            <p className="mb-3 mt-1 text-sm leading-relaxed text-slate-300">
               Tus jugadores, estadísticas e historial viven solo en este dispositivo. Exportalos a un archivo
               .json para guardarlos o pasarlos a otro celular, y después importalos desde ahí.
             </p>
-            <p className="mb-3 text-[11px] text-slate-400">
+            <p className="mb-3 text-sm text-slate-400">
               Ahora: {jugadoresPermanentes.length} jugador{jugadoresPermanentes.length === 1 ? '' : 'es'} ·{' '}
               {historialPartidas.length} partida{historialPartidas.length === 1 ? '' : 's'} en el historial.
             </p>
             <div className="grid grid-cols-2 gap-2">
-              <button type="button" onClick={exportar} className="btn-blanco-marron rounded-xl py-3 text-sm">
+              <button type="button" onClick={exportar} className="btn-blanco-marron rounded-xl py-3 text-base">
                 ⬇ Exportar
               </button>
               <button
                 type="button"
                 onClick={() => archivoRef.current?.click()}
-                className="btn-marron-oscuro rounded-xl py-3 text-sm"
+                className="btn-marron-oscuro rounded-xl py-3 text-base"
               >
                 ⬆ Importar
               </button>
@@ -119,15 +158,29 @@ export function ModalAjustes() {
               className="hidden"
               onChange={(evento) => void importar(evento.target.files?.[0])}
             />
-            <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
+            <p className="mt-2 text-sm leading-relaxed text-slate-400">
               Al importar, los datos se suman a los actuales: no se borra nada y las partidas repetidas se
               omiten.
             </p>
           </section>
 
-          <InsigniaAutoria variante="completa" />
+          <section className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
+            <h4 className="text-lg font-black text-amber-300">Tu opinión</h4>
+            <p className="mb-3 mt-1 text-base leading-relaxed text-slate-300">
+              ¿Encontraste un error o tenés una idea para mejorar la app? Contanos.
+            </p>
+            <button
+              type="button"
+              onClick={() => setFeedbackAbierto(true)}
+              className="btn-marron-oscuro w-full rounded-xl py-3.5 text-lg"
+            >
+              💬 Enviar comentarios o reportar error
+            </button>
+          </section>
         </div>
       </Modal>
+
+      <ModalFeedback abierto={feedbackAbierto} onCerrar={() => setFeedbackAbierto(false)} />
 
       <ModalAviso
         abierto={aviso !== null}

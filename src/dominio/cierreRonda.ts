@@ -205,6 +205,7 @@ export function cerrarRondaParaJugador(
     capturasMonstruo:
       jugador.capturasMonstruo + (Number(jugador.eventosBono.monstruo_davy) || 0),
     apuesta: 0,
+    apuestaElegida: false,
     ganadas: 0,
     modoEnvite: 'metralla',
     bribonHabilidadPts: null,

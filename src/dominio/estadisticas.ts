@@ -18,10 +18,11 @@ export function crearEstadisticasVacias(): EstadisticasJugador {
   };
 }
 
-export function crearJugadorPermanente(nombre: string): JugadorPermanente {
+export function crearJugadorPermanente(nombre: string, avatar?: string): JugadorPermanente {
   return {
     id: `pirata_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
     nombre: (nombre || 'Pirata').trim() || 'Pirata',
+    ...(avatar ? { avatar } : {}),
     estadisticas: crearEstadisticasVacias(),
     evolucion: [],
   };

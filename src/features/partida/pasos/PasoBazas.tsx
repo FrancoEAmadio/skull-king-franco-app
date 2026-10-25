@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { ContadorMasMenos } from '../../../ui/ContadorMasMenos';
-import { ModalAviso } from '../../../ui/ModalAviso';
 import { useApp } from '../../../estado/AppProvider';
+import { avatarDe } from '../../../datos/avatares';
+import { AvatarPirata } from '../../../ui/AvatarPirata';
+import { FichasNumero } from '../../../ui/FichasNumero';
+import { ModalAviso } from '../../../ui/ModalAviso';
 
 export function PasoBazas() {
   const { partida } = useApp();
@@ -9,7 +11,7 @@ export function PasoBazas() {
     jugadoresOrdenados,
     cartasPorJugadorEnRonda,
     totalGanadasAsignadas,
-    cambiarGanadas,
+    elegirGanadas,
     maxGanadasPara,
     limpiarBazasRonda,
     avanzarAPasoBonos,
@@ -20,56 +22,68 @@ export function PasoBazas() {
     if (avanzarAPasoBonos() === 'bazas_excedidas') setMostrarAvisoBazas(true);
   };
 
+  const faltan = cartasPorJugadorEnRonda - totalGanadasAsignadas;
+
   return (
-    <section className="flex flex-col gap-4 flex-1 overflow-y-auto">
-      <div className="tarjeta-marron p-3.5 flex items-center justify-between border-l-4 border-emerald-500">
+    <section className="flex flex-1 flex-col gap-4">
+      <div className="tarjeta-marron flex items-center justify-between gap-3 p-4">
         <div>
-          <span className="text-xs font-bold text-amber-300 uppercase block">3. Registro de Bazas</span>
-          <span className="text-[11px] text-slate-300 block mt-0.5">
-            Anotá cuántas bazas ganó cada jugador (pueden ser menos si nadie la ganó).
+          <span className="block text-sm font-bold uppercase tracking-widest text-amber-300">Bazas ganadas</span>
+          <span className="block text-lg font-extrabold leading-tight text-white">
+            {faltan > 0 ? `Quedan ${faltan} por asignar` : 'Todas asignadas'}
           </span>
         </div>
         <button
           type="button"
           onClick={limpiarBazasRonda}
-          className="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg border border-slate-700 font-bold shrink-0"
+          className="btn-marron-oscuro shrink-0 rounded-xl px-4 py-3 text-base font-bold"
         >
           🔄 Limpiar
         </button>
       </div>
 
-      <div className="tarjeta-marron p-3 flex items-center justify-between border-l-4 border-amber-500">
-        <span className="text-xs font-bold text-slate-300 uppercase">Bazas registradas</span>
-        <span className="text-lg font-black text-amber-300">
-          {totalGanadasAsignadas} / {cartasPorJugadorEnRonda} máx
-        </span>
-      </div>
+      {jugadoresOrdenados.map(({ jugador, originalIndex }) => {
+        const acerto = jugador.ganadas === jugador.apuesta;
+        return (
+          <div key={originalIndex} className="tarjeta-marron flex flex-col gap-3 p-4">
+            <div className="flex items-center gap-3">
+              <AvatarPirata emoji={avatarDe(jugador.permanenteId, jugador.avatar)} tamano="md" />
+              <div className="min-w-0 flex-1">
+                <span className="block truncate text-xl font-black text-white">{jugador.nombre}</span>
+                <span className="block text-sm font-bold text-amber-300">Envite: {jugador.apuesta}</span>
+              </div>
+              <span
+                className={`rounded-full px-3 py-1 text-base font-black ${
+                  acerto
+                    ? 'border border-emerald-500/60 bg-emerald-950/70 text-emerald-300'
+                    : 'border border-red-500/60 bg-red-950/70 text-red-300'
+                }`}
+              >
+                {acerto ? '✓ Exacto' : '✕ Fuera'}
+              </span>
+            </div>
 
-      {jugadoresOrdenados.map(({ jugador, originalIndex }) => (
-        <div
-          key={originalIndex}
-          className="tarjeta-marron p-3.5 flex items-center justify-between border-l-4 border-emerald-500/70"
-        >
-          <div className="flex flex-col gap-0.5">
-            <span className="font-black text-white text-base">{jugador.nombre}</span>
-            <span className="text-[11px] font-bold text-amber-300 bg-slate-900/60 border border-slate-800/50 px-1.5 py-0.5 rounded-md w-fit">
-              Envite: {jugador.apuesta}
-            </span>
+            <FichasNumero
+              etiqueta={`Bazas de ${jugador.nombre}`}
+              valor={jugador.ganadas}
+              max={cartasPorJugadorEnRonda}
+              meta={jugador.apuesta}
+              resultado={acerto ? 'ok' : 'mal'}
+              deshabilitada={(numero) => numero > maxGanadasPara(originalIndex)}
+              onElegir={(numero) => elegirGanadas(originalIndex, numero)}
+            />
           </div>
-          <ContadorMasMenos
-            valor={jugador.ganadas}
-            colorValor="text-emerald-400"
-            onDecrementar={() => cambiarGanadas(originalIndex, -1)}
-            onIncrementar={() => cambiarGanadas(originalIndex, 1)}
-            decrementarDisabled={jugador.ganadas <= 0}
-            incrementarDisabled={jugador.ganadas >= maxGanadasPara(originalIndex)}
-          />
-        </div>
-      ))}
+        );
+      })}
+
+      <p className="px-1 text-center text-sm font-semibold text-slate-300">
+        El aro punteado marca el envite de cada pirata.
+      </p>
 
       <button
+        type="button"
         onClick={intentarAvanzar}
-        className="w-full mt-1 py-4 btn-blanco-marron text-lg rounded-2xl font-black shadow-xl"
+        className="btn-blanco-marron sticky bottom-3 w-full rounded-2xl py-4 text-xl font-black shadow-xl"
       >
         Siguiente: Bonos ➔
       </button>

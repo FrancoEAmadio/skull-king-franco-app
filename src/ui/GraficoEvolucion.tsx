@@ -193,14 +193,14 @@ export function GraficoEvolucion({ series, etiquetas, titulo = 'Evolución del p
 
       {detalle && indiceActivo !== null && (
         <div className="rounded-xl border border-amber-500/30 bg-slate-950/80 p-2.5">
-          <span className="mb-1.5 block text-[11px] font-black uppercase tracking-wide text-amber-300">
+          <span className="mb-1.5 block text-sm font-black uppercase tracking-wide text-amber-300">
             {indiceActivo === 0 ? 'Punto de partida' : `Tras la ${etiquetaX(indiceActivo)}`}
           </span>
           <ul className="grid grid-cols-2 gap-x-3 gap-y-1">
             {detalle.map((fila, posicion) => (
-              <li key={fila.nombre} className="flex items-center justify-between gap-2 text-xs">
+              <li key={fila.nombre} className="flex items-center justify-between gap-2 text-sm">
                 <span className="flex min-w-0 items-center gap-1.5 text-slate-200">
-                  <span className="text-[11px] text-slate-400">{posicion + 1}.</span>
+                  <span className="text-sm text-slate-400">{posicion + 1}.</span>
                   <span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: fila.color }} />
                   <span className="truncate">{fila.nombre}</span>
                 </span>
@@ -222,7 +222,7 @@ export function GraficoEvolucion({ series, etiquetas, titulo = 'Evolución del p
               type="button"
               aria-pressed={activa}
               onClick={() => setResaltada(activa ? null : serie.nombre)}
-              className={`flex min-h-8 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold ${
+              className={`flex min-h-8 items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm font-bold ${
                 activa
                   ? 'border-amber-400 bg-amber-500/15 text-amber-200'
                   : 'border-slate-700 bg-slate-900/80 text-slate-200 hover:border-slate-500'

@@ -1,60 +1,92 @@
+import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
+import { useInstalarPWA } from '../../ui/useInstalarPWA';
+import { ModalFeedback } from '../ajustes/ModalFeedback';
 
 export function PantallaInicio() {
   const { setPantallaActual, partida, setAjustesAbiertos } = useApp();
+  const { puedeInstalar, instalar, mostrarAyudaIOS } = useInstalarPWA();
+  const [feedbackAbierto, setFeedbackAbierto] = useState(false);
 
   return (
-    <main className="flex flex-col items-center justify-center my-auto text-center py-4 w-full">
+    <main className="my-auto flex w-full flex-col items-center py-4 text-center">
       <img
         src="./archivos/iconos/tapa.png"
-        alt="Skull King Portada"
-        className="w-full max-w-xs h-auto mb-4 rounded-2xl shadow-2xl border border-amber-500/30 object-contain drop-shadow-[0_10px_15px_rgba(245,158,11,0.25)]"
+        alt="Skull King"
+        className="mb-3 h-auto max-h-[24dvh] w-auto max-w-full rounded-3xl border border-amber-500/40 object-contain shadow-2xl drop-shadow-[0_10px_18px_rgba(245,158,11,0.3)]"
         onError={(e) => {
           e.currentTarget.style.display = 'none';
         }}
       />
 
-      <h1 className="text-4xl font-extrabold tracking-wider text-white drop-shadow-md mb-1">
-        Skull King
-      </h1>
-      <p className="text-xs uppercase tracking-widest text-amber-300 font-bold mb-6">
-        Contador de Puntos y Manual
-      </p>
+      <h1 className="titulo-pirata mb-1 text-6xl text-white">Skull King</h1>
+      <p className="mb-5 text-base font-bold uppercase tracking-[0.25em] text-amber-300">Anotador de puntos</p>
 
-      <div className="w-full flex flex-col gap-3">
+      <div className="flex w-full flex-col gap-3">
         <button
+          type="button"
           onClick={partida.irANuevaPartida}
-          className="w-full py-4 btn-blanco-marron text-lg rounded-2xl font-bold shadow-lg"
+          className="btn-blanco-marron w-full rounded-2xl py-5 text-2xl shadow-lg"
         >
           🏴‍☠️ Nueva Partida
         </button>
         {partida.hayPartidaGuardada && (
           <button
+            type="button"
             onClick={() => setPantallaActual('partida')}
-            className="w-full py-4 btn-marron-oscuro text-lg rounded-2xl font-bold text-amber-300 border border-amber-500/40"
+            className="btn-marron-oscuro w-full rounded-2xl border-amber-400/60 py-5 text-2xl text-amber-300"
           >
             ▶️ Continuar Partida
           </button>
         )}
         <button
+          type="button"
           onClick={() => setPantallaActual('jugadores')}
-          className="w-full py-4 btn-marron-oscuro text-lg rounded-2xl font-semibold"
+          className="btn-marron-oscuro w-full rounded-2xl py-5 text-xl"
         >
           👥 Jugadores, Estadísticas e Historial
         </button>
         <button
+          type="button"
           onClick={() => setPantallaActual('reglas')}
-          className="w-full py-4 btn-marron-oscuro text-lg rounded-2xl font-semibold"
+          className="btn-marron-oscuro w-full rounded-2xl py-5 text-xl"
         >
           📖 Manual, Cartas y Reglas
         </button>
+      </div>
+
+      <div className="mt-6 flex w-full flex-col items-center gap-2">
+        {puedeInstalar && (
+          <button
+            type="button"
+            onClick={() => void instalar()}
+            className="btn-marron-oscuro w-full rounded-2xl py-4 text-lg"
+          >
+            📲 Instalar la app en este dispositivo
+          </button>
+        )}
+        {mostrarAyudaIOS && (
+          <p className="text-base text-slate-300">
+            📲 Para instalarla en iPhone: tocá Compartir y elegí «Añadir a pantalla de inicio».
+          </p>
+        )}
         <button
-          onClick={() => setAjustesAbiertos(true)}
-          className="w-full py-3 btn-marron-oscuro text-sm rounded-2xl font-semibold text-slate-200"
+          type="button"
+          onClick={() => setFeedbackAbierto(true)}
+          className="w-full rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-4 text-lg font-bold text-amber-200"
         >
-          💾 Copia de seguridad e información
+          💬 Tu opinión, enviar comentarios o reportar error
+        </button>
+        <button
+          type="button"
+          onClick={() => setAjustesAbiertos(true)}
+          className="px-3 py-3 text-base font-bold text-slate-300 underline underline-offset-4"
+        >
+          ⚙️ Ajustes y copia de seguridad
         </button>
       </div>
+
+      <ModalFeedback abierto={feedbackAbierto} onCerrar={() => setFeedbackAbierto(false)} />
     </main>
   );
 }

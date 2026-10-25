@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react';
 import { MAX_JUGADORES_BASE, MAX_JUGADORES_EXPANSION } from '../../../constantes';
 import { useApp } from '../../../estado/AppProvider';
 import { Modal } from '../../../ui/Modal';
+import { AVATARES } from '../../../datos/avatares';
+import { AvatarPirata } from '../../../ui/AvatarPirata';
+import { SelectorAvatar } from '../../../ui/SelectorAvatar';
 import { ModalAviso } from '../../../ui/ModalAviso';
 import { TarjetaSeleccionJugador } from './TarjetaSeleccionJugador';
 
@@ -32,6 +35,8 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
   const [busqueda, setBusqueda] = useState('');
   const [nombreNuevo, setNombreNuevo] = useState('');
   const [mostrarLimite, setMostrarLimite] = useState(false);
+  const [avatarNuevo, setAvatarNuevo] = useState(AVATARES[0]!);
+  const [eligiendoAvatar, setEligiendoAvatar] = useState(false);
 
   const jugadoresFiltrados = useMemo(() => {
     const patron = normalizarBusqueda(busqueda);
@@ -51,8 +56,10 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
   };
 
   const crearJugador = () => {
-    const nuevo = crearJugadorPermanente(nombreNuevo);
+    const nuevo = crearJugadorPermanente(nombreNuevo, avatarNuevo);
     if (!nuevo) return;
+    setEligiendoAvatar(false);
+    setAvatarNuevo(AVATARES[(AVATARES.indexOf(avatarNuevo) + 1) % AVATARES.length]!);
     setNombreNuevo('');
     setBusqueda('');
   };
@@ -67,8 +74,8 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
       <Modal abierto={abierto} onCerrar={cerrar} ancho="max-w-md" cerrarAlHacerClickAfuera>
         <div className="flex items-center justify-between border-b border-amber-900/60 bg-slate-900 p-4">
           <div>
-            <h3 className="text-lg font-black text-amber-300">Seleccionar jugadores</h3>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <h3 className="text-xl font-black text-amber-300">Seleccionar jugadores</h3>
+            <span className="text-sm font-bold uppercase tracking-wider text-slate-400">
               {idsJugadoresSeleccionados.length} de {maximoJugadores} seleccionados
             </span>
           </div>
@@ -76,7 +83,7 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
             type="button"
             onClick={cerrar}
             aria-label="Cerrar selector de jugadores"
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-xl font-bold text-slate-400 hover:bg-slate-700 hover:text-white"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-2xl font-bold text-slate-400 hover:bg-slate-700 hover:text-white"
           >
             ×
           </button>
@@ -89,26 +96,45 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
             type="search"
             placeholder="Buscar pirata..."
             aria-label="Buscar pirata por nombre"
-            className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+            className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-base text-white focus:border-amber-500 focus:outline-none"
           />
 
           <form
-            className="flex gap-2"
+            className="flex flex-col gap-2"
             onSubmit={(evento) => {
               evento.preventDefault();
               crearJugador();
             }}
           >
-            <input
-              value={nombreNuevo}
-              onChange={(evento) => setNombreNuevo(evento.target.value)}
-              type="text"
-              placeholder="Nombre del nuevo pirata..."
-              className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
-            />
-            <button type="submit" className="btn-blanco-marron rounded-xl px-4 py-2.5 text-sm font-bold">
-              + Crear
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setEligiendoAvatar(!eligiendoAvatar)}
+                aria-label="Elegir icono del nuevo pirata"
+                className="btn-marron-oscuro flex shrink-0 items-center justify-center rounded-xl px-2"
+              >
+                <AvatarPirata emoji={avatarNuevo} tamano="md" />
+              </button>
+              <input
+                value={nombreNuevo}
+                onChange={(evento) => setNombreNuevo(evento.target.value)}
+                type="text"
+                placeholder="Nombre del nuevo pirata..."
+                className="min-w-0 flex-1"
+              />
+              <button type="submit" className="btn-blanco-marron shrink-0 rounded-xl px-4 text-lg font-bold">
+                + Crear
+              </button>
+            </div>
+            {eligiendoAvatar && (
+              <SelectorAvatar
+                valor={avatarNuevo}
+                onCambiar={(emoji) => {
+                  setAvatarNuevo(emoji);
+                  setEligiendoAvatar(false);
+                }}
+              />
+            )}
           </form>
 
           {jugadoresFiltrados.length > 0 ? (
@@ -123,7 +149,7 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
               ))}
             </div>
           ) : (
-            <div className="tarjeta-marron p-6 text-center text-sm text-slate-300">
+            <div className="tarjeta-marron p-6 text-center text-base text-slate-300">
               {jugadoresPermanentes.length === 0
                 ? 'Todavía no hay piratas. Creá el primero arriba.'
                 : 'No hay piratas que coincidan con la búsqueda.'}
@@ -135,7 +161,7 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
           <button
             type="button"
             onClick={cerrar}
-            className="btn-blanco-marron w-full rounded-2xl py-3.5 text-base font-bold"
+            className="btn-blanco-marron w-full rounded-2xl py-3.5 text-lg font-bold"
           >
             Listo ({idsJugadoresSeleccionados.length})
           </button>

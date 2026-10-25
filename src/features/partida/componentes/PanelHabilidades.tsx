@@ -40,14 +40,14 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
         className="flex justify-between items-center cursor-pointer select-none"
         onClick={onToggle}
       >
-        <label className="block text-xs uppercase tracking-wider text-amber-300 font-bold cursor-pointer">
+        <label className="block text-sm uppercase tracking-wider text-amber-300 font-bold cursor-pointer">
           🏴‍☠️ Habilidades de Piratas
         </label>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] text-slate-400 font-bold">
+          <span className="text-sm text-slate-400 font-bold">
             {registroHabilidadesRonda.length}/3
           </span>
-          <span className="text-amber-400 font-bold text-base px-1">
+          <span className="text-amber-400 font-bold text-lg px-1">
             {abierto ? '▲' : '▼'}
           </span>
         </div>
@@ -55,26 +55,26 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
 
       {abierto && (
         <div className="flex flex-col gap-3 mt-3 pt-3 border-t border-slate-800/80">
-          <p className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-2 text-left text-[11px] leading-relaxed text-slate-300">
+          <p className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-2 text-left text-sm leading-relaxed text-slate-300">
             ℹ️ Regla oficial: la habilidad de un pirata se usa justo después de la baza que ganó con esa carta.
             Tras la última baza de la ronda solo tiene efecto Harry el Gigante. Si te equivocás de jugador,
             tocá ✕ en el registro: el envite vuelve a su valor original.
           </p>
           {bloqueado ? (
-            <p className="text-xs text-slate-400 text-center py-2">
+            <p className="text-sm text-slate-400 text-center py-2">
               Se alcanzó el límite de 3 habilidades por ronda.
             </p>
           ) : (
             <>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col text-left">
-                  <label className="text-[11px] text-slate-400 font-bold uppercase block mb-1">
+                  <label className="text-sm text-slate-400 font-bold uppercase block mb-1">
                     Habilidad:
                   </label>
                   <select
                     value={habSeleccionada}
                     onChange={(e) => setHabSeleccionada(e.target.value as HabId)}
-                    className="w-full text-amber-300 text-xs bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
+                    className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
                   >
                     <option value="bribon_rotan" disabled={esHabilidadYaRegistrada('Bribón de Roatán')}>
                       Bribón de Roatán {esHabilidadYaRegistrada('Bribón de Roatán') ? '✓' : ''}
@@ -87,13 +87,13 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
                 </div>
 
                 <div className="flex flex-col text-left">
-                  <label className="text-[11px] text-slate-400 font-bold uppercase block mb-1">
+                  <label className="text-sm text-slate-400 font-bold uppercase block mb-1">
                     Pirata que la utilizó:
                   </label>
                   <select
                     value={habJugadorIdx}
                     onChange={(e) => setHabJugadorIdx(Number(e.target.value))}
-                    className="w-full text-amber-300 text-xs bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
+                    className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
                   >
                     {jugadores.map((jug, idx) => (
                       <option key={idx} value={idx}>
@@ -107,13 +107,13 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
               {habSeleccionada === 'bribon_rotan' && (
                 <div className="mt-1 flex flex-col gap-2">
                   <div className="flex flex-col text-left">
-                    <label className="text-[11px] text-slate-400 font-bold uppercase block mb-1">
+                    <label className="text-sm text-slate-400 font-bold uppercase block mb-1">
                       Apuesta de puntos de riesgo:
                     </label>
                     <select
                       value={habPuntosBribon}
                       onChange={(e) => setHabPuntosBribon(Number(e.target.value))}
-                      className="w-full text-amber-300 text-xs bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
+                      className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
                     >
                       <option value={0}>0 puntos extra (Sin riesgo)</option>
                       <option value={10}>±10 puntos (+10 si cumple / −10 si falla)</option>
@@ -133,7 +133,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
 
               {habSeleccionada === 'harry_gigante' && (
                 <div className="mt-1 flex flex-col gap-2">
-                  <span className="text-[11px] text-slate-300 text-left">
+                  <span className="text-sm text-slate-300 text-left">
                     Modifica el envite (bazas) de <strong>{jugadores[habJugadorIdx]?.nombre}</strong>:
                   </span>
                   <div className="grid grid-cols-2 gap-2">
@@ -160,13 +160,13 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
               {kongDisponible && habSeleccionada === 'kong' && (
                 <div className="mt-1 flex flex-col gap-2.5">
                   <div className="flex flex-col text-left">
-                    <label className="text-[11px] text-slate-400 font-bold uppercase block mb-1">
+                    <label className="text-sm text-slate-400 font-bold uppercase block mb-1">
                       Habilidad copiada por Kong:
                     </label>
                     <select
                       value={habHabilidadCopiada}
                       onChange={(e) => setHabHabilidadCopiada(e.target.value as HabCopiada)}
-                      className="w-full text-purple-200 text-xs bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
+                      className="w-full text-purple-200 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
                     >
                       <option value="Bribón de Roatán" disabled={esKongYaRegistradoCon('Bribón')}>
                         Bribón de Roatán (Apuesta de puntos: 0/10/20) {esKongYaRegistradoCon('Bribón') ? '✓' : ''}
@@ -179,13 +179,13 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
 
                   {habHabilidadCopiada === 'Bribón de Roatán' && (
                     <div className="flex flex-col gap-2 text-left">
-                      <label className="text-[11px] text-slate-400 font-bold uppercase block mb-0.5">
+                      <label className="text-sm text-slate-400 font-bold uppercase block mb-0.5">
                         Apuesta de puntos copiada:
                       </label>
                       <select
                         value={habPuntosBribon}
                         onChange={(e) => setHabPuntosBribon(Number(e.target.value))}
-                        className="w-full text-amber-300 text-xs bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
+                        className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
                       >
                         <option value={0}>0 puntos extra</option>
                         <option value={10}>±10 puntos (+10 si cumple / −10 si falla)</option>
@@ -204,7 +204,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
 
                   {habHabilidadCopiada === 'Harry el Gigante' && (
                     <div className="flex flex-col gap-2 text-left">
-                      <span className="text-[11px] text-slate-300">
+                      <span className="text-sm text-slate-300">
                         Modifica el envite de <strong>{jugadores[habJugadorIdx]?.nombre}</strong> con la copia de Harry:
                       </span>
                       <div className="grid grid-cols-2 gap-2">
@@ -234,25 +234,25 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
 
           {registroHabilidadesRonda.length > 0 && (
             <div className="flex flex-col gap-1.5">
-              <span className="text-[11px] text-slate-400 font-bold uppercase">
+              <span className="text-sm text-slate-400 font-bold uppercase">
                 Habilidades en esta ronda:
               </span>
               {registroHabilidadesRonda.map((h, idx) => (
                 <div
                   key={h.id}
-                  className="flex items-center justify-between p-2.5 bg-slate-900/90 border border-purple-900/60 rounded-xl text-xs"
+                  className="flex items-center justify-between p-2.5 bg-slate-900/90 border border-purple-900/60 rounded-xl text-sm"
                 >
                   <div className="flex flex-col text-left">
                     <span className="font-bold text-purple-300">
-                      {h.etiqueta} <span className="text-slate-400 text-[11px]">({h.jugadorNombre})</span>
+                      {h.etiqueta} <span className="text-slate-400 text-sm">({h.jugadorNombre})</span>
                     </span>
-                    <span className="text-[11px] text-slate-300 mt-0.5">{h.detalle}</span>
+                    <span className="text-sm text-slate-300 mt-0.5">{h.detalle}</span>
                   </div>
                   <button
                     type="button"
                     onClick={() => eliminarRegistroHabilidad(idx)}
                     aria-label={`Quitar ${h.etiqueta}`}
-                    className="text-xs text-red-300 hover:text-red-200 font-bold min-h-9 min-w-9 px-2 py-1 rounded bg-slate-800"
+                    className="text-sm text-red-300 hover:text-red-200 font-bold min-h-9 min-w-9 px-2 py-1 rounded bg-slate-800"
                   >
                     ✕
                   </button>

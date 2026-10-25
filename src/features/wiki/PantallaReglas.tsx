@@ -75,17 +75,17 @@ export function PantallaReglas() {
       >
         <button
           onClick={() => setPantallaActual('inicio')}
-          className="mb-4 text-sm text-amber-300 font-bold"
+          className="mb-4 text-base text-amber-300 font-bold"
         >
           ← Volver al menú
         </button>
-        <h2 className="text-2xl font-bold mb-1 text-white">Manual y Jerarquía del Juego</h2>
-        <p className="text-xs text-slate-300 mb-4">Organizado por categorías y expansiones</p>
+        <h2 className="text-3xl font-bold mb-1 text-white">Manual y Jerarquía del Juego</h2>
+        <p className="text-sm text-slate-300 mb-4">Organizado por categorías y expansiones</p>
 
         <div className="grid grid-cols-2 gap-2 mb-4">
           <button
             onClick={() => setVista('manual')}
-            className={`py-2.5 px-3 rounded-xl font-bold text-xs border text-center ${
+            className={`py-2.5 px-3 rounded-xl font-bold text-sm border text-center ${
               vista === 'manual' ? 'btn-blanco-marron' : 'btn-marron-oscuro'
             }`}
           >
@@ -93,7 +93,7 @@ export function PantallaReglas() {
           </button>
           <button
             onClick={() => setVista('cartas')}
-            className={`py-2.5 px-3 rounded-xl font-bold text-xs border text-center ${
+            className={`py-2.5 px-3 rounded-xl font-bold text-sm border text-center ${
               vista === 'cartas' ? 'btn-blanco-marron' : 'btn-marron-oscuro'
             }`}
           >
@@ -110,12 +110,12 @@ export function PantallaReglas() {
                 onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
                 type="text"
                 placeholder="🔍 Buscar carta..."
-                className="w-full rounded-xl pl-3.5 pr-10 py-2.5 text-xs text-white bg-slate-900 border border-slate-700 focus:outline-none focus:border-amber-500"
+                className="w-full rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-white bg-slate-900 border border-slate-700 focus:outline-none focus:border-amber-500"
               />
               {termino.length > 0 && (
                 <button
                   onClick={() => setTermino('')}
-                  className="absolute right-2.5 flex items-center justify-center w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold"
+                  className="absolute right-2.5 flex items-center justify-center w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-bold"
                 >
                   ✕
                 </button>
@@ -130,7 +130,7 @@ export function PantallaReglas() {
                   key={f}
                   ref={f === filtro ? filtroRef : undefined}
                   onClick={() => setFiltro(f)}
-                  className={`px-3 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap text-center ${
+                  className={`px-3 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap text-center ${
                     filtro === f
                       ? 'btn-blanco-marron text-black'
                       : 'bg-slate-900 border border-slate-800 text-slate-300'
@@ -150,13 +150,13 @@ export function PantallaReglas() {
             <div key={categoria.id} className="border border-slate-800 rounded-xl overflow-hidden">
               <button
                 onClick={() => toggleAcordeon(categoria.id)}
-                className="w-full p-3.5 bg-slate-900 flex justify-between items-center font-bold text-amber-300 text-sm"
+                className="w-full p-3.5 bg-slate-900 flex justify-between items-center font-bold text-amber-300 text-base"
               >
                 <span>{categoria.titulo}</span>
                 <span>{acordeonAbierto === categoria.id ? '▲' : '▼'}</span>
               </button>
               {acordeonAbierto === categoria.id && (
-                <div className="p-4 bg-slate-950 text-xs text-slate-300 flex flex-col gap-3 border-t border-slate-800">
+                <div className="p-4 bg-slate-950 text-sm text-slate-300 flex flex-col gap-3 border-t border-slate-800">
                   {categoria.items.map((regla, idx) => {
                     const clave = `${categoria.id}-${idx}`;
                     const abierta = reglasAbiertas[clave] ?? false;
@@ -170,7 +170,7 @@ export function PantallaReglas() {
                           className="w-full text-left font-bold text-white flex justify-between items-center py-1"
                         >
                           <span>{regla.titulo}</span>
-                          <span className="text-[11px] text-amber-400 font-normal">
+                          <span className="text-sm text-amber-400 font-normal">
                             {abierta ? '−' : '+'}
                           </span>
                         </button>
@@ -198,13 +198,13 @@ export function PantallaReglas() {
             <article key={carta.id} className="tarjeta-marron p-3.5 flex flex-col gap-3">
               <div className="flex items-start justify-between">
                 <span
-                  className={`text-[11px] font-extrabold px-2 py-0.5 rounded-md border ${estiloBadgeModo(
+                  className={`text-sm font-extrabold px-2 py-0.5 rounded-md border ${estiloBadgeModo(
                     carta.modo
                   )}`}
                 >
                   {iconoModo(carta.modo)} {carta.modo}
                 </span>
-                <span className="text-xs font-bold text-slate-400">
+                <span className="text-sm font-bold text-slate-400">
                   Cantidad: {carta.cantidad}
                 </span>
               </div>
@@ -218,10 +218,10 @@ export function PantallaReglas() {
                   }}
                 />
                 <div className="flex flex-col gap-1">
-                  <h4 className="text-sm font-extrabold text-white">{carta.nombre}</h4>
-                  <p className="text-xs text-slate-300 leading-relaxed">{carta.descripcion}</p>
+                  <h4 className="text-base font-extrabold text-white">{carta.nombre}</h4>
+                  <p className="text-sm text-slate-300 leading-relaxed">{carta.descripcion}</p>
                   {carta.habilidad && (
-                    <p className="text-xs text-amber-300 font-semibold mt-1 bg-amber-950/30 p-1.5 rounded border border-amber-900/40">
+                    <p className="text-sm text-amber-300 font-semibold mt-1 bg-amber-950/30 p-1.5 rounded border border-amber-900/40">
                       ⚡ {carta.habilidad}
                     </p>
                   )}
