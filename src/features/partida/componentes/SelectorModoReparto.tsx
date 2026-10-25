@@ -39,7 +39,7 @@ export function SelectorModoReparto({
       >
         {MODOS_REPARTO.map((modo) => (
           <option key={modo.id} value={modo.id}>
-            {modo.icono} {modo.nombre} {modo.cartas ? `(${modo.cartas.join(', ')})` : '(A elección)'}
+            {modo.icono} {modo.nombre}
           </option>
         ))}
       </select>

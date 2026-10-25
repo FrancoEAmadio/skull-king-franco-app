@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { AvatarPirata } from './AvatarPirata';
 import { avatarDe } from '../datos/avatares';
 
@@ -7,7 +6,7 @@ export interface ItemCarrusel {
   id: string;
   nombre: string;
   avatar?: string;
-  /** Línea chica debajo del nombre, por ejemplo "1 / 2". */
+  /** Línea chica debajo del nombre, por ejemplo "1/2". */
   detalle?: string;
 }
 
@@ -17,49 +16,57 @@ interface Props {
   onSeleccionar: (indice: number) => void;
 }
 
-/** Barra fija de jugadores: el seleccionado queda siempre en el centro, con el anterior y el siguiente a los lados. */
-export function CarruselJugadores({ items, seleccionado, onSeleccionar }: Props) {
-  const contenedor = useRef<HTMLDivElement>(null);
-  const refs = useRef(new Map<number, HTMLButtonElement>());
+const VISIBLES = 3;
 
-  useEffect(() => {
-    const caja = contenedor.current;
-    const item = refs.current.get(seleccionado);
-    if (!caja || !item) return;
-    const izquierda = item.offsetLeft - (caja.clientWidth - item.clientWidth) / 2;
-    caja.scrollTo({ left: Math.max(0, izquierda), behavior: 'smooth' });
-  }, [seleccionado, items.length]);
+/**
+ * Siempre muestra 3 jugadores: el anterior, el actual y el siguiente.
+ * En el primero queda a la izquierda y en el último a la derecha.
+ */
+export function CarruselJugadores({ items, seleccionado, onSeleccionar }: Props) {
+  const posicion = Math.max(
+    0,
+    items.findIndex((item) => item.indice === seleccionado)
+  );
+  const inicio = Math.min(Math.max(0, posicion - 1), Math.max(0, items.length - VISIBLES));
+  const visibles = items.slice(inicio, inicio + VISIBLES);
 
   return (
     <nav
-      ref={contenedor}
       aria-label="Jugadores"
-      className="carrusel-jugadores sticky top-0 z-20 -mx-4 border-b border-amber-500/20 bg-slate-950/90 backdrop-blur"
+      className="sticky top-0 z-20 -mx-4 px-4 pb-3 pt-2 backdrop-blur-md"
     >
-      {items.map((item) => {
-        const activo = item.indice === seleccionado;
-        return (
-          <button
-            key={item.id + item.indice}
-            ref={(el) => {
-              if (el) refs.current.set(item.indice, el);
-              else refs.current.delete(item.indice);
-            }}
-            type="button"
-            aria-current={activo}
-            onClick={() => onSeleccionar(item.indice)}
-            className={`carrusel-item ${activo ? 'carrusel-item-activo' : ''}`}
-          >
-            <AvatarPirata emoji={avatarDe(item.id, item.avatar)} tamano={activo ? 'lg' : 'md'} activo={activo} />
-            <span className={`max-w-full truncate font-black ${activo ? 'text-lg text-white' : 'text-base text-slate-300'}`}>
-              {item.nombre}
-            </span>
-            {item.detalle && (
-              <span className={`text-sm font-bold ${activo ? 'text-amber-300' : 'text-slate-400'}`}>{item.detalle}</span>
-            )}
-          </button>
-        );
-      })}
+      <div className="grid grid-cols-3 gap-2">
+        {visibles.map((item) => {
+          const activo = item.indice === seleccionado;
+          return (
+            <button
+              key={item.id + item.indice}
+              type="button"
+              aria-current={activo}
+              onClick={() => onSeleccionar(item.indice)}
+              className={`flex min-w-0 flex-col items-center gap-1 rounded-2xl border px-1 py-2.5 ${
+                activo
+                  ? 'border-amber-400/80 bg-[#2a2314]'
+                  : 'border-slate-700 bg-slate-900 opacity-90'
+              }`}
+            >
+              <AvatarPirata emoji={avatarDe(item.id, item.avatar)} tamano={activo ? 'lg' : 'md'} activo={activo} />
+              <span
+                className={`w-full truncate px-1 text-center font-black ${
+                  activo ? 'text-xl text-white' : 'text-lg text-slate-300'
+                }`}
+              >
+                {item.nombre}
+              </span>
+              {item.detalle && (
+                <span className={`text-base font-bold ${activo ? 'text-amber-300' : 'text-slate-400'}`}>
+                  {item.detalle}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
     </nav>
   );
 }

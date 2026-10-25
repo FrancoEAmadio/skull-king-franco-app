@@ -4,22 +4,15 @@ import { modoPermiteRegla } from '../../../dominio/disponibilidadContenido';
 import type { ConfiguracionMesa, ReglasOpcionales } from '../../../tipos';
 
 const OPCIONES_AVANZADAS: [keyof ReglasOpcionales, string][] = [
-  ['kraken', 'Kraken'],
-  ['ballenaBlanca', 'Ballena Blanca'],
-  ['botin', 'Botín'],
+  ['kraken', 'Kraken (nadie gana la baza)'],
+  ['botin', 'Botín (alianzas +20 pts)'],
 ];
 
 const OPCIONES_EXPANSION: [keyof ReglasOpcionales, string][] = [
   ['primerOficialKong', 'Primer Oficial Kong'],
-  ['pirataMaryThorne', 'Mary Thorne'],
-  ['mono15', 'Mono Comodín (15)'],
-  ['mantarrayaMoteada', 'Mantarraya Moteada'],
-  ['davyJones', 'Davy Jones'],
-  ['caminarPorLaTabla', 'Caminar por la Tabla'],
-  ['ultimaDescarga', 'Última Descarga'],
-  ['carta7', 'Carta 7 (−5 pts bonificación)'],
-  ['carta8', 'Carta 8 (+5 pts bonificación)'],
-  ['cartas0y14', 'Cartas 0–14'],
+  ['davyJones', 'Davy Jones (monstruos destruidos)'],
+  ['carta7', 'Carta 7 (−5 pts)'],
+  ['carta8', 'Carta 8 (+5 pts)'],
 ];
 
 interface Props {
@@ -95,7 +88,7 @@ function GrupoOpciones({ titulo, color, opciones, configuracion, onCambiar }: Gr
         const deshabilitada = !modoPermiteRegla(configuracion.modoContenido, clave);
         return (
           <label key={clave} className="flex items-center justify-between cursor-pointer py-1">
-            <span className="font-semibold text-sm text-slate-200">{etiqueta}</span>
+            <span className="font-semibold text-base text-slate-200">{etiqueta}</span>
             <Toggle
               tamano="sm"
               checked={configuracion.reglasOpcionales[clave]}

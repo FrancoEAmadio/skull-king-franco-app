@@ -38,7 +38,7 @@ function calcularBonosDeEventos(eventosBono: Record<string, number>): number {
   for (const evId of Object.keys(eventosBono)) {
     if (evId === 'alianza_botin') continue;
     const cantidad = Number(eventosBono[evId]) || 0;
-    if (cantidad <= 0) continue;
+    if (cantidad === 0) continue;
     const regla = LISTA_EVENTOS_BONO.find((r) => r.id === evId);
     if (regla) total += cantidad * regla.puntos;
   }

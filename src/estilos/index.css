@@ -1,24 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg-dark: #07142b;
-  --color-slate-950: #06122a;
-  --color-slate-900: #0c2044;
-  --color-slate-800: #153164;
-  --color-slate-700: #204780;
-  --color-slate-600: #34609f;
-  --color-slate-500: #6d8bbd;
-  --color-slate-400: #9fb5d9;
-  --color-slate-300: #c6d4ea;
-  --color-slate-200: #dde6f3;
+  --color-bg-dark: #090d16;
   --font-display: 'Pirata One', 'Cinzel', system-ui, serif;
   --font-heading: 'Cinzel', system-ui, serif;
 }
 
 :root {
-  --bg-dark: #07142b;
-  --bg-card: rgba(12, 32, 68, 0.92);
-  --border-card: rgba(120, 160, 220, 0.22);
+  --bg-dark: #090d16;
+  --bg-card: rgba(17, 24, 39, 0.92);
+  --border-card: rgba(55, 65, 81, 0.75);
   --accent-gold: #f59e0b;
   --accent-gold-hover: #fbbf24;
   --text-main: #f3f4f6;
@@ -37,8 +28,8 @@ body {
 
 body {
   background:
-    radial-gradient(ellipse at top center, rgba(245, 180, 40, 0.10) 0%, transparent 50%),
-    linear-gradient(180deg, #1b4a8f 0%, #12336a 38%, #0a1d40 100%);
+    radial-gradient(ellipse at top center, rgba(245, 158, 11, 0.06) 0%, transparent 55%),
+    radial-gradient(circle at top center, #131c2e 0%, var(--bg-dark) 100%);
   background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
@@ -119,16 +110,16 @@ button {
 }
 
 .btn-marron-oscuro {
-  background: linear-gradient(180deg, #1f4278 0%, #17325f 100%);
+  background: linear-gradient(180deg, #263243 0%, #1f2937 100%);
   color: var(--text-main);
   font-weight: 700;
-  border: 1px solid #34609f;
+  border: 1px solid #374151;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .btn-marron-oscuro:hover:not(:disabled) {
-  background: linear-gradient(180deg, #2a5495 0%, #1f4278 100%);
-  border-color: #4a78b8;
+  background: linear-gradient(180deg, #374151 0%, #263243 100%);
+  border-color: #4b5563;
 }
 
 .btn-secundario-retroceder {
@@ -175,8 +166,8 @@ button {
 input[type="text"],
 input[type="number"],
 select {
-  background-color: #0a1b3b;
-  border: 1.5px solid #34609f;
+  background-color: #0f172a;
+  border: 1.5px solid #374151;
   color: #f8fafc;
   border-radius: 0.65rem;
   padding: 0.75rem 0.95rem;
@@ -390,7 +381,7 @@ table {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: radial-gradient(circle at 35% 30%, #1f4278 0%, #0c2044 100%);
+  background: radial-gradient(circle at 35% 30%, #263243 0%, #111827 100%);
   border: 2px solid rgba(245, 158, 11, 0.55);
   line-height: 1;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
@@ -471,24 +462,24 @@ table {
 }
 
 .ficha-inactiva {
-  background: #0c2044;
-  border: 2px solid #204780;
+  background: #111827;
+  border: 2px solid #374151;
 }
 
 /* Píldora de bono: toque = suma, al llegar al máximo vuelve a cero */
 .pildora-bono {
   position: relative;
   display: inline-flex;
-  min-height: 3.5rem;
+  min-height: 3.1rem;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   gap: 0.1rem;
   border-radius: 1rem;
-  border: 1.5px solid #34609f;
-  background: linear-gradient(180deg, #17325f 0%, #10264d 100%);
-  padding: 0.55rem 0.95rem;
-  padding-right: 3.4rem;
+  border: 1.5px solid #374151;
+  background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+  padding: 0.4rem 0.85rem;
+  padding-right: 3.6rem;
   text-align: left;
   color: #dde6f3;
   font-weight: 700;
@@ -510,6 +501,11 @@ table {
   opacity: 0.3;
 }
 
+/* Llegó al tope: sigue viéndose encendida, solo que ya no suma más */
+.pildora-bono-activa:disabled {
+  opacity: 0.85;
+}
+
 .pildora-contador {
   position: absolute;
   right: 0.55rem;
@@ -521,7 +517,7 @@ table {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: #0a1b3b;
+  background: #0f172a;
   color: #fcd34d;
   font-size: 1.1rem;
   font-weight: 900;
@@ -572,4 +568,20 @@ table {
 
 .pie-pagina {
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+/* Bonos que no se cobraron: la línea de tachado va en rojo */
+.tachado-rojo {
+  text-decoration-line: line-through;
+  text-decoration-color: #ef4444;
+  text-decoration-thickness: 2px;
+}
+
+/* Ronda en curso en la barra de rondas: solo borde dorado, sin sombra ni brillo
+   (el brillo se recortaba contra el scroll horizontal y quedaba como un rectángulo). */
+.ronda-actual {
+  border: 2px solid #fcd34d;
+  background: #fbbf24;
+  color: #2a1700;
+  box-shadow: none;
 }

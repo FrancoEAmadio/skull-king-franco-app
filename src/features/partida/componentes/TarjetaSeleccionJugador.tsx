@@ -22,19 +22,21 @@ export function TarjetaSeleccionJugador({ jugador, posicionSeleccion, onSeleccio
         seleccionado ? 'btn-blanco-marron' : 'btn-marron-oscuro'
       }`}
     >
-      <AvatarPirata emoji={avatarDe(jugador.id, jugador.avatar)} tamano="lg" activo={seleccionado} />
+      <AvatarPirata emoji={avatarDe(jugador.id, jugador.avatar)} tamano="md" activo={seleccionado} />
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          {seleccionado && <span className="badge-orden-jugador !h-7 !w-7 shrink-0 !text-base">{posicionSeleccion}</span>}
-          <span className={`truncate text-2xl font-black ${seleccionado ? 'text-amber-950' : 'text-white'}`}>
-            {jugador.nombre}
-          </span>
-        </div>
-        <span className={`mt-1 block text-base font-bold ${seleccionado ? 'text-amber-900' : 'text-slate-300'}`}>
+        <span className={`block truncate text-2xl font-black ${seleccionado ? 'text-amber-950' : 'text-white'}`}>
+          {jugador.nombre}
+        </span>
+        <span className={`mt-0.5 block text-[0.95rem] font-bold ${seleccionado ? 'text-amber-900' : 'text-slate-300'}`}>
           {partidasJugadas} {partidasJugadas === 1 ? 'partida' : 'partidas'} · 🏆 {victorias}{' '}
           {victorias === 1 ? 'victoria' : 'victorias'}
         </span>
       </div>
+      {seleccionado && (
+        <span className="badge-orden-jugador !h-9 !w-9 shrink-0 !text-lg" aria-label={`Puesto ${posicionSeleccion}`}>
+          {posicionSeleccion}
+        </span>
+      )}
     </button>
   );
 }

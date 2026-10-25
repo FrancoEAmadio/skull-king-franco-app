@@ -69,10 +69,7 @@ export function PantallaReglas() {
 
   return (
     <main className="py-6 w-full">
-      <div
-        className="sticky top-0 z-20 w-full pb-4 border-b border-slate-800/50 backdrop-blur-md"
-        style={{ backgroundColor: 'var(--bg-card)' }}
-      >
+      <div className="w-full pb-4">
         <button
           onClick={() => setPantallaActual('inicio')}
           className="mb-4 text-base text-amber-300 font-bold"
@@ -196,15 +193,15 @@ export function PantallaReglas() {
         >
           {cartasFiltradas.map((carta) => (
             <article key={carta.id} className="tarjeta-marron p-3.5 flex flex-col gap-3">
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-3">
                 <span
-                  className={`text-sm font-extrabold px-2 py-0.5 rounded-md border ${estiloBadgeModo(
+                  className={`shrink-0 self-start whitespace-nowrap text-sm font-extrabold px-2 py-0.5 rounded-md border ${estiloBadgeModo(
                     carta.modo
                   )}`}
                 >
                   {iconoModo(carta.modo)} {carta.modo}
                 </span>
-                <span className="text-sm font-bold text-slate-400">
+                <span className="min-w-0 text-right text-sm font-bold leading-snug text-slate-400">
                   Cantidad: {carta.cantidad}
                 </span>
               </div>

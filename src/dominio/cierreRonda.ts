@@ -49,7 +49,7 @@ function clasificarEventosBono(
   for (const idEvento of Object.keys(jugador.eventosBono)) {
     if (idEvento === 'alianza_botin') continue;
     const cantidad = Number(jugador.eventosBono[idEvento]) || 0;
-    if (cantidad <= 0) continue;
+    if (cantidad === 0) continue;
 
     const evento = LISTA_EVENTOS_BONO.find((e) => e.id === idEvento);
     const unitario = evento ? evento.puntos : 0;
