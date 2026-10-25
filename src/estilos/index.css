@@ -501,11 +501,6 @@ table {
   opacity: 0.3;
 }
 
-/* Llegó al tope: sigue viéndose encendida, solo que ya no suma más */
-.pildora-bono-activa:disabled {
-  opacity: 0.85;
-}
-
 .pildora-contador {
   position: absolute;
   right: 0.55rem;
@@ -570,18 +565,45 @@ table {
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
-/* Bonos que no se cobraron: la línea de tachado va en rojo */
+/* Control que llegó a su tope: se ve apagado pero legible */
+.pildora-bono.pildora-tope:disabled {
+  opacity: 0.85;
+  filter: saturate(0.7);
+}
+
+/* Número de ronda en curso: solo borde dorado, sin sombra rectangular */
+.ronda-actual {
+  border: 2px solid #fcd34d;
+  background: rgba(245, 158, 11, 0.18);
+  color: #fcd34d;
+  box-shadow: none;
+}
+
+/* Tachado en rojo para bonos que no se cobran */
 .tachado-rojo {
   text-decoration-line: line-through;
   text-decoration-color: #ef4444;
   text-decoration-thickness: 2px;
 }
 
-/* Ronda en curso en la barra de rondas: solo borde dorado, sin sombra ni brillo
-   (el brillo se recortaba contra el scroll horizontal y quedaba como un rectángulo). */
-.ronda-actual {
-  border: 2px solid #fcd34d;
-  background: #fbbf24;
-  color: #2a1700;
-  box-shadow: none;
+/* Selección clara sin pintar todo de amarillo: borde dorado + brillo, texto blanco (los emojis se ven bien) */
+.opcion-activa {
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0.08) 100%);
+  border: 2px solid #fbbf24;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(251, 191, 36, 0.28);
+}
+
+.opcion-inactiva {
+  background: #111827;
+  border: 2px solid #2b3648;
+  color: #cbd5e1;
+}
+
+.punto-modo {
+  display: inline-block;
+  height: 1.1rem;
+  width: 1.1rem;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.85);
 }

@@ -4,7 +4,7 @@ import {
   CLAVE_LS_PARTIDA_GUARDADA,
 } from '../constantes';
 import { MAX_PARTIDAS_EVOLUCION } from '../constantes';
-import { crearEstadisticasVacias } from '../dominio/estadisticas';
+import { crearEstadisticasVacias, recalcularEstadisticasDesdeHistorial } from '../dominio/estadisticas';
 import type {
   EntradaEvolucion,
   EntradaHistorialPartida,
@@ -293,21 +293,39 @@ export interface ResultadoCombinacion {
  * - jugadores con el mismo id: se conserva el que tiene más partidas jugadas;
  * - partidas del historial: se omiten las que ya existen (misma fecha y resultado).
  */
+/** Las fechas se guardan como "25/10/2026, 21:30" (es-AR): se convierten para poder ordenar. */
+function marcaDeTiempo(fecha: string): number {
+  const m = /(\d{1,2})\/(\d{1,2})\/(\d{4})\D*(\d{1,2})?:?(\d{2})?/.exec(fecha);
+  if (!m) return Date.parse(fecha) || 0;
+  return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]), Number(m[4] ?? 0), Number(m[5] ?? 0)).getTime();
+}
+
 export function combinarCopiaSeguridad(
   jugadoresActuales: JugadorPermanente[],
   historialActual: EntradaHistorialPartida[],
   copia: CopiaSeguridad
 ): ResultadoCombinacion {
+  const clave = (nombre: string) => nombre.trim().toLowerCase();
   const porId = new Map(jugadoresActuales.map((j) => [j.id, j]));
+  const porNombre = new Map(jugadoresActuales.map((j) => [clave(j.nombre), j]));
+  // Cada teléfono genera sus propios ids: al importar, "Franco" de otro celular es el mismo Franco de este.
+  const reemplazoDeId = new Map<string, string>();
   let jugadoresNuevos = 0;
   let jugadoresActualizados = 0;
+
   for (const entrante of copia.jugadores) {
-    const existente = porId.get(entrante.id);
+    const existente = porId.get(entrante.id) ?? porNombre.get(clave(entrante.nombre));
     if (!existente) {
       porId.set(entrante.id, entrante);
+      porNombre.set(clave(entrante.nombre), entrante);
       jugadoresNuevos += 1;
-    } else if (entrante.estadisticas.partidasJugadas > existente.estadisticas.partidasJugadas) {
-      porId.set(entrante.id, entrante);
+      continue;
+    }
+    if (existente.id !== entrante.id) reemplazoDeId.set(entrante.id, existente.id);
+    if (!existente.avatar && entrante.avatar) {
+      const conIcono = { ...existente, avatar: entrante.avatar };
+      porId.set(existente.id, conIcono);
+      porNombre.set(clave(existente.nombre), conIcono);
       jugadoresActualizados += 1;
     }
   }
@@ -322,12 +340,24 @@ export function combinarCopiaSeguridad(
       continue;
     }
     firmas.add(firma);
-    nuevas.push(partida);
+    nuevas.push({
+      ...partida,
+      ranking: partida.ranking.map((fila) =>
+        fila.permanenteId && reemplazoDeId.has(fila.permanenteId)
+          ? { ...fila, permanenteId: reemplazoDeId.get(fila.permanenteId) }
+          : fila
+      ),
+    });
   }
 
+  // El historial va de la partida más nueva a la más vieja.
+  const historial = [...historialActual, ...nuevas].sort((a, b) => marcaDeTiempo(b.fecha) - marcaDeTiempo(a.fecha));
+  // Las estadísticas se reconstruyen con el historial unido, así nada se cuenta dos veces.
+  const jugadores = recalcularEstadisticasDesdeHistorial([...porId.values()], historial);
+
   return {
-    jugadores: [...porId.values()],
-    historial: [...historialActual, ...nuevas],
+    jugadores,
+    historial,
     jugadoresNuevos,
     jugadoresActualizados,
     partidasNuevas: nuevas.length,

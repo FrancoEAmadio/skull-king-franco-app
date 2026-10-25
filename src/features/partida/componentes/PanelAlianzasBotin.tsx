@@ -38,7 +38,7 @@ export function PanelAlianzasBotin() {
   };
 
   return (
-    <div className="tarjeta-marron flex flex-col gap-2.5 p-3">
+    <div className="flex flex-col gap-2.5 p-3">
       <div className="flex items-center justify-between">
         <span className="text-sm font-bold uppercase tracking-widest text-amber-300">🤝 Alianzas de botín</span>
         <span className="text-sm font-bold text-slate-400">

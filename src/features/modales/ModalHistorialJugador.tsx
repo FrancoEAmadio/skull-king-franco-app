@@ -78,9 +78,12 @@ export function ModalHistorialJugador() {
                   ))}
 
                   {ronda.bonosNoCobradas.map((b, i) => (
-                    <div key={`bn-${i}`} className="flex justify-between text-slate-400 line-through">
-                      <span>{b.etiqueta}:</span>
-                      <span>+{b.subtotal} pts</span>
+                    <div key={`bn-${i}`} className="flex justify-between text-slate-400">
+                      <span className="tachado-rojo">{b.etiqueta}:</span>
+                      <span className="tachado-rojo">
+                        {b.subtotal > 0 ? '+' : ''}
+                        {b.subtotal} pts
+                      </span>
                     </div>
                   ))}
                 </div>

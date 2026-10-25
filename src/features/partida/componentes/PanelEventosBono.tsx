@@ -26,8 +26,8 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
     jugadorActual,
     obtenerCantidadBono,
     obtenerMaximoBono,
-    limitePuntosCartas,
     ajustarPuntosCartas,
+    limitePuntosCartas,
     cambiarCantidadBono,
     borrarBonoInmediato,
     limpiarTodosLosEventos,
@@ -36,9 +36,10 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
   if (!jugadorActual) return null;
 
   const tieneEventos = Object.values(jugadorActual.eventosBono).some((v) => Number(v) !== 0);
-  const puntosCartas = (Number(jugadorActual.eventosBono.puntos_cartas) || 0) * 5;
-  const enTopeMaximo = puntosCartas >= limitePuntosCartas.maxPuntos;
-  const enTopeMinimo = puntosCartas <= limitePuntosCartas.minPuntos;
+  const unidadesCartas = Number(jugadorActual.eventosBono.puntos_cartas) || 0;
+  const puntosCartas = unidadesCartas * 5;
+  const enMaximo = unidadesCartas >= limitePuntosCartas.maximoUnidades;
+  const enMinimo = unidadesCartas <= limitePuntosCartas.minimoUnidades;
   const base = eventosBase.filter((e) => !REEMPLAZADOS.has(e.id));
   const expansion = eventosExpansion.filter((e) => !REEMPLAZADOS.has(e.id));
 
@@ -73,8 +74,8 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
 
   return (
     <div
-      className={`flex flex-col gap-3 rounded-2xl p-3 ${
-        sinBonosNormales ? 'border border-red-700/80 bg-red-950/30' : 'tarjeta-marron'
+      className={`flex flex-col gap-3 p-3 ${
+        sinBonosNormales ? 'bg-red-950/30' : ''
       }`}
     >
       <div className="flex items-center justify-between gap-2">
@@ -108,13 +109,13 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
               vibrar();
               ajustarPuntosCartas(1);
             }}
-            disabled={enTopeMaximo}
-            aria-label={`Puntos por cartas capturadas: ${puntosCartas}. Máximo ${limitePuntosCartas.maxPuntos}. Tocá para sumar 5`}
-            className={`pildora-bono col-span-2 w-full ${puntosCartas !== 0 ? 'pildora-bono-activa' : ''}`}
+            disabled={enMaximo}
+            aria-label={`Puntos por cartas capturadas: ${puntosCartas}. Tocá para sumar 5`}
+            className={`pildora-bono pildora-tope col-span-2 w-full ${puntosCartas !== 0 ? 'pildora-bono-activa' : ''}`}
           >
             <span className="text-base font-extrabold leading-tight">Puntos por cartas capturadas</span>
             <span className={`text-sm font-bold ${puntosCartas !== 0 ? 'text-amber-950/80' : 'text-amber-300'}`}>
-              14, 8 y 7 · cada toque suma +5 · máx +{limitePuntosCartas.maxPuntos}
+              {enMaximo ? `Máximo de la ronda: ${limitePuntosCartas.maximoUnidades * 5} pts` : '14, 8 y 7 · cada toque suma +5'}
             </span>
             <span className="pildora-contador !min-w-[3.4rem] px-2 text-base" aria-hidden="true">
               {puntosCartas > 0 ? '+' : ''}
@@ -127,9 +128,9 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
               vibrar();
               ajustarPuntosCartas(-1);
             }}
-            disabled={enTopeMinimo}
+            disabled={enMinimo}
             aria-label="Restar 5 puntos"
-            className="btn-marron-oscuro min-h-12 rounded-2xl text-xl font-black disabled:opacity-30"
+            className="btn-marron-oscuro min-h-12 rounded-2xl text-xl font-black"
           >
             −5
           </button>

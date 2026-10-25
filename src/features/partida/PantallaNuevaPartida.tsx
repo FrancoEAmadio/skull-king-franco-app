@@ -9,10 +9,10 @@ import { SelectorJugadores } from './componentes/SelectorJugadores';
 import { SelectorModoReparto } from './componentes/SelectorModoReparto';
 import { ConfiguradorRepartoPersonalizado } from './componentes/ConfiguradorRepartoPersonalizado';
 
-const MODOS_CONTENIDO: { id: ModoContenido; etiqueta: string }[] = [
-  { id: 'base', etiqueta: '🟢 Juego Base' },
-  { id: 'avanzado', etiqueta: '🟣 Reglas Avanzadas' },
-  { id: 'expansion', etiqueta: '🟠 Expansión' },
+const MODOS_CONTENIDO: { id: ModoContenido; etiqueta: string; color: string }[] = [
+  { id: 'base', etiqueta: 'Juego Base', color: '#22c55e' },
+  { id: 'avanzado', etiqueta: 'Reglas Avanzadas', color: '#a855f7' },
+  { id: 'expansion', etiqueta: 'Expansión', color: '#f97316' },
 ];
 
 export function PantallaNuevaPartida() {
@@ -97,9 +97,6 @@ export function PantallaNuevaPartida() {
     <main className="py-6 flex flex-col gap-6 w-full overflow-y-auto">
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-sm uppercase tracking-widest text-amber-400 font-bold block">
-            Paso 1 de 5
-          </span>
           <h2 className="text-3xl font-bold text-white">Configurar Mesa</h2>
         </div>
         <button
@@ -110,23 +107,25 @@ export function PantallaNuevaPartida() {
         </button>
       </div>
 
-      <section className="tarjeta-marron p-4">
-        <label className="block text-sm uppercase tracking-wider text-amber-300 font-bold mb-3">
+      <section className="flex flex-col gap-3">
+        <label className="block text-sm uppercase tracking-wider text-amber-300 font-bold">
           📦 Modo de Contenido de la Mesa
         </label>
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {MODOS_CONTENIDO.map((modo) => {
             const seleccionado = configuracionMesa.modoContenido === modo.id;
             return (
               <button
                 key={modo.id}
                 onClick={() => cambiarModoContenido(modo.id)}
-                className={`p-3 rounded-xl font-bold text-left text-sm border flex items-center justify-between transition-all ${
-                  seleccionado ? 'btn-blanco-marron' : 'btn-marron-oscuro'
+                aria-pressed={seleccionado}
+                className={`flex min-h-24 flex-col items-center justify-start gap-2 rounded-2xl px-1.5 pt-4 pb-3 text-center text-base font-extrabold leading-tight transition-all ${
+                  seleccionado ? 'opcion-activa' : 'opcion-inactiva'
                 }`}
               >
+                <span className="punto-modo" style={{ backgroundColor: modo.color }} />
                 <span>{modo.etiqueta}</span>
-                <span className="text-base">{seleccionado ? '✓' : ''}</span>
+                <span className={`text-sm ${seleccionado ? 'text-amber-300' : 'text-transparent'}`}>✓ Elegido</span>
               </button>
             );
           })}
@@ -206,11 +205,11 @@ function TarjetaOpcion({ titulo, detalle, activo, onChange }: TarjetaOpcionProps
       aria-checked={activo}
       onClick={() => onChange(!activo)}
       className={`flex min-h-[6.5rem] flex-col items-start justify-between gap-1 rounded-2xl p-3.5 text-left ${
-        activo ? 'btn-blanco-marron' : 'btn-marron-oscuro opacity-80'
+        activo ? 'opcion-activa' : 'opcion-inactiva'
       }`}
     >
       <span className="text-base font-black leading-tight">{titulo}</span>
-      <span className={`text-sm font-semibold leading-tight ${activo ? 'text-amber-900' : 'text-slate-400'}`}>
+      <span className={`text-sm font-semibold leading-tight ${activo ? 'text-amber-300' : 'text-slate-400'}`}>
         {activo ? '✓ ' : ''}
         {detalle}
       </span>

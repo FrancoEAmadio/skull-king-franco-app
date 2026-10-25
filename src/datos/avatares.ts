@@ -1,11 +1,11 @@
-/** Iconos de pirata que se pueden asignar a cada jugador. */
+/** Iconos de pirata que se pueden asignar a cada jugador: todos tienen que ver con el juego. */
 export const AVATARES: string[] = [
-  '🏴‍☠️', '💀', '🦜', '⚓', '🗡️', '🧭', '🐙', '🦈',
-  '🧜‍♀️', '👑', '🐋', '🦀', '🏝️', '💎', '🔥', '🌊',
-  '🐊', '🦑', '🪙', '🍾', '🐍', '🦅', '🐺', '🌙',
+  '🏴‍☠️', '💀', '☠️', '🦜', '🐒', '⚓', '🗡️', '🧭',
+  '🗺️', '⛵', '🚢', '🐙', '🦑', '🦈', '🐋', '🧜‍♀️',
+  '🏝️', '🌊', '💎', '🪙', '👑', '🍾', '🔱', '🎩',
 ];
 
-/** Si el jugador todavía no eligió, se le asigna uno estable según su id. */
+/** Si el jugador todavía no eligió (o su icono ya no está en la lista), se le asigna uno estable según su id. */
 export function avatarDe(id: string, avatar?: string): string {
   if (avatar && AVATARES.includes(avatar)) return avatar;
   let hash = 0;

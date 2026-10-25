@@ -89,14 +89,14 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
           </button>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 scroll-oculto">
+        <div className="flex flex-col gap-3 border-b border-slate-800 bg-slate-900/60 p-4">
           <input
             value={busqueda}
             onChange={(evento) => setBusqueda(evento.target.value)}
             type="search"
             placeholder="Buscar pirata..."
             aria-label="Buscar pirata por nombre"
-            className="w-full rounded-xl border border-slate-700 bg-slate-900 px-3.5 py-2.5 text-base text-white focus:border-amber-500 focus:outline-none"
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-3 text-lg text-white focus:border-amber-500 focus:outline-none"
           />
 
           <form
@@ -120,7 +120,7 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
                 onChange={(evento) => setNombreNuevo(evento.target.value)}
                 type="text"
                 placeholder="Nombre del nuevo pirata..."
-                className="min-w-0 flex-1"
+                className="min-w-0 flex-1 !text-lg"
               />
               <button type="submit" className="btn-blanco-marron shrink-0 rounded-xl px-4 text-lg font-bold">
                 + Crear
@@ -136,9 +136,14 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
               />
             )}
           </form>
+        </div>
 
+        <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto p-4 scroll-oculto">
           {jugadoresFiltrados.length > 0 ? (
             <div className="flex flex-col gap-2.5">
+              <span className="text-sm font-bold uppercase tracking-widest text-slate-400">
+                Tocá en el orden en que juegan
+              </span>
               {jugadoresFiltrados.map((jugador) => (
                 <TarjetaSeleccionJugador
                   key={jugador.id}
