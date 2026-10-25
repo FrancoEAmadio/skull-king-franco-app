@@ -24,8 +24,20 @@ const REGLAS_EXPANSION = new Set<keyof ReglasOpcionales>([
   'cartas0y14',
 ]);
 
+/** Reglas que solo existen en el Manual: no cambian la puntuación, así que no se activan al armar la mesa. */
+const REGLAS_FUERA_DEL_SELECTOR = new Set<keyof ReglasOpcionales>([
+  'ballenaBlanca',
+  'pirataMaryThorne',
+  'mono15',
+  'mantarrayaMoteada',
+  'caminarPorLaTabla',
+  'ultimaDescarga',
+  'cartas0y14',
+]);
+
 const EVENTOS_BASE = new Set([
   'pirata_por_sk',
+  'puntos_cartas',
   'sk_por_sirena',
   'sirena_por_pirata',
   'catorce_negro',
@@ -67,7 +79,7 @@ export function reglasOpcionalesPorDefectoDelModo(
   const reglas = {} as Record<keyof ReglasOpcionales, boolean>;
   const claves = Array.from(new Set([...REGLAS_AVANZADAS, ...REGLAS_EXPANSION]));
   for (const regla of claves) {
-    reglas[regla] = modoPermiteRegla(modoContenido, regla);
+    reglas[regla] = modoPermiteRegla(modoContenido, regla) && !REGLAS_FUERA_DEL_SELECTOR.has(regla);
   }
   return reglas as ReglasOpcionales;
 }

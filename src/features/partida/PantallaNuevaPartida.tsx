@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { ModalAviso } from '../../ui/ModalAviso';
-import { Toggle } from '../../ui/Toggle';
 import type { ConfiguracionMesa, ModoContenido, ModoRepartoId, ReglasOpcionales } from '../../tipos';
 import { reglasOpcionalesPorDefectoDelModo } from '../../dominio/disponibilidadContenido';
 import { MAX_RONDAS_PERSONALIZADO, MAX_CARTAS_POR_RONDA } from '../../constantes';
@@ -142,31 +141,30 @@ export function PantallaNuevaPartida() {
 
       <SelectorJugadores />
 
-      <section className="flex flex-col gap-3">
-        <TarjetaToggle
-          titulo="¿Comodines de Bonificación?"
+      <section className="grid grid-cols-2 gap-3">
+        <TarjetaOpcion
+          titulo="🃏 Comodines de bonificación"
+          detalle="Cartas blancas: +5 a +50 pts"
           activo={configuracionMesa.usarComodinesBonificacion}
           onChange={(valor) => actualizarConfig('usarComodinesBonificacion', valor)}
-          ayuda="🃏 Al recibir una Carta Blanca, apartala y robá otra del mazo. Bonificación final: 1 = +5 pts | 2 = +10 pts | 3 = +20 pts | 4+ = +50 pts."
         />
-        <TarjetaToggle
-          titulo="¿Reglas del Bribón Opcionales?"
+        <TarjetaOpcion
+          titulo="🏴‍☠️ Reglas del Bribón"
+          detalle="Metralla o Bala de cañón"
           activo={configuracionMesa.usarModoBribon}
           onChange={(valor) => actualizarConfig('usarModoBribon', valor)}
-          ayuda="🏴‍☠️ Permite elegir entre Metralla (Mano abierta) para asegurar puntos o Bala de cañón (Puño cerrado) para arriesgar por una recompensa mayor."
         />
-        <TarjetaToggle
-          titulo="¿Habilidades de Piratas?"
+        <TarjetaOpcion
+          titulo="✨ Habilidades de piratas"
+          detalle="Bribón, Harry y Kong"
           activo={configuracionMesa.usarHabilidadesPiratas}
           onChange={(valor) => actualizarConfig('usarHabilidadesPiratas', valor)}
-          ayuda="🏴‍☠️ Activa habilidades que modifican puntuación y envites: Bribón de Roatán (±0/10/20 pts), Harry el Gigante (±1 baza) y Primer Oficial Kong."
         />
-        <TarjetaToggle
-          titulo="¿Cobrar bonos al fallar envite?"
+        <TarjetaOpcion
+          titulo="💰 Bonos al fallar envite"
+          detalle="Se cobran aunque falles"
           activo={configuracionMesa.cobrarBonosSinAcierto}
           onChange={(valor) => actualizarConfig('cobrarBonosSinAcierto', valor)}
-          ayuda="ℹ️ Por defecto (regla oficial), las bonificaciones normales de captura solo se suman si acertás tu envite."
-          ayudaSiempreVisible
         />
       </section>
 
@@ -192,27 +190,30 @@ export function PantallaNuevaPartida() {
   );
 }
 
-interface TarjetaToggleProps {
+interface TarjetaOpcionProps {
   titulo: string;
+  detalle: string;
   activo: boolean;
   onChange: (valor: boolean) => void;
-  ayuda: string;
-  ayudaSiempreVisible?: boolean;
 }
 
-function TarjetaToggle({ titulo, activo, onChange, ayuda, ayudaSiempreVisible }: TarjetaToggleProps) {
-  const mostrarAyuda = ayudaSiempreVisible || activo;
+/** Tarjeta que funciona como botón: iluminada si está activa, apagada si no. Se pueden activar varias. */
+function TarjetaOpcion({ titulo, detalle, activo, onChange }: TarjetaOpcionProps) {
   return (
-    <div className="p-4 tarjeta-marron">
-      <label className="flex items-center justify-between cursor-pointer">
-        <span className="font-bold text-base text-white">{titulo}</span>
-        <Toggle checked={activo} onChange={onChange} />
-      </label>
-      {mostrarAyuda && (
-        <p className="text-sm text-slate-300 leading-relaxed mt-2 border-t border-amber-900/50 pt-2">
-          {ayuda}
-        </p>
-      )}
-    </div>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={activo}
+      onClick={() => onChange(!activo)}
+      className={`flex min-h-[6.5rem] flex-col items-start justify-between gap-1 rounded-2xl p-3.5 text-left ${
+        activo ? 'btn-blanco-marron' : 'btn-marron-oscuro opacity-80'
+      }`}
+    >
+      <span className="text-base font-black leading-tight">{titulo}</span>
+      <span className={`text-sm font-semibold leading-tight ${activo ? 'text-amber-900' : 'text-slate-400'}`}>
+        {activo ? '✓ ' : ''}
+        {detalle}
+      </span>
+    </button>
   );
 }

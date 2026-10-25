@@ -1,12 +1,9 @@
-import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { useInstalarPWA } from '../../ui/useInstalarPWA';
-import { ModalFeedback } from '../ajustes/ModalFeedback';
 
 export function PantallaInicio() {
   const { setPantallaActual, partida, setAjustesAbiertos } = useApp();
   const { puedeInstalar, instalar, mostrarAyudaIOS } = useInstalarPWA();
-  const [feedbackAbierto, setFeedbackAbierto] = useState(false);
 
   return (
     <main className="my-auto flex w-full flex-col items-center py-4 text-center">
@@ -72,21 +69,12 @@ export function PantallaInicio() {
         )}
         <button
           type="button"
-          onClick={() => setFeedbackAbierto(true)}
-          className="w-full rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-4 text-lg font-bold text-amber-200"
-        >
-          💬 Tu opinión, enviar comentarios o reportar error
-        </button>
-        <button
-          type="button"
           onClick={() => setAjustesAbiertos(true)}
           className="px-3 py-3 text-base font-bold text-slate-300 underline underline-offset-4"
         >
-          ⚙️ Ajustes y copia de seguridad
+          ⚙️ Ajustes
         </button>
       </div>
-
-      <ModalFeedback abierto={feedbackAbierto} onCerrar={() => setFeedbackAbierto(false)} />
     </main>
   );
 }

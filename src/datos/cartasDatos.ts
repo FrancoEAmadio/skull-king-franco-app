@@ -299,6 +299,7 @@ export const LISTA_EVENTOS_BONO: EventoBono[] = [
   { id: 'catorce_color', etiqueta: '14 de Color (+10 c/u)', puntos: 10, maximo: 3 },
   { id: 'ocho_expansion', etiqueta: '8 capturado (+5 pts c/u)', puntos: 5, maximo: 4 },
   { id: 'siete_expansion', etiqueta: '7 capturado (-5 pts c/u)', puntos: -5, maximo: 4 },
+  { id: 'puntos_cartas', etiqueta: 'Puntos por cartas capturadas (+5 c/u)', puntos: 5, maximo: 99 },
   { id: 'alianza_botin', etiqueta: 'Alianza de Botín (+20 c/u)', puntos: 20, maximo: 2 },
   { id: 'monstruo_davy', etiqueta: 'Monstruo destruido por Davy Jones (+20 c/u)', puntos: 20, maximo: 3 },
   { id: 'kong_por_sk_sirena', etiqueta: 'Primer Oficial Kong capturado por SK/Sirena (+30)', puntos: 30, maximo: 1 },

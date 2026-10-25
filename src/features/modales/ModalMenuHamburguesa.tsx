@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { copiarLink } from '../../infra/compartir';
+import { ModalFeedback } from '../ajustes/ModalFeedback';
 
 export function ModalMenuHamburguesa() {
   const { menuHamburguesaAbierto, setMenuHamburguesaAbierto, setPantallaActual, setAjustesAbiertos, partida } =
     useApp();
   const [copiado, setCopiado] = useState(false);
+  const [feedbackAbierto, setFeedbackAbierto] = useState(false);
 
-  if (!menuHamburguesaAbierto) return null;
+  if (!menuHamburguesaAbierto && !feedbackAbierto) {
+    return null;
+  }
 
   const cerrar = () => setMenuHamburguesaAbierto(false);
 
@@ -20,7 +24,12 @@ export function ModalMenuHamburguesa() {
   const claseOpcion =
     'flex min-h-14 w-full items-center gap-3 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-left text-lg font-bold text-white hover:bg-slate-800';
 
+  if (!menuHamburguesaAbierto) {
+    return <ModalFeedback abierto={feedbackAbierto} onCerrar={() => setFeedbackAbierto(false)} />;
+  }
+
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-start justify-start bg-black/80 p-4" onClick={cerrar}>
       <div className="tarjeta-marron mt-12 flex w-full max-w-sm flex-col gap-4 p-5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-slate-700 pb-3">
@@ -52,7 +61,7 @@ export function ModalMenuHamburguesa() {
             type="button"
             onClick={() => {
               cerrar();
-              setAjustesAbiertos(true);
+              setFeedbackAbierto(true);
             }}
             className={claseOpcion}
           >
@@ -81,5 +90,6 @@ export function ModalMenuHamburguesa() {
         </div>
       </div>
     </div>
+    </>
   );
 }

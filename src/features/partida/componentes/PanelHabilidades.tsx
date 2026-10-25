@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../../../estado/AppProvider';
 import { estaReglaActiva } from '../../../dominio/disponibilidadContenido';
+import { vibrar } from '../../../infra/vibracion';
 
 interface Props {
   abierto: boolean;
@@ -10,29 +11,80 @@ interface Props {
 type HabId = 'bribon_rotan' | 'harry_gigante' | 'kong';
 type HabCopiada = 'Bribón de Roatán' | 'Harry el Gigante';
 
+const OPCIONES_BRIBON = [0, 10, 20] as const;
+
+interface TogglesBribonProps {
+  etiqueta: string;
+  valor: number;
+  deshabilitado: boolean;
+  onElegir: (pts: number) => void;
+}
+
+/** Tres botones en fila (0, +10, +20): el elegido queda encendido y al tocar otro se reemplaza. */
+function TogglesBribon({ etiqueta, valor, deshabilitado, onElegir }: TogglesBribonProps) {
+  return (
+    <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={etiqueta}>
+      {OPCIONES_BRIBON.map((pts) => {
+        const activo = valor === pts;
+        return (
+          <button
+            key={pts}
+            type="button"
+            role="radio"
+            aria-checked={activo}
+            disabled={deshabilitado}
+            onClick={() => {
+              vibrar();
+              onElegir(pts);
+            }}
+            className={`rounded-xl py-3 text-lg font-black disabled:opacity-40 ${
+              activo ? 'btn-blanco-marron' : 'btn-marron-oscuro'
+            }`}
+          >
+            {pts === 0 ? '0' : `+${pts}`}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function PanelHabilidades({ abierto, onToggle }: Props) {
   const { partida } = useApp();
   const {
-    jugadores,
+    jugadorActual,
+    jugadorSeleccionadoIdx,
     configuracionMesa,
     registroHabilidadesRonda,
     habilidadesBloqueadasPorLimite,
     esHabilidadYaRegistrada,
     esKongYaRegistradoCon,
-    aplicarBribonRotan,
     aplicarHarryGigante,
-    aplicarKongCopiaBribon,
     aplicarKongHarryGigante,
+    elegirPuntosBribon,
     eliminarRegistroHabilidad,
   } = partida;
 
   const [habSeleccionada, setHabSeleccionada] = useState<HabId>('bribon_rotan');
-  const [habJugadorIdx, setHabJugadorIdx] = useState(0);
-  const [habPuntosBribon, setHabPuntosBribon] = useState(0);
   const [habHabilidadCopiada, setHabHabilidadCopiada] = useState<HabCopiada>('Bribón de Roatán');
 
+  if (!jugadorActual) return null;
+
+  const nombre = jugadorActual.nombre;
   const bloqueado = habilidadesBloqueadasPorLimite;
   const kongDisponible = estaReglaActiva(configuracionMesa, 'primerOficialKong');
+
+  const registroBribon = registroHabilidadesRonda.find((h) => h.tipo === 'Bribón de Roatán');
+  const bribonDeOtro = !!registroBribon && registroBribon.jugadorIdx !== jugadorSeleccionadoIdx;
+  const ptsBribon = registroBribon && !bribonDeOtro ? (jugadorActual.bribonHabilidadPts ?? 0) : 0;
+
+  const registroKongBribon = registroHabilidadesRonda.find(
+    (h) => h.tipo === 'Primer Oficial Kong' && h.etiqueta.includes('Bribón')
+  );
+  const kongBribonDeOtro =
+    !!registroKongBribon && registroKongBribon.jugadorIdx !== jugadorSeleccionadoIdx;
+  const ptsKongBribon =
+    registroKongBribon && !kongBribonDeOtro ? (jugadorActual.bribonHabilidadPts ?? 0) : 0;
 
   return (
     <div className={`p-3 rounded-2xl transition-all ${bloqueado ? 'bg-slate-900/50 border border-slate-800' : 'tarjeta-marron'}`}>
@@ -55,91 +107,61 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
 
       {abierto && (
         <div className="flex flex-col gap-3 mt-3 pt-3 border-t border-slate-800/80">
-          <p className="rounded-lg border border-slate-700 bg-slate-950/60 px-2.5 py-2 text-left text-sm leading-relaxed text-slate-300">
-            ℹ️ Regla oficial: la habilidad de un pirata se usa justo después de la baza que ganó con esa carta.
-            Tras la última baza de la ronda solo tiene efecto Harry el Gigante. Si te equivocás de jugador,
-            tocá ✕ en el registro: el envite vuelve a su valor original.
-          </p>
           {bloqueado ? (
             <p className="text-sm text-slate-400 text-center py-2">
               Se alcanzó el límite de 3 habilidades por ronda.
             </p>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex flex-col text-left">
-                  <label className="text-sm text-slate-400 font-bold uppercase block mb-1">
-                    Habilidad:
-                  </label>
-                  <select
-                    value={habSeleccionada}
-                    onChange={(e) => setHabSeleccionada(e.target.value as HabId)}
-                    className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
-                  >
-                    <option value="bribon_rotan" disabled={esHabilidadYaRegistrada('Bribón de Roatán')}>
-                      Bribón de Roatán {esHabilidadYaRegistrada('Bribón de Roatán') ? '✓' : ''}
-                    </option>
-                    <option value="harry_gigante" disabled={esHabilidadYaRegistrada('Harry el Gigante')}>
-                      Harry el Gigante {esHabilidadYaRegistrada('Harry el Gigante') ? '✓' : ''}
-                    </option>
-                    {kongDisponible && <option value="kong">Primer Oficial Kong</option>}
-                  </select>
-                </div>
+              <span className="text-base font-bold text-white text-left">
+                Habilidad pirata de <span className="text-amber-300">{nombre}</span>
+              </span>
 
-                <div className="flex flex-col text-left">
-                  <label className="text-sm text-slate-400 font-bold uppercase block mb-1">
-                    Pirata que la utilizó:
-                  </label>
-                  <select
-                    value={habJugadorIdx}
-                    onChange={(e) => setHabJugadorIdx(Number(e.target.value))}
-                    className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
-                  >
-                    {jugadores.map((jug, idx) => (
-                      <option key={idx} value={idx}>
-                        {jug.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="flex flex-col text-left">
+                <label className="text-sm text-slate-400 font-bold uppercase block mb-1">
+                  Habilidad:
+                </label>
+                <select
+                  value={habSeleccionada}
+                  onChange={(e) => setHabSeleccionada(e.target.value as HabId)}
+                  className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
+                >
+                  <option value="bribon_rotan">Bribón de Roatán</option>
+                  <option value="harry_gigante" disabled={esHabilidadYaRegistrada('Harry el Gigante')}>
+                    Harry el Gigante {esHabilidadYaRegistrada('Harry el Gigante') ? '✓' : ''}
+                  </option>
+                  {kongDisponible && <option value="kong">Primer Oficial Kong</option>}
+                </select>
               </div>
 
               {habSeleccionada === 'bribon_rotan' && (
-                <div className="mt-1 flex flex-col gap-2">
-                  <div className="flex flex-col text-left">
-                    <label className="text-sm text-slate-400 font-bold uppercase block mb-1">
-                      Apuesta de puntos de riesgo:
-                    </label>
-                    <select
-                      value={habPuntosBribon}
-                      onChange={(e) => setHabPuntosBribon(Number(e.target.value))}
-                      className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
-                    >
-                      <option value={0}>0 puntos extra (Sin riesgo)</option>
-                      <option value={10}>±10 puntos (+10 si cumple / −10 si falla)</option>
-                      <option value={20}>±20 puntos (+20 si cumple / −20 si falla)</option>
-                    </select>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => aplicarBribonRotan(habJugadorIdx, habPuntosBribon)}
-                    disabled={esHabilidadYaRegistrada('Bribón de Roatán')}
-                    className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-extrabold rounded-xl disabled:opacity-40"
-                  >
-                    + Registrar Bribón de Roatán (Apuesta: {habPuntosBribon} pts)
-                  </button>
+                <div className="flex flex-col gap-2 text-left">
+                  <span className="text-sm text-slate-300">
+                    Puntos que arriesga <strong>{nombre}</strong> (se suman si cumple su envite, se restan si falla):
+                  </span>
+                  <TogglesBribon
+                    etiqueta={`Apuesta de puntos de ${nombre}`}
+                    valor={ptsBribon}
+                    deshabilitado={bribonDeOtro}
+                    onElegir={(pts) => elegirPuntosBribon(jugadorSeleccionadoIdx, pts)}
+                  />
+                  {bribonDeOtro && (
+                    <span className="text-sm text-amber-300">
+                      El Bribón de Roatán ya lo usó {registroBribon?.jugadorNombre} en esta ronda.
+                    </span>
+                  )}
                 </div>
               )}
 
               {habSeleccionada === 'harry_gigante' && (
-                <div className="mt-1 flex flex-col gap-2">
-                  <span className="text-sm text-slate-300 text-left">
-                    Modifica el envite (bazas) de <strong>{jugadores[habJugadorIdx]?.nombre}</strong>:
+                <div className="flex flex-col gap-2 text-left">
+                  <span className="text-sm text-slate-300">
+                    Modifica el envite (bazas) de <strong>{nombre}</strong> (hoy: {jugadorActual.apuesta}):
                   </span>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => aplicarHarryGigante(habJugadorIdx, 1)}
+                      onClick={() => aplicarHarryGigante(jugadorSeleccionadoIdx, 1)}
                       disabled={esHabilidadYaRegistrada('Harry el Gigante')}
                       className="py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold rounded-xl disabled:opacity-40"
                     >
@@ -147,7 +169,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
                     </button>
                     <button
                       type="button"
-                      onClick={() => aplicarHarryGigante(habJugadorIdx, -1)}
+                      onClick={() => aplicarHarryGigante(jugadorSeleccionadoIdx, -1)}
                       disabled={esHabilidadYaRegistrada('Harry el Gigante')}
                       className="py-2.5 bg-rose-800 hover:bg-rose-700 text-white font-extrabold rounded-xl disabled:opacity-40"
                     >
@@ -158,7 +180,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
               )}
 
               {kongDisponible && habSeleccionada === 'kong' && (
-                <div className="mt-1 flex flex-col gap-2.5">
+                <div className="flex flex-col gap-2.5">
                   <div className="flex flex-col text-left">
                     <label className="text-sm text-slate-400 font-bold uppercase block mb-1">
                       Habilidad copiada por Kong:
@@ -168,9 +190,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
                       onChange={(e) => setHabHabilidadCopiada(e.target.value as HabCopiada)}
                       className="w-full text-purple-200 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
                     >
-                      <option value="Bribón de Roatán" disabled={esKongYaRegistradoCon('Bribón')}>
-                        Bribón de Roatán (Apuesta de puntos: 0/10/20) {esKongYaRegistradoCon('Bribón') ? '✓' : ''}
-                      </option>
+                      <option value="Bribón de Roatán">Bribón de Roatán (Apuesta de puntos: 0/10/20)</option>
                       <option value="Harry el Gigante" disabled={esKongYaRegistradoCon('Harry')}>
                         Harry el Gigante (Modificar Envite ±1) {esKongYaRegistradoCon('Harry') ? '✓' : ''}
                       </option>
@@ -179,38 +199,32 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
 
                   {habHabilidadCopiada === 'Bribón de Roatán' && (
                     <div className="flex flex-col gap-2 text-left">
-                      <label className="text-sm text-slate-400 font-bold uppercase block mb-0.5">
-                        Apuesta de puntos copiada:
-                      </label>
-                      <select
-                        value={habPuntosBribon}
-                        onChange={(e) => setHabPuntosBribon(Number(e.target.value))}
-                        className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
-                      >
-                        <option value={0}>0 puntos extra</option>
-                        <option value={10}>±10 puntos (+10 si cumple / −10 si falla)</option>
-                        <option value={20}>±20 puntos (+20 si cumple / −20 si falla)</option>
-                      </select>
-                      <button
-                        type="button"
-                        onClick={() => aplicarKongCopiaBribon(habJugadorIdx, habPuntosBribon)}
-                        disabled={esKongYaRegistradoCon('Bribón')}
-                        className="w-full py-2.5 bg-purple-700 hover:bg-purple-600 text-white font-extrabold rounded-xl disabled:opacity-40"
-                      >
-                        + Kong copia Bribón (±{habPuntosBribon} pts)
-                      </button>
+                      <span className="text-sm text-slate-300">
+                        Apuesta de puntos que copia <strong>{nombre}</strong>:
+                      </span>
+                      <TogglesBribon
+                        etiqueta={`Apuesta copiada por Kong para ${nombre}`}
+                        valor={ptsKongBribon}
+                        deshabilitado={kongBribonDeOtro}
+                        onElegir={(pts) => elegirPuntosBribon(jugadorSeleccionadoIdx, pts, true)}
+                      />
+                      {kongBribonDeOtro && (
+                        <span className="text-sm text-amber-300">
+                          Kong ya copió al Bribón con {registroKongBribon?.jugadorNombre} en esta ronda.
+                        </span>
+                      )}
                     </div>
                   )}
 
                   {habHabilidadCopiada === 'Harry el Gigante' && (
                     <div className="flex flex-col gap-2 text-left">
                       <span className="text-sm text-slate-300">
-                        Modifica el envite de <strong>{jugadores[habJugadorIdx]?.nombre}</strong> con la copia de Harry:
+                        Modifica el envite de <strong>{nombre}</strong> con la copia de Harry:
                       </span>
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
-                          onClick={() => aplicarKongHarryGigante(habJugadorIdx, 1)}
+                          onClick={() => aplicarKongHarryGigante(jugadorSeleccionadoIdx, 1)}
                           disabled={esKongYaRegistradoCon('Harry')}
                           className="py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold rounded-xl disabled:opacity-40"
                         >
@@ -218,7 +232,7 @@ export function PanelHabilidades({ abierto, onToggle }: Props) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => aplicarKongHarryGigante(habJugadorIdx, -1)}
+                          onClick={() => aplicarKongHarryGigante(jugadorSeleccionadoIdx, -1)}
                           disabled={esKongYaRegistradoCon('Harry')}
                           className="py-2.5 bg-rose-800 hover:bg-rose-700 text-white font-extrabold rounded-xl disabled:opacity-40"
                         >

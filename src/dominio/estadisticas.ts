@@ -1,5 +1,10 @@
 import { MAX_PARTIDAS_EVOLUCION } from '../constantes';
-import type { EntradaEvolucion, EstadisticasJugador, JugadorPermanente } from '../tipos';
+import type {
+  EntradaEvolucion,
+  EntradaHistorialPartida,
+  EstadisticasJugador,
+  JugadorPermanente,
+} from '../tipos';
 
 export function crearEstadisticasVacias(): EstadisticasJugador {
   return {
@@ -101,4 +106,55 @@ export function aplicarFinDePartida(
   ].slice(-MAX_PARTIDAS_EVOLUCION);
 
   return { ...jugador, estadisticas: est, evolucion: nuevaEvolucion };
+}
+
+/**
+ * Reconstruye las estadísticas y la evolución de cada jugador usando SOLO las partidas
+ * que hoy están en el historial. Así, borrar una partida descuenta todo al instante.
+ * El historial se guarda de la más nueva a la más vieja.
+ */
+export function recalcularEstadisticasDesdeHistorial(
+  jugadores: JugadorPermanente[],
+  historial: EntradaHistorialPartida[]
+): JugadorPermanente[] {
+  const cronologico = [...historial].reverse();
+
+  return jugadores.map((jugador) => {
+    let resultado: JugadorPermanente = {
+      ...jugador,
+      estadisticas: crearEstadisticasVacias(),
+      evolucion: [],
+    };
+
+    for (const partida of cronologico) {
+      const indice = partida.ranking.findIndex((fila) =>
+        fila.permanenteId
+          ? fila.permanenteId === jugador.id
+          : fila.nombre.trim().toLowerCase() === jugador.nombre.trim().toLowerCase()
+      );
+      if (indice === -1) continue;
+      const fila = partida.ranking[indice]!;
+
+      let acertadas = 0;
+      let falladas = 0;
+      for (const ronda of fila.historial) {
+        if (ronda.apuesta === '-' || ronda.ganadas === '-') continue;
+        if (ronda.acierto) acertadas += 1;
+        else falladas += 1;
+      }
+
+      resultado = aplicarFinDePartida(resultado, {
+        fecha: partida.fecha,
+        puntos: fila.puntos,
+        posicion: indice + 1,
+        apuestasAcertadas: acertadas,
+        apuestasFalladas: falladas,
+        capturasSkullKing: 0,
+        capturasSirena: 0,
+        capturasMonstruo: 0,
+      });
+    }
+
+    return resultado;
+  });
 }

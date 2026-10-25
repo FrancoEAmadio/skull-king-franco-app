@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { useApp } from '../../../estado/AppProvider';
-import { avatarDe } from '../../../datos/avatares';
-import { AvatarPirata } from '../../../ui/AvatarPirata';
 import { FichasNumero } from '../../../ui/FichasNumero';
 import { ModalAviso } from '../../../ui/ModalAviso';
 
@@ -25,7 +23,7 @@ export function PasoBazas() {
   const faltan = cartasPorJugadorEnRonda - totalGanadasAsignadas;
 
   return (
-    <section className="flex flex-1 flex-col gap-4">
+    <section className="flex flex-1 flex-col gap-3">
       <div className="tarjeta-marron flex items-center justify-between gap-3 p-4">
         <div>
           <span className="block text-sm font-bold uppercase tracking-widest text-amber-300">Bazas ganadas</span>
@@ -45,22 +43,19 @@ export function PasoBazas() {
       {jugadoresOrdenados.map(({ jugador, originalIndex }) => {
         const acerto = jugador.ganadas === jugador.apuesta;
         return (
-          <div key={originalIndex} className="tarjeta-marron flex flex-col gap-3 p-4">
-            <div className="flex items-center gap-3">
-              <AvatarPirata emoji={avatarDe(jugador.permanenteId, jugador.avatar)} tamano="md" />
-              <div className="min-w-0 flex-1">
-                <span className="block truncate text-xl font-black text-white">{jugador.nombre}</span>
-                <span className="block text-sm font-bold text-amber-300">Envite: {jugador.apuesta}</span>
+          <div key={originalIndex} className="tarjeta-marron flex flex-col gap-2 p-3">
+            <div className="grid grid-cols-[4.5rem_1fr_4.5rem] items-center gap-2">
+              <div className="flex flex-col items-start leading-none">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Bazas</span>
+                <span className={`text-2xl font-black ${acerto ? 'text-emerald-300' : 'text-red-300'}`}>
+                  {jugador.ganadas}
+                </span>
               </div>
-              <span
-                className={`rounded-full px-3 py-1 text-base font-black ${
-                  acerto
-                    ? 'border border-emerald-500/60 bg-emerald-950/70 text-emerald-300'
-                    : 'border border-red-500/60 bg-red-950/70 text-red-300'
-                }`}
-              >
-                {acerto ? '✓ Exacto' : '✕ Fuera'}
-              </span>
+              <span className="truncate text-center text-xl font-black text-white">{jugador.nombre}</span>
+              <div className="flex flex-col items-end leading-none">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Envite</span>
+                <span className="text-2xl font-black text-amber-300">{jugador.apuesta}</span>
+              </div>
             </div>
 
             <FichasNumero

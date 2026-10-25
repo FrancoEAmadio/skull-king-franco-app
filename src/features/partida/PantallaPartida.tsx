@@ -66,8 +66,8 @@ export function PantallaPartida() {
             <h2 className="titulo-pirata whitespace-nowrap text-2xl leading-none text-amber-300">
               Ronda {rondaVisible} <span className="text-slate-300">de {totalRondas}</span>
             </h2>
-            <span className="text-base font-bold text-white">
-              {cartasPorJugadorVisibles} carta{cartasPorJugadorVisibles > 1 ? 's' : ''} en juego
+            <span className="block whitespace-nowrap text-base font-bold text-white">
+              {cartasPorJugadorVisibles * jugadores.length} cartas en mesa · {cartasPorJugadorVisibles} c/u
             </span>
           </div>
           <button
@@ -98,7 +98,7 @@ export function PantallaPartida() {
                 }
                 className={`flex h-12 min-w-12 shrink-0 items-center justify-center rounded-full text-xl font-black ${
                   esActual
-                    ? 'ficha-elegida !h-12 !w-12 !text-xl'
+                    ? 'ronda-actual'
                     : esCorregible
                       ? 'border-2 border-amber-300 bg-amber-950/60 text-amber-200'
                       : esPasada

@@ -36,13 +36,26 @@ function formatear(valor: number): string {
 /**
  * Gráfico de líneas (SVG responsive) con el puntaje acumulado de cada pirata, ronda a ronda.
  * - Tocá una ronda para ver el puntaje de cada jugador en ese momento.
- * - Tocá un nombre de la leyenda para resaltar su curva y atenuar el resto.
+ * - Tocá un nombre de la leyenda para prender o apagar su línea y comparar solo a quienes quieras.
  */
-export function GraficoEvolucion({ series, etiquetas, titulo = 'Evolución del puntaje por ronda' }: Props) {
+export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = 'Evolución del puntaje por ronda' }: Props) {
   const [indiceActivo, setIndiceActivo] = useState<number | null>(null);
-  const [resaltada, setResaltada] = useState<string | null>(null);
+  const [apagadas, setApagadas] = useState<string[]>([]);
 
-  const cantidadPuntos = Math.max(...series.map((serie) => serie.puntos.length), 0);
+  // Solo se dibujan las líneas prendidas; el color de cada jugador no cambia al apagar a otros.
+  const series = useMemo(
+    () => todasLasSeries.filter((serie) => !apagadas.includes(serie.nombre)),
+    [todasLasSeries, apagadas]
+  );
+  const cantidadPuntos = Math.max(...todasLasSeries.map((serie) => serie.puntos.length), 0);
+
+  const alternar = (nombre: string) =>
+    setApagadas((actuales) => {
+      if (actuales.includes(nombre)) return actuales.filter((n) => n !== nombre);
+      // Siempre queda al menos una línea prendida.
+      if (todasLasSeries.length - actuales.length <= 1) return actuales;
+      return [...actuales, nombre];
+    });
 
   const geometria = useMemo(() => {
     const todos = series.flatMap((serie) => serie.puntos);
@@ -57,7 +70,7 @@ export function GraficoEvolucion({ series, etiquetas, titulo = 'Evolución del p
     return { minimo, maximo, rango, anchoUtil, x, y };
   }, [series, cantidadPuntos]);
 
-  if (cantidadPuntos < 2 || series.length === 0) return null;
+  if (cantidadPuntos < 2 || todasLasSeries.length === 0) return null;
 
   const { minimo, maximo, rango, anchoUtil, x, y } = geometria;
   const marcasY = [minimo, minimo + rango / 2, maximo];
@@ -67,13 +80,16 @@ export function GraficoEvolucion({ series, etiquetas, titulo = 'Evolución del p
   const pasoEtiqueta = cantidadPuntos > 12 ? 2 : 1;
   const anchoColumna = anchoUtil / Math.max(cantidadPuntos - 1, 1);
 
+  const colorDe = (nombre: string) =>
+    COLORES_SERIES[Math.max(0, todasLasSeries.findIndex((serie) => serie.nombre === nombre)) % COLORES_SERIES.length]!;
+
   const detalle =
     indiceActivo === null
       ? null
       : series
-          .map((serie, indiceSerie) => ({
+          .map((serie) => ({
             nombre: serie.nombre,
-            color: COLORES_SERIES[indiceSerie % COLORES_SERIES.length]!,
+            color: colorDe(serie.nombre),
             valor: serie.puntos[Math.min(indiceActivo, serie.puntos.length - 1)] ?? 0,
           }))
           .sort((a, b) => b.valor - a.valor);
@@ -97,7 +113,7 @@ export function GraficoEvolucion({ series, etiquetas, titulo = 'Evolución del p
               strokeWidth={1}
               strokeDasharray="2 4"
             />
-            <text x={MARGEN.izq - 5} y={y(marca) + 3.5} textAnchor="end" fontSize={10} fill="#94a3b8">
+            <text x={MARGEN.izq - 5} y={y(marca) + 3.5} textAnchor="end" fontSize={11} fill="#94a3b8">
               {formatear(marca)}
             </text>
           </g>
@@ -121,7 +137,7 @@ export function GraficoEvolucion({ series, etiquetas, titulo = 'Evolución del p
               x={x(indice)}
               y={ALTO - 8}
               textAnchor="middle"
-              fontSize={10}
+              fontSize={11}
               fill={indice === indiceActivo ? '#fbbf24' : '#94a3b8'}
               fontWeight={indice === indiceActivo ? 700 : 400}
             >
@@ -142,20 +158,19 @@ export function GraficoEvolucion({ series, etiquetas, titulo = 'Evolución del p
           />
         )}
 
-        {series.map((serie, indiceSerie) => {
-          const color = COLORES_SERIES[indiceSerie % COLORES_SERIES.length]!;
-          const atenuada = resaltada !== null && resaltada !== serie.nombre;
+        {series.map((serie) => {
+          const color = colorDe(serie.nombre);
           const puntos = serie.puntos
             .map((valor, indice) => `${x(indice).toFixed(1)},${y(valor).toFixed(1)}`)
             .join(' ');
           const ultimo = serie.puntos.length - 1;
           return (
-            <g key={serie.nombre} opacity={atenuada ? 0.18 : 1}>
+            <g key={serie.nombre}>
               <polyline
                 points={puntos}
                 fill="none"
                 stroke={color}
-                strokeWidth={resaltada === serie.nombre ? 3.5 : 2.5}
+                strokeWidth={2.8}
                 strokeLinejoin="round"
                 strokeLinecap="round"
               />
@@ -213,24 +228,25 @@ export function GraficoEvolucion({ series, etiquetas, titulo = 'Evolución del p
         </div>
       )}
 
-      <figcaption className="flex flex-wrap gap-1.5">
-        {series.map((serie, indice) => {
-          const activa = resaltada === serie.nombre;
+      <figcaption className="flex flex-wrap gap-2">
+        {todasLasSeries.map((serie) => {
+          const prendida = !apagadas.includes(serie.nombre);
           return (
             <button
               key={serie.nombre}
               type="button"
-              aria-pressed={activa}
-              onClick={() => setResaltada(activa ? null : serie.nombre)}
-              className={`flex min-h-8 items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm font-bold ${
-                activa
-                  ? 'border-amber-400 bg-amber-500/15 text-amber-200'
-                  : 'border-slate-700 bg-slate-900/80 text-slate-200 hover:border-slate-500'
+              role="switch"
+              aria-checked={prendida}
+              onClick={() => alternar(serie.nombre)}
+              className={`flex min-h-11 items-center gap-2 rounded-full border px-3.5 py-1.5 text-base font-bold ${
+                prendida
+                  ? 'border-amber-400 bg-amber-500/15 text-amber-100'
+                  : 'border-slate-700 bg-slate-900/80 text-slate-500 line-through'
               }`}
             >
               <span
-                className="inline-block h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: COLORES_SERIES[indice % COLORES_SERIES.length] }}
+                className="inline-block h-3 w-3 rounded-full"
+                style={{ backgroundColor: prendida ? colorDe(serie.nombre) : '#475569' }}
               />
               {serie.nombre}
             </button>

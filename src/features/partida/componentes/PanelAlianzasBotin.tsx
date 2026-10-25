@@ -1,110 +1,105 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApp } from '../../../estado/AppProvider';
 import { MAX_ALIANZAS_POR_RONDA } from '../../../constantes';
 import { ModalAviso } from '../../../ui/ModalAviso';
 
+/** Alianzas de Botín del jugador que se está anotando: solo hay que elegir con quién se alió. */
 export function PanelAlianzasBotin() {
   const { partida } = useApp();
-  const {
-    jugadores,
-    alianzasBotinRonda,
-    agregarAlianzaBotin,
-    eliminarAlianzaBotin,
-  } = partida;
+  const { jugadores, jugadorSeleccionadoIdx, alianzasBotinRonda, agregarAlianzaBotin, eliminarAlianzaBotin } = partida;
 
-  const [idxA, setIdxA] = useState(0);
-  const [idxB, setIdxB] = useState(1);
+  const activo = jugadores[jugadorSeleccionadoIdx];
+  const [idxOtro, setIdxOtro] = useState<number | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
 
-  const limiteAlcanzado = alianzasBotinRonda.length >= MAX_ALIANZAS_POR_RONDA;
+  // Al cambiar de jugador se limpia la elección anterior.
+  useEffect(() => {
+    setIdxOtro(null);
+  }, [jugadorSeleccionadoIdx]);
 
-  const agregar = () => {
-    const resultado = agregarAlianzaBotin(idxA, idxB);
-    if (resultado === 'jugadores_iguales') {
-      setAviso('Elegí dos jugadores distintos para formar una alianza.');
-    } else if (resultado === 'limite_alcanzado') {
-      setAviso(`Ya se registraron las ${MAX_ALIANZAS_POR_RONDA} alianzas máximas de esta ronda.`);
+  if (!activo) return null;
+
+  const limiteAlcanzado = alianzasBotinRonda.length >= MAX_ALIANZAS_POR_RONDA;
+  const otros = jugadores.map((jug, idx) => ({ jug, idx })).filter(({ idx }) => idx !== jugadorSeleccionadoIdx);
+
+  const registrar = () => {
+    if (idxOtro === null) {
+      setAviso('Elegí con quién se alió.');
+      return;
+    }
+    const resultado = agregarAlianzaBotin(jugadorSeleccionadoIdx, idxOtro);
+    if (resultado === 'limite_alcanzado') {
+      setAviso(`Ya se registraron las ${MAX_ALIANZAS_POR_RONDA} alianzas de esta ronda (hay 2 cartas de Botín).`);
     } else if (resultado === 'regla_inactiva') {
       setAviso('La regla de Botín no está activa en esta partida.');
-    } else if (resultado === 'jugador_invalido') {
-      setAviso('Seleccioná dos jugadores válidos.');
+    } else if (resultado === 'alianza_agregada') {
+      setIdxOtro(null);
     }
   };
 
   return (
-    <div className="tarjeta-marron p-3">
-      <label className="block text-sm uppercase tracking-wider text-amber-300 font-bold mb-2">
-        🤝 Alianzas de Botín
-      </label>
+    <div className="tarjeta-marron flex flex-col gap-2.5 p-3">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-bold uppercase tracking-widest text-amber-300">🤝 Alianzas de botín</span>
+        <span className="text-sm font-bold text-slate-400">
+          {alianzasBotinRonda.length}/{MAX_ALIANZAS_POR_RONDA}
+        </span>
+      </div>
 
-      {limiteAlcanzado ? (
-        <p className="text-sm text-slate-400 text-center py-2">
-          Ya se registraron las {MAX_ALIANZAS_POR_RONDA} alianzas máximas de esta ronda.
-        </p>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <div className="grid grid-cols-2 gap-2">
-            <select
-              value={idxA}
-              onChange={(e) => setIdxA(Number(e.target.value))}
-              className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
-            >
-              {jugadores.map((jug, idx) => (
-                <option key={idx} value={idx}>
-                  {jug.nombre}
-                </option>
-              ))}
-            </select>
-            <select
-              value={idxB}
-              onChange={(e) => setIdxB(Number(e.target.value))}
-              className="w-full text-amber-300 text-sm bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5"
-            >
-              {jugadores.map((jug, idx) => (
-                <option key={idx} value={idx}>
-                  {jug.nombre}
-                </option>
-              ))}
-            </select>
+      {!limiteAlcanzado && (
+        <>
+          <span className="text-base font-bold text-white">
+            Alianza de <span className="text-amber-300">{activo.nombre}</span> con:
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {otros.map(({ jug, idx }) => (
+              <button
+                key={idx}
+                type="button"
+                aria-pressed={idxOtro === idx}
+                onClick={() => setIdxOtro(idx)}
+                className={`rounded-xl px-4 py-2.5 text-base font-bold ${
+                  idxOtro === idx ? 'btn-blanco-marron' : 'btn-marron-oscuro'
+                }`}
+              >
+                {jug.nombre}
+              </button>
+            ))}
           </div>
           <button
             type="button"
-            onClick={agregar}
-            className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-black font-extrabold rounded-xl"
+            onClick={registrar}
+            className="w-full rounded-xl bg-amber-500 py-3 text-base font-extrabold text-black active:scale-[0.98]"
           >
-            + Registrar Alianza (+20 pts c/u si ambos aciertan)
+            + Registrar alianza (+20 pts c/u si ambos aciertan)
           </button>
-        </div>
+        </>
       )}
 
       {alianzasBotinRonda.length > 0 && (
-        <div className="flex flex-col gap-1.5 mt-2">
-          <span className="text-sm text-slate-400 font-bold uppercase">
-            Alianzas en esta ronda:
-          </span>
+        <div className="flex flex-wrap gap-2">
           {alianzasBotinRonda.map((alianza, idx) => (
-            <div
+            <span
               key={idx}
-              className="flex items-center justify-between p-2.5 bg-slate-900/90 border border-amber-900/60 rounded-xl text-sm"
+              className="flex items-center gap-2 rounded-full border border-amber-700/60 bg-slate-900 py-1 pl-3 pr-1 text-base font-bold text-amber-300"
             >
-              <span className="font-bold text-amber-300">
-                {alianza.nombreA} 🤝 {alianza.nombreB}
-              </span>
+              {alianza.nombreA} 🤝 {alianza.nombreB}
               <button
                 type="button"
                 onClick={() => eliminarAlianzaBotin(idx)}
-                className="text-sm text-red-400 hover:text-red-300 font-bold px-2 py-1 rounded bg-slate-800"
+                aria-label={`Borrar alianza ${alianza.nombreA} y ${alianza.nombreB}`}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-red-400"
               >
                 ✕
               </button>
-            </div>
+            </span>
           ))}
         </div>
       )}
 
       <ModalAviso
         abierto={aviso !== null}
-        titulo="No se pudo registrar la alianza"
+        titulo="Alianza de botín"
         mensaje={aviso ?? ''}
         textoBoton="Entendido"
         onCerrar={() => setAviso(null)}

@@ -42,7 +42,7 @@ export function PasoResumen() {
                   : 'bg-red-950 text-red-400 border border-red-800'
               }`}
             >
-              {res.acierto ? '✓ Acertó' : '✕ Falló'} ({res.ganadas} de {res.apuesta})
+              {res.acierto ? '✓ Acertó' : '✕ No acertó'} ({res.ganadas} de {res.apuesta})
             </span>
           </div>
 
@@ -90,10 +90,13 @@ export function PasoResumen() {
                   key={`rn-${i}`}
                   className="flex justify-between text-sm text-slate-400 bg-slate-900/60 px-2 py-1 rounded-lg border border-slate-800"
                 >
-                  <span className="line-through">
+                  <span className="tachado-rojo">
                     {b.etiqueta} {b.cantidad > 1 && `×${b.cantidad}`}
                   </span>
-                  <span className="line-through">+{b.subtotal}</span>
+                  <span className="tachado-rojo">
+                    {b.subtotal > 0 ? '+' : ''}
+                    {b.subtotal}
+                  </span>
                 </div>
               ))}
             </div>
