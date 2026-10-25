@@ -286,9 +286,12 @@ export async function compartirTarjetaResultado(datos: DatosResultado): Promise<
   return 'descargado';
 }
 
+/** Link público de la app: siempre se comparte este, sin importar en qué pantalla esté el usuario. */
+export const LINK_BASE_APP = 'https://skull-king-franco-app.vercel.app/';
+
 /** Copia el link de la app al portapapeles (con alternativa para navegadores viejos). */
 export async function copiarLink(): Promise<boolean> {
-  const link = `${window.location.origin}${window.location.pathname}`;
+  const link = LINK_BASE_APP;
   try {
     await navigator.clipboard.writeText(link);
     return true;

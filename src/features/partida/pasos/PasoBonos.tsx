@@ -71,76 +71,79 @@ export function PasoBonos() {
       onTouchEnd={finalizarTouch}
       className="flex h-full select-none flex-col"
     >
-      <CarruselJugadores
-        seleccionado={jugadorSeleccionadoIdx}
-        onSeleccionar={setJugadorSeleccionadoIdx}
-        items={jugadoresOrdenados.map(({ jugador, originalIndex }) => ({
-          indice: originalIndex,
-          id: jugador.permanenteId,
-          nombre: jugador.nombre,
-          avatar: jugador.avatar,
-          detalle: `${jugador.ganadas}/${jugador.apuesta}`,
-        }))}
-      />
+      <div className="tarjeta-marron overflow-clip">
+        <CarruselJugadores
+          variante="pestanas"
+          seleccionado={jugadorSeleccionadoIdx}
+          onSeleccionar={setJugadorSeleccionadoIdx}
+          items={jugadoresOrdenados.map(({ jugador, originalIndex }) => ({
+            indice: originalIndex,
+            id: jugador.permanenteId,
+            nombre: jugador.nombre,
+            detalle: `${jugador.ganadas}/${jugador.apuesta}`,
+          }))}
+        />
 
-      <div className="tarjeta-marron mt-3 flex items-center justify-between border-l-4 border-amber-500 p-4">
-        <div>
-          <span className="text-sm text-slate-400 uppercase font-bold block">Puntos totales</span>
-          <span className="text-3xl font-black text-white leading-none">
-            {jugadorActual.puntos}{' '}
-            <span className="text-base text-amber-300 font-bold">pts</span>
-          </span>
+        <div className="flex items-center justify-between border-b border-slate-800 p-4">
+          <div>
+            <span className="block text-sm font-bold uppercase text-slate-400">Puntos totales</span>
+            <span className="text-3xl font-black leading-none text-white">
+              {jugadorActual.puntos} <span className="text-base font-bold text-amber-300">pts</span>
+            </span>
+          </div>
+          <div className="text-right">
+            <span className="block text-sm font-bold uppercase text-slate-400">Esta ronda</span>
+            <span
+              className={`inline-block rounded-full px-2.5 py-0.5 text-xl font-black ${
+                puntajeProyectadoActual >= 0
+                  ? 'border border-emerald-800 bg-emerald-950/60 text-emerald-300'
+                  : 'border border-red-800 bg-red-950/60 text-red-300'
+              }`}
+            >
+              {puntajeProyectadoActual >= 0 ? '+' : ''}
+              {puntajeProyectadoActual} pts
+            </span>
+          </div>
         </div>
-        <div className="text-right">
-          <span className="text-sm text-slate-400 uppercase font-bold block">Ronda</span>
-          <span
-            className={`text-xl font-black px-2.5 py-0.5 rounded-full inline-block ${
-              puntajeProyectadoActual >= 0
-                ? 'text-emerald-300 bg-emerald-950/60 border border-emerald-800'
-                : 'text-red-300 bg-red-950/60 border border-red-800'
-            }`}
-          >
-            {puntajeProyectadoActual >= 0 ? '+' : ''}
-            {puntajeProyectadoActual} pts
-          </span>
+
+        <div className="flex flex-col divide-y divide-slate-800">
+          {configuracionMesa.usarComodinesBonificacion && (
+            <div className="flex flex-col gap-2 p-3">
+              <span className="block text-sm font-bold uppercase tracking-widest text-amber-300">
+                🃏 Comodines de bonificación
+              </span>
+              <PildoraBono
+                nombre="Comodín"
+                detalle={`En mesa: ${limiteComodines.comodinesDisponibles} / ${limiteComodines.maxComodinesPermitidos}`}
+                cantidad={jugadorActual.cartasBlancas || 0}
+                maximo={limiteComodines.comodinesBloqueados ? 0 : 1}
+                onTocar={() =>
+                  limiteComodines.comodinesBloqueados
+                    ? fijarCartasBlancas(jugadorSeleccionadoIdx, 0)
+                    : fijarCartasBlancas(jugadorSeleccionadoIdx, (jugadorActual.cartasBlancas || 0) + 1)
+                }
+              />
+            </div>
+          )}
+
+          {configuracionMesa.usarHabilidadesPiratas && (
+            <PanelHabilidades
+              abierto={acordeonHabilidadesAbierto}
+              onToggle={() => setAcordeonHabilidadesAbierto(!acordeonHabilidadesAbierto)}
+            />
+          )}
+
+          <PanelEventosBono
+            eventosBase={eventosBase}
+            eventosExpansion={eventosExpansion}
+            sinBonosNormales={sinBonosNormales}
+          />
+
+          {estaReglaActiva(configuracionMesa, 'botin') && <PanelAlianzasBotin />}
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto flex flex-col gap-4 pt-3">
-        {configuracionMesa.usarComodinesBonificacion && (
-          <div className="tarjeta-marron flex flex-col gap-2 p-4">
-            <span className="block text-sm font-bold uppercase tracking-widest text-amber-300">
-              🃏 Comodines de bonificación
-            </span>
-            <PildoraBono
-              nombre="Comodín"
-              detalle={`En mesa: ${limiteComodines.comodinesDisponibles} / ${limiteComodines.maxComodinesPermitidos}`}
-              cantidad={jugadorActual.cartasBlancas || 0}
-              maximo={limiteComodines.comodinesBloqueados ? 0 : 1}
-              onTocar={() =>
-                limiteComodines.comodinesBloqueados
-                  ? fijarCartasBlancas(jugadorSeleccionadoIdx, 0)
-                  : fijarCartasBlancas(jugadorSeleccionadoIdx, (jugadorActual.cartasBlancas || 0) + 1)
-              }
-            />
-          </div>
-        )}
-
-        {configuracionMesa.usarHabilidadesPiratas && (
-          <PanelHabilidades
-            abierto={acordeonHabilidadesAbierto}
-            onToggle={() => setAcordeonHabilidadesAbierto(!acordeonHabilidadesAbierto)}
-          />
-        )}
-
-        <PanelEventosBono
-          eventosBase={eventosBase}
-          eventosExpansion={eventosExpansion}
-          sinBonosNormales={sinBonosNormales}
-        />
-
-        {estaReglaActiva(configuracionMesa, 'botin') && <PanelAlianzasBotin />}
-
+      <div className="flex flex-col pt-3">
         <button
           onClick={guardarJugadorYContinuar}
           className="w-full mt-1 py-4 btn-blanco-marron text-xl rounded-2xl shadow-lg font-black"

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { MODOS_REPARTO, obtenerCartasPorRondaDelModo } from '../../../datos/modosReparto';
 import type { ConfiguracionMesa, ModoRepartoId } from '../../../tipos';
 
@@ -20,6 +20,7 @@ export function SelectorModoReparto({
   onCambiarModo,
   onConfigurarPersonalizado,
 }: Props) {
+  const [abierto, setAbierto] = useState(false);
   const modoSeleccionado = MODOS_REPARTO.find((m) => m.id === configuracion.modoReparto);
   const vistaPrevia = useMemo(
     () => obtenerCartasPorRondaDelModo(configuracion.modoReparto, configuracion.cartasPorRonda),
@@ -32,17 +33,50 @@ export function SelectorModoReparto({
         🃏 Modo de Reparto de Cartas
       </label>
 
-      <select
-        value={configuracion.modoReparto}
-        onChange={(e) => onCambiarModo(e.target.value as ModoRepartoId)}
-        className="w-full font-bold text-sm sm:text-base"
-      >
-        {MODOS_REPARTO.map((modo) => (
-          <option key={modo.id} value={modo.id}>
-            {modo.icono} {modo.nombre}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <button
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded={abierto}
+          onClick={() => setAbierto(!abierto)}
+          className="opcion-activa flex min-h-14 w-full items-center justify-between rounded-2xl px-4 text-left text-lg font-extrabold"
+        >
+          <span>
+            {modoSeleccionado?.icono} {modoSeleccionado?.nombre}
+          </span>
+          <span className="text-amber-300">{abierto ? '▲' : '▼'}</span>
+        </button>
+
+        {abierto && (
+          <ul
+            role="listbox"
+            className="mt-2 flex max-h-72 flex-col gap-1.5 overflow-y-auto rounded-2xl border border-slate-700 bg-[#0d1320] p-2"
+          >
+            {MODOS_REPARTO.map((modo) => {
+              const activo = modo.id === configuracion.modoReparto;
+              return (
+                <li key={modo.id} role="option" aria-selected={activo}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onCambiarModo(modo.id);
+                      setAbierto(false);
+                    }}
+                    className={`flex min-h-12 w-full items-center justify-between rounded-xl px-3 text-left text-base font-bold ${
+                      activo ? 'bg-amber-500/20 text-amber-200' : 'text-slate-200 hover:bg-slate-800'
+                    }`}
+                  >
+                    <span>
+                      {modo.icono} {modo.nombre}
+                    </span>
+                    {activo && <span>✓</span>}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
 
       <p className="text-sm text-slate-400 mt-2 leading-relaxed">{modoSeleccionado?.descripcion}</p>
 

@@ -193,15 +193,15 @@ export function PantallaReglas() {
         >
           {cartasFiltradas.map((carta) => (
             <article key={carta.id} className="tarjeta-marron p-3.5 flex flex-col gap-3">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                 <span
-                  className={`shrink-0 self-start whitespace-nowrap text-sm font-extrabold px-2 py-0.5 rounded-md border ${estiloBadgeModo(
+                  className={`shrink-0 whitespace-nowrap text-sm font-extrabold px-2 py-0.5 rounded-md border ${estiloBadgeModo(
                     carta.modo
                   )}`}
                 >
                   {iconoModo(carta.modo)} {carta.modo}
                 </span>
-                <span className="min-w-0 text-right text-sm font-bold leading-snug text-slate-400">
+                <span className="min-w-0 text-sm font-bold leading-tight text-slate-400">
                   Cantidad: {carta.cantidad}
                 </span>
               </div>

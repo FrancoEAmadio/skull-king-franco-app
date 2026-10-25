@@ -35,7 +35,7 @@ import {
 } from '../../dominio/cierreRonda';
 import { calcularBonoCartasBlancas, calcularPuntajeRonda } from '../../dominio/puntuacion';
 import { calcularBonosAlianzasBotin } from '../../dominio/alianzas';
-import { calcularLimitePuntosCartas, calcularMaximoDisponible } from '../../dominio/bonos';
+import { calcularMaximoDisponible, limitesPuntosCartas } from '../../dominio/bonos';
 import { aplicarFinDePartida, recalcularEstadisticasDesdeHistorial } from '../../dominio/estadisticas';
 import {
   estaDisponibleEventoBono,
@@ -564,22 +564,23 @@ export function usePartidaState({
     ]
   );
 
-  /** Tope de puntos por cartas capturadas según las cartas que hay en la mesa en esta ronda. */
-  const limitePuntosCartas = useMemo(
-    () => calcularLimitePuntosCartas(configuracionMesa, jugadores.length, cartasPorJugadorEnRonda),
-    [configuracionMesa, jugadores.length, cartasPorJugadorEnRonda]
-  );
+  /** Suma o resta puntos (de a 5) del control único "Puntos por cartas capturadas". */
+  const limitePuntosCartas = useMemo(() => {
+    const { minimo, maximo } = limitesPuntosCartas({
+      jugadorSeleccionadoIdx,
+      jugadores,
+      configuracion: configuracionMesa,
+      cartasPorJugadorEnRonda,
+    });
+    return { minimoUnidades: minimo / 5, maximoUnidades: maximo / 5 };
+  }, [jugadorSeleccionadoIdx, jugadores, configuracionMesa, cartasPorJugadorEnRonda]);
 
-  /** Suma o resta toques (de a 5 pts) del control único "Puntos por cartas capturadas". */
   const ajustarPuntosCartas = useCallback(
     (delta: number) => {
       if (!jugadorActual) return;
       const actual = Number(jugadorActual.eventosBono.puntos_cartas) || 0;
-      const nuevo = Math.max(
-        limitePuntosCartas.minToques,
-        Math.min(limitePuntosCartas.maxToques, actual + delta)
-      );
-      if (nuevo === actual) return;
+      const { minimoUnidades, maximoUnidades } = limitePuntosCartas;
+      const nuevo = Math.max(minimoUnidades, Math.min(maximoUnidades, actual + delta));
       actualizarJugador(jugadorSeleccionadoIdx, {
         eventosBono: { ...jugadorActual.eventosBono, puntos_cartas: nuevo },
       });
@@ -788,55 +789,6 @@ export function usePartidaState({
       registrarHabilidad,
       actualizarJugador,
     ]
-  );
-
-  /**
-   * Bribón de Roatán (propio o copiado por Kong) con los botones 0 / +10 / +20:
-   * al tocar uno se registra en el acto y reemplaza la elección anterior de ese pirata.
-   * "0" equivale a no arriesgar nada, así que quita el registro en lugar de gastar una habilidad.
-   */
-  const elegirPuntosBribon = useCallback(
-    (indiceJugador: number, pts: number, comoKong = false) => {
-      const jugador = jugadores[indiceJugador];
-      if (!jugador) return;
-      if (comoKong && !estaReglaActiva(configuracionMesa, 'primerOficialKong')) return;
-
-      const esDeEsteTipo = (h: { tipo: string; etiqueta: string }) =>
-        comoKong
-          ? h.tipo === 'Primer Oficial Kong' && h.etiqueta.includes('Bribón')
-          : h.tipo === 'Bribón de Roatán';
-
-      const previo = registroHabilidadesRonda.find(esDeEsteTipo);
-      if (previo && previo.jugadorIdx !== indiceJugador) return; // lo usó otro pirata
-      if (!previo && pts !== 0 && registroHabilidadesRonda.length >= MAX_HABILIDADES_POR_RONDA) return;
-
-      setRegistroHabilidadesRonda((previas) => {
-        const sin = previas.filter((h) => !esDeEsteTipo(h));
-        if (pts === 0) return sin;
-        return [
-          ...sin,
-          {
-            id: generarIdHabilidad(),
-            ronda: rondaActual,
-            jugadorIdx: indiceJugador,
-            jugadorNombre: jugador.nombre,
-            jugadorId: jugador.permanenteId,
-            tipo: comoKong ? 'Primer Oficial Kong' : 'Bribón de Roatán',
-            etiqueta: comoKong
-              ? 'Primer Oficial Kong (Copió Bribón de Roatán)'
-              : 'Bribón de Roatán (Apuesta de puntos)',
-            detalle: comoKong
-              ? `Copió apuesta de ${pts} pts (ambos conservan su apuesta de riesgo)`
-              : `Arriesgó una apuesta de ${pts} pts sobre el cumplimiento de su envite`,
-          },
-        ];
-      });
-      actualizarJugador(indiceJugador, {
-        bribonHabilidadPts: pts === 0 ? null : pts,
-        bribonStolenFrom: pts === 0 || !comoKong ? null : '(Copiado por Kong)',
-      });
-    },
-    [jugadores, configuracionMesa, registroHabilidadesRonda, rondaActual, actualizarJugador]
   );
 
   const eliminarRegistroHabilidad = useCallback(
@@ -1185,7 +1137,6 @@ export function usePartidaState({
     totalGanadasAsignadas,
     puedeModificarRondaAnterior,
     limiteComodines,
-    limitePuntosCartas,
     puntajeProyectadoActual,
     textoBotonAvanzar,
     habilidadesBloqueadasPorLimite,
@@ -1211,6 +1162,7 @@ export function usePartidaState({
     obtenerMaximoBono,
     borrarBonoInmediato,
     ajustarPuntosCartas,
+    limitePuntosCartas,
     limpiarTodosLosEventos,
     agregarAlianzaBotin,
     eliminarAlianzaBotin,
@@ -1220,7 +1172,6 @@ export function usePartidaState({
     aplicarHarryGigante,
     aplicarKongCopiaBribon,
     aplicarKongHarryGigante,
-    elegirPuntosBribon,
     eliminarRegistroHabilidad,
     guardarJugadorYContinuar,
     confirmarFinalizacionPartida,
