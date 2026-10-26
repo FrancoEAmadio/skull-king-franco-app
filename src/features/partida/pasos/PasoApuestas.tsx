@@ -11,7 +11,7 @@ export function PasoApuestas() {
     configuracionMesa,
     elegirApuesta,
     cambiarModoEnvite,
-    avanzarAPasoBazas,
+    avanzarAPasoPuntos,
   } = partida;
 
   const elegidas = jugadoresOrdenados.filter(({ jugador }) => jugador.apuestaElegida).length;
@@ -87,7 +87,7 @@ export function PasoApuestas() {
 
       <button
         type="button"
-        onClick={avanzarAPasoBazas}
+        onClick={avanzarAPasoPuntos}
         disabled={!completo}
         className="btn-blanco-marron sticky bottom-3 w-full rounded-2xl py-4 text-xl font-black shadow-xl disabled:opacity-50"
       >

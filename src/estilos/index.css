@@ -1,19 +1,53 @@
 @import "tailwindcss";
 
+/*
+ * Paleta Skull King: fondo azul de mar, tarjetas azul noche y tipografía dorada.
+ * Se redefinen las escalas "slate" y "amber" de Tailwind para que TODA la app (incluidas las clases
+ * ya usadas en cada pantalla) tome estos colores sin tocar componente por componente.
+ */
 @theme {
-  --color-bg-dark: #090d16;
+  --color-bg-dark: #0c2350;
   --font-display: 'Pirata One', 'Cinzel', system-ui, serif;
   --font-heading: 'Cinzel', system-ui, serif;
+
+  /* Grises → azules noche */
+  --color-slate-50: #f3f7fe;
+  --color-slate-100: #e6eefb;
+  --color-slate-200: #d0def5;
+  --color-slate-300: #b4c7ea;
+  --color-slate-400: #93a9d6;
+  --color-slate-500: #6f87ba;
+  --color-slate-600: #4e689f;
+  --color-slate-700: #33497f;
+  --color-slate-800: #223666;
+  --color-slate-900: #172a56;
+  --color-slate-950: #0f1e43;
+
+  /* Ámbar → dorado de pirata */
+  --color-amber-50: #fdf9e6;
+  --color-amber-100: #faf0c3;
+  --color-amber-200: #f6e496;
+  --color-amber-300: #f1d36b;
+  --color-amber-400: #e9bf42;
+  --color-amber-500: #d8a62a;
+  --color-amber-600: #b68618;
+  --color-amber-700: #8c6612;
+  --color-amber-800: #664a12;
+  --color-amber-900: #493511;
+  --color-amber-950: #2c2009;
 }
 
 :root {
-  --bg-dark: #090d16;
-  --bg-card: rgba(17, 24, 39, 0.92);
-  --border-card: rgba(55, 65, 81, 0.75);
-  --accent-gold: #f59e0b;
-  --accent-gold-hover: #fbbf24;
-  --text-main: #f3f4f6;
-  --text-muted: #9ca3af;
+  --bg-dark: #0c2350;
+  --bg-mar: #17488a;
+  --bg-card: #162a57;
+  --bg-card-2: #1d3566;
+  --border-card: rgba(147, 169, 214, 0.2);
+  --accent-gold: #e9bf42;
+  --accent-gold-hover: #f1d36b;
+  --gold-text: #f1d36b;
+  --text-main: #eef3ff;
+  --text-muted: #9fb3dc;
 }
 
 * {
@@ -28,8 +62,9 @@ body {
 
 body {
   background:
-    radial-gradient(ellipse at top center, rgba(245, 158, 11, 0.06) 0%, transparent 55%),
-    radial-gradient(circle at top center, #131c2e 0%, var(--bg-dark) 100%);
+    radial-gradient(ellipse at 50% 0%, rgba(58, 130, 214, 0.55) 0%, transparent 60%),
+    radial-gradient(ellipse at 50% 35%, #1b5499 0%, var(--bg-mar) 38%, #0f2f66 78%, var(--bg-dark) 100%);
+  background-color: var(--bg-dark);
   background-attachment: fixed;
   color: var(--text-main);
   min-height: 100vh;
@@ -43,14 +78,15 @@ body {
   position: relative;
 }
 
+/* Rejilla de puntitos muy tenue, como la textura del fondo del juego real */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.5;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  opacity: 0.6;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px);
   background-size: 22px 22px;
 }
 
@@ -64,7 +100,8 @@ h1 {
   font-family: var(--font-display);
   letter-spacing: 0.04em;
   font-weight: 400;
-  text-shadow: 0 2px 12px rgba(245, 158, 11, 0.25), 0 2px 4px rgba(0, 0, 0, 0.6);
+  color: var(--gold-text);
+  text-shadow: 0 2px 14px rgba(241, 211, 107, 0.35), 0 2px 4px rgba(4, 12, 34, 0.7);
 }
 
 h2,
@@ -88,19 +125,21 @@ button {
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
   touch-action: manipulation;
+  -webkit-touch-callout: none;
 }
 
+/* ── Botones ─────────────────────────────────────────────────────────── */
 .btn-blanco-marron {
-  background: linear-gradient(180deg, var(--accent-gold-hover) 0%, var(--accent-gold) 55%, #d97706 100%);
-  color: #1a1002;
+  background: linear-gradient(180deg, #f7da72 0%, var(--accent-gold) 55%, #c9951c 100%);
+  color: #251a05;
   font-weight: 800;
-  border: 1px solid #d97706;
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  border: 1px solid #b98a1c;
+  box-shadow: 0 6px 16px -4px rgba(233, 191, 66, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
 .btn-blanco-marron:hover:not(:disabled) {
-  background: linear-gradient(180deg, #fcd34d 0%, var(--accent-gold-hover) 55%, var(--accent-gold) 100%);
-  box-shadow: 0 6px 25px -2px rgba(245, 158, 11, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  background: linear-gradient(180deg, #fbe597 0%, var(--accent-gold-hover) 55%, var(--accent-gold) 100%);
+  box-shadow: 0 8px 22px -4px rgba(241, 211, 107, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .btn-blanco-marron:active:not(:disabled),
@@ -110,16 +149,20 @@ button {
 }
 
 .btn-marron-oscuro {
-  background: linear-gradient(180deg, #263243 0%, #1f2937 100%);
+  background: linear-gradient(180deg, #2c4a85 0%, #24407a 100%);
   color: var(--text-main);
   font-weight: 700;
-  border: 1px solid #374151;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border: 1px solid #3a5a98;
+  box-shadow: 0 3px 10px rgba(4, 12, 34, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .btn-marron-oscuro:hover:not(:disabled) {
-  background: linear-gradient(180deg, #374151 0%, #263243 100%);
-  border-color: #4b5563;
+  background: linear-gradient(180deg, #355795 0%, #2c4a85 100%);
+  border-color: #4a6cae;
+}
+
+.btn-marron-oscuro:disabled {
+  opacity: 0.4;
 }
 
 .btn-secundario-retroceder {
@@ -128,48 +171,78 @@ button {
   justify-content: center;
   gap: 0.4rem;
   padding: 0.5rem 0.85rem;
-  background-color: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(71, 85, 105, 0.6);
+  background-color: rgba(23, 42, 86, 0.75);
+  border: 1px solid rgba(147, 169, 214, 0.35);
   border-radius: 0.75rem;
-  color: #cbd5e1;
+  color: #c9d8f3;
   font-size: 0.75rem;
   font-weight: 700;
   transition: all 0.2s ease;
 }
 
 .btn-secundario-retroceder:hover {
-  background-color: rgba(51, 65, 85, 0.9);
-  color: #fbbf24;
-  border-color: #f59e0b;
+  background-color: rgba(34, 54, 102, 0.95);
+  color: var(--gold-text);
+  border-color: var(--accent-gold);
 }
 
+/* ── Tarjetas ────────────────────────────────────────────────────────── */
 .tarjeta-marron {
   background-color: var(--bg-card);
   border: 1px solid var(--border-card);
-  border-radius: 1.25rem;
-  backdrop-filter: blur(14px);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-radius: 1.5rem;
+  box-shadow: 0 14px 30px -10px rgba(3, 10, 32, 0.7), 0 2px 6px rgba(3, 10, 32, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
   position: relative;
 }
 
-.tarjeta-marron::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.5), transparent);
-  pointer-events: none;
+/* Tarjeta con acento dorado a la izquierda (ficha del jugador) */
+.tarjeta-acento {
+  border-left: 5px solid var(--accent-gold);
 }
 
+/* Encabezado de sección dentro de una tarjeta: numeración + título dorado + marcador a la derecha */
+.seccion-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  background: linear-gradient(180deg, #1f3a72 0%, #1a3266 100%);
+  border-bottom: 1px solid rgba(147, 169, 214, 0.2);
+}
+
+.seccion-cabecera h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+  line-height: 1.2;
+}
+
+.marcador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.2rem;
+  padding: 0.15rem 0.7rem;
+  border-radius: 9999px;
+  background: rgba(15, 30, 67, 0.75);
+  border: 1px solid rgba(147, 169, 214, 0.3);
+  color: var(--gold-text);
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+
+/* ── Campos ──────────────────────────────────────────────────────────── */
 input[type="text"],
 input[type="number"],
 select {
-  background-color: #0f172a;
-  border: 1.5px solid #374151;
-  color: #f8fafc;
-  border-radius: 0.65rem;
+  background-color: #0f1e43;
+  border: 1.5px solid #33497f;
+  color: #f4f8ff;
+  border-radius: 0.8rem;
   padding: 0.75rem 0.95rem;
   font-family: inherit;
   /* 16px evita el zoom automático de iOS al enfocar un campo */
@@ -185,31 +258,31 @@ input[type="number"]:focus,
 select:focus {
   outline: none;
   border-color: var(--accent-gold);
-  background-color: #162032;
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+  background-color: #14274f;
+  box-shadow: 0 0 0 3px rgba(233, 191, 66, 0.25);
 }
 
 select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f59e0b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23e9bf42'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.85rem center;
   background-size: 1.1rem 1.1rem;
   padding-right: 2.6rem !important;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 5px rgba(4, 12, 34, 0.3);
 }
 
 select:hover {
-  border-color: #475569;
-  background-color: #162032;
+  border-color: #4e689f;
+  background-color: #14274f;
 }
 
 select option {
-  background-color: #0b1120;
-  color: #f8fafc;
+  background-color: #0f1e43;
+  color: #f4f8ff;
   padding: 0.85rem 1rem;
   font-size: 0.9rem;
   line-height: 1.5;
@@ -221,12 +294,12 @@ select option {
   align-items: center;
   justify-content: space-between;
   text-align: center;
-  background: #0b1120;
-  border: 1px solid #334155;
-  border-radius: 0.6rem;
+  background: #0f1e43;
+  border: 1px solid #33497f;
+  border-radius: 0.8rem;
   padding: 0.5rem 0.25rem;
   min-height: 5.4rem;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 5px rgba(4, 12, 34, 0.35);
 }
 
 .tarjeta-ronda-personalizada .linea-1 {
@@ -234,14 +307,14 @@ select option {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: #93a9d6;
   line-height: 1;
 }
 
 .tarjeta-ronda-personalizada .linea-2 {
   font-size: 1.15rem;
   font-weight: 900;
-  color: #f59e0b;
+  color: var(--gold-text);
   line-height: 1;
   margin: 0.15rem 0;
   min-width: 1.5rem;
@@ -261,17 +334,17 @@ select option {
   font-weight: 900;
   text-align: center;
   text-align-last: center;
-  background-color: #1e293b;
-  border: 1px solid #475569;
+  background-color: #223666;
+  border: 1px solid #4e689f;
   color: #ffffff;
-  border-radius: 0.4rem;
+  border-radius: 0.5rem;
   background-image: none;
   box-shadow: none;
 }
 
 .tarjeta-ronda-personalizada select:focus {
   border-color: var(--accent-gold);
-  background-color: #0f172a;
+  background-color: #0f1e43;
 }
 
 .badge-orden-jugador {
@@ -286,20 +359,21 @@ select option {
   color: #022c22;
   font-size: 0.75rem;
   font-weight: 900;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
-  border: 1.5px solid #090d16;
+  box-shadow: 0 2px 5px rgba(4, 12, 34, 0.45);
+  border: 1.5px solid #0f1e43;
   flex-shrink: 0;
   line-height: 1;
 }
 
 @keyframes titilar-amarillo {
   0%, 100% {
-    border-color: #374151;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    border-color: #3a5a98;
+    box-shadow: 0 3px 10px rgba(4, 12, 34, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
   50% {
-    border-color: rgba(245, 158, 11, 0.9);
-    box-shadow: 0 0 18px rgba(245, 158, 11, 0.4), 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    border-color: rgba(241, 211, 107, 0.95);
+    box-shadow: 0 0 18px rgba(241, 211, 107, 0.45), 0 3px 10px rgba(4, 12, 34, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 }
 
@@ -331,7 +405,6 @@ main :where(h1, h2, h3, p, span) {
   overflow-wrap: anywhere;
 }
 
-/* Objetivos táctiles cómodos en botones de texto */
 button:not(:disabled) {
   cursor: pointer;
 }
@@ -344,11 +417,6 @@ button:disabled {
 :where(button, a, input, select, [role='button']):focus-visible {
   outline: 2px solid var(--accent-gold-hover);
   outline-offset: 2px;
-}
-
-/* Texto secundario con contraste suficiente sobre el fondo oscuro */
-:root {
-  --text-muted: #a8b3c4;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -366,7 +434,6 @@ table {
   font-variant-numeric: tabular-nums;
 }
 
-
 /* ── Identidad pirata: fichas, avatares y píldoras ──────────────────── */
 
 .titulo-pirata {
@@ -381,18 +448,18 @@ table {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: radial-gradient(circle at 35% 30%, #263243 0%, #111827 100%);
-  border: 2px solid rgba(245, 158, 11, 0.55);
+  background: radial-gradient(circle at 35% 30%, #2c4a85 0%, #172a56 100%);
+  border: 2px solid rgba(233, 191, 66, 0.6);
   line-height: 1;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 10px rgba(4, 12, 34, 0.45);
 }
 
 .avatar-pirata-activo {
-  border-color: #fcd34d;
-  box-shadow: 0 0 0 3px rgba(252, 211, 77, 0.25), 0 0 18px rgba(252, 211, 77, 0.55);
+  border-color: #f1d36b;
+  box-shadow: 0 0 0 3px rgba(241, 211, 107, 0.25), 0 0 18px rgba(241, 211, 107, 0.55);
 }
 
-/* Ficha / moneda grande y tocable (envites y bazas) */
+/* Moneda grande y tocable (envites y bazas): apagada en gris rosado, elegida en oro brillante */
 .ficha {
   position: relative;
   display: inline-flex;
@@ -405,12 +472,11 @@ table {
   font-weight: 800;
   font-size: 1.85rem;
   line-height: 1;
-  color: #3b2204;
-  background: radial-gradient(circle at 35% 30%, #d9a94a 0%, #a8741f 55%, #6e4710 100%);
-  border: 3px solid #8a5a14;
-  box-shadow: inset 0 2px 3px rgba(255, 235, 170, 0.45), 0 4px 8px rgba(0, 0, 0, 0.45);
-  opacity: 0.62;
-  filter: saturate(0.75);
+  color: #3a2c30;
+  background: radial-gradient(circle at 35% 30%, #e2c9c8 0%, #b99697 55%, #8a6d71 100%);
+  border: 3px solid #a58587;
+  box-shadow: inset 0 2px 3px rgba(255, 240, 240, 0.5), 0 4px 8px rgba(4, 12, 34, 0.4);
+  opacity: 0.85;
 }
 
 .ficha:active:not(:disabled) {
@@ -419,19 +485,18 @@ table {
 
 .ficha-elegida {
   opacity: 1;
-  filter: none;
   color: #2a1700;
-  background: radial-gradient(circle at 35% 30%, #fff3b0 0%, #fcd34d 45%, #e8a413 100%);
+  background: radial-gradient(circle at 35% 30%, #fff3b0 0%, #f7d44c 45%, #e0a812 100%);
   border-color: #fff0a8;
   box-shadow:
-    0 0 0 3px rgba(252, 211, 77, 0.35),
-    0 0 22px rgba(252, 211, 77, 0.75),
-    inset 0 2px 3px rgba(255, 255, 255, 0.7);
+    0 0 0 3px rgba(241, 211, 107, 0.4),
+    0 0 22px rgba(241, 211, 107, 0.8),
+    inset 0 2px 3px rgba(255, 255, 255, 0.75);
   transform: scale(1.06);
 }
 
 .ficha:disabled {
-  opacity: 0.2;
+  opacity: 0.22;
   filter: grayscale(1);
 }
 
@@ -441,29 +506,29 @@ table {
   position: absolute;
   inset: -6px;
   border-radius: 9999px;
-  border: 2px dashed rgba(252, 211, 77, 0.9);
+  border: 2px dashed rgba(241, 211, 107, 0.95);
 }
 
 .ficha-ok {
   border-color: #6ee7b7;
-  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.35), 0 0 22px rgba(52, 211, 153, 0.7), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.4), 0 0 22px rgba(52, 211, 153, 0.7), inset 0 2px 3px rgba(255, 255, 255, 0.6);
 }
 
 .ficha-mal {
   border-color: #fca5a5;
-  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.3), 0 0 18px rgba(248, 113, 113, 0.55), inset 0 2px 3px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.35), 0 0 18px rgba(248, 113, 113, 0.55), inset 0 2px 3px rgba(255, 255, 255, 0.5);
 }
 
 /* Botón cuadrado de selección (avatares, opciones) */
 .ficha-activa {
-  background: linear-gradient(180deg, #fcd34d 0%, #f59e0b 100%);
+  background: linear-gradient(180deg, #f1d36b 0%, #e9bf42 100%);
   border: 2px solid #fff0a8;
-  box-shadow: 0 0 16px rgba(252, 211, 77, 0.55);
+  box-shadow: 0 0 16px rgba(241, 211, 107, 0.55);
 }
 
 .ficha-inactiva {
-  background: #111827;
-  border: 2px solid #374151;
+  background: #172a56;
+  border: 2px solid #33497f;
 }
 
 /* Píldora de bono: toque = suma, al llegar al máximo vuelve a cero */
@@ -476,14 +541,15 @@ table {
   justify-content: center;
   gap: 0.1rem;
   border-radius: 1rem;
-  border: 1.5px solid #374151;
-  background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+  border: 1.5px solid #3a5a98;
+  background: linear-gradient(180deg, #2c4a85 0%, #24407a 100%);
   padding: 0.4rem 0.85rem;
   padding-right: 3.6rem;
   text-align: left;
-  color: #dde6f3;
+  color: #e6eefb;
   font-weight: 700;
   line-height: 1.15;
+  box-shadow: 0 2px 8px rgba(4, 12, 34, 0.3);
 }
 
 .pildora-bono:active:not(:disabled) {
@@ -491,14 +557,14 @@ table {
 }
 
 .pildora-bono-activa {
-  background: linear-gradient(180deg, #fcd34d 0%, #e8a413 100%);
+  background: linear-gradient(180deg, #f7da72 0%, #e0ac2c 100%);
   border-color: #fff0a8;
   color: #2a1700;
-  box-shadow: 0 0 14px rgba(252, 211, 77, 0.45);
+  box-shadow: 0 0 14px rgba(241, 211, 107, 0.5);
 }
 
 .pildora-bono:disabled {
-  opacity: 0.3;
+  opacity: 0.35;
 }
 
 .pildora-contador {
@@ -512,57 +578,15 @@ table {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: #0f172a;
-  color: #fcd34d;
+  background: #0f1e43;
+  color: var(--gold-text);
   font-size: 1.1rem;
   font-weight: 900;
 }
 
 .pildora-bono-activa .pildora-contador {
   background: #2a1700;
-  color: #fcd34d;
-}
-
-/* Carrusel fijo de jugadores durante la partida */
-.carrusel-jugadores {
-  display: flex;
-  gap: 0.5rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 0.5rem 34%;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.carrusel-jugadores::-webkit-scrollbar {
-  display: none;
-}
-
-.carrusel-item {
-  flex: 0 0 32%;
-  scroll-snap-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
-  border-radius: 1.1rem;
-  border: 1.5px solid transparent;
-  padding: 0.5rem 0.25rem;
-  opacity: 0.55;
-  transform: scale(0.88);
-  transition: all 0.2s ease;
-}
-
-.carrusel-item-activo {
-  opacity: 1;
-  transform: scale(1);
-  background: linear-gradient(180deg, rgba(252, 211, 77, 0.18) 0%, rgba(252, 211, 77, 0.06) 100%);
-  border-color: rgba(252, 211, 77, 0.75);
-  box-shadow: 0 0 18px rgba(252, 211, 77, 0.25);
-}
-
-.pie-pagina {
-  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  color: #f7d44c;
 }
 
 /* Control que llegó a su tope: se ve apagado pero legible */
@@ -571,11 +595,15 @@ table {
   filter: saturate(0.7);
 }
 
+.pie-pagina {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
 /* Número de ronda en curso: solo borde dorado, sin sombra rectangular */
 .ronda-actual {
-  border: 2px solid #fcd34d;
-  background: rgba(245, 158, 11, 0.18);
-  color: #fcd34d;
+  border: 2px solid #f1d36b;
+  background: rgba(241, 211, 107, 0.2);
+  color: #f1d36b;
   box-shadow: none;
 }
 
@@ -586,18 +614,18 @@ table {
   text-decoration-thickness: 2px;
 }
 
-/* Selección clara sin pintar todo de amarillo: borde dorado + brillo, texto blanco (los emojis se ven bien) */
+/* Selección clara: borde dorado + brillo, texto blanco (los emojis se ven bien) */
 .opcion-activa {
-  background: linear-gradient(180deg, rgba(245, 158, 11, 0.22) 0%, rgba(245, 158, 11, 0.08) 100%);
-  border: 2px solid #fbbf24;
+  background: linear-gradient(180deg, rgba(241, 211, 107, 0.26) 0%, rgba(241, 211, 107, 0.1) 100%);
+  border: 2px solid #f1d36b;
   color: #fff;
-  box-shadow: 0 0 16px rgba(251, 191, 36, 0.28);
+  box-shadow: 0 0 16px rgba(241, 211, 107, 0.3);
 }
 
 .opcion-inactiva {
-  background: #111827;
-  border: 2px solid #2b3648;
-  color: #cbd5e1;
+  background: #1d3566;
+  border: 2px solid #33497f;
+  color: #cfdcf5;
 }
 
 .punto-modo {
@@ -606,4 +634,126 @@ table {
   width: 1.1rem;
   border-radius: 9999px;
   border: 2px solid rgba(255, 255, 255, 0.85);
+}
+
+/* ── Selector de jugadores deslizable (hoja de puntos) ───────────────── */
+.selector-jugadores {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: calc(50% - 3.25rem);
+  padding: 0.45rem calc(50% - 3.25rem);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  /* Los bordes se desvanecen: los vecinos "se meten" al deslizar, como un carrusel */
+  mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+}
+
+.selector-jugadores::-webkit-scrollbar {
+  display: none;
+}
+
+.selector-jugadores-fijo {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.45rem;
+}
+
+.chip-jugador {
+  scroll-snap-align: center;
+  flex: 0 0 6.5rem;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  border-radius: 1rem;
+  border: 2px solid #33497f;
+  background: #1d3566;
+  color: #cfdcf5;
+  padding: 0.5rem 0.4rem;
+  min-height: 4rem;
+  opacity: 0.72;
+  transform: scale(0.9);
+  transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2), opacity 0.25s ease, background 0.25s ease,
+    border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.selector-jugadores-fijo .chip-jugador {
+  flex: none;
+}
+
+.chip-jugador-activo {
+  opacity: 1;
+  transform: scale(1);
+  color: #fff;
+  background: linear-gradient(180deg, #2f5aa8 0%, #234a8f 100%);
+  border-color: #f1d36b;
+  box-shadow: 0 0 20px rgba(241, 211, 107, 0.35), 0 6px 14px rgba(4, 12, 34, 0.45);
+}
+
+/* ── Animaciones al cambiar de jugador ───────────────────────────────── */
+@keyframes entrar-desde-derecha {
+  from {
+    opacity: 0;
+    transform: translateX(36px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes entrar-desde-izquierda {
+  from {
+    opacity: 0;
+    transform: translateX(-36px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes entrar-subiendo {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.entra-derecha {
+  animation: entrar-desde-derecha 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.entra-izquierda {
+  animation: entrar-desde-izquierda 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.entra-subiendo {
+  animation: entrar-subiendo 0.25s ease-out both;
+}
+
+/* Sección de bonos bloqueada hasta que el jugador acierte su envite */
+.bloqueado-suave {
+  opacity: 0.45;
+  filter: saturate(0.6);
+  pointer-events: none;
+}
+
+/* Barra inferior fija con "Anterior / Siguiente" */
+.barra-inferior {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  margin-inline: -1rem;
+  padding: 1.5rem 1rem max(0.75rem, env(safe-area-inset-bottom));
+  background: linear-gradient(0deg, rgba(12, 35, 80, 0.97) 55%, rgba(12, 35, 80, 0) 100%);
 }

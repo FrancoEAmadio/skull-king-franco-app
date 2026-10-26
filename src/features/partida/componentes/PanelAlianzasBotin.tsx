@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { useApp } from '../../../estado/AppProvider';
 import { MAX_ALIANZAS_POR_RONDA } from '../../../constantes';
 import { ModalAviso } from '../../../ui/ModalAviso';
+import { Seccion } from '../../../ui/Seccion';
 
 /** Alianzas de Botín del jugador que se está anotando: solo hay que elegir con quién se alió. */
-export function PanelAlianzasBotin() {
+export function PanelAlianzasBotin({ numero }: { numero?: number }) {
   const { partida } = useApp();
   const { jugadores, jugadorSeleccionadoIdx, alianzasBotinRonda, agregarAlianzaBotin, eliminarAlianzaBotin } = partida;
 
@@ -38,13 +39,7 @@ export function PanelAlianzasBotin() {
   };
 
   return (
-    <div className="flex flex-col gap-2.5 p-3">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-bold uppercase tracking-widest text-amber-300">🤝 Alianzas de botín</span>
-        <span className="text-sm font-bold text-slate-400">
-          {alianzasBotinRonda.length}/{MAX_ALIANZAS_POR_RONDA}
-        </span>
-      </div>
+    <Seccion numero={numero} titulo="Alianzas de botín" marcador={`${alianzasBotinRonda.length}/${MAX_ALIANZAS_POR_RONDA}`}>
 
       {!limiteAlcanzado && (
         <>
@@ -69,7 +64,7 @@ export function PanelAlianzasBotin() {
           <button
             type="button"
             onClick={registrar}
-            className="w-full rounded-xl bg-amber-500 py-3 text-base font-extrabold text-black active:scale-[0.98]"
+            className="btn-blanco-marron w-full rounded-xl py-3 text-base active:scale-[0.98]"
           >
             + Registrar alianza (+20 pts c/u si ambos aciertan)
           </button>
@@ -104,6 +99,6 @@ export function PanelAlianzasBotin() {
         textoBoton="Entendido"
         onCerrar={() => setAviso(null)}
       />
-    </div>
+    </Seccion>
   );
 }

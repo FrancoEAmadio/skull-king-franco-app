@@ -20,7 +20,7 @@ export function PasoResumen() {
     <section className="flex flex-col gap-4 flex-1 overflow-y-auto">
       <div className="tarjeta-marron p-3.5 border-l-4 border-amber-500">
         <span className="text-sm font-bold text-amber-300 uppercase block">
-          5. Resumen de la Ronda {rondaVisible}
+          3. Resumen de la Ronda {rondaVisible}
         </span>
         <span className="text-sm text-slate-300 block mt-0.5">
           {partidaFinalizada

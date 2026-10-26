@@ -1,6 +1,6 @@
 export type PantallaId = 'inicio' | 'nueva_partida' | 'partida' | 'jugadores' | 'reglas';
 
-export type PasoPartida = 'apuestas' | 'bazas' | 'bonos' | 'resumen';
+export type PasoPartida = 'apuestas' | 'puntos' | 'resumen';
 
 export type ModoContenido = 'base' | 'avanzado' | 'expansion';
 
