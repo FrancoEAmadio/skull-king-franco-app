@@ -102,7 +102,12 @@ function filtrarEventosJugadores(
   }));
 }
 
-const ORDEN_PASOS: PasoPartida[] = ['apuestas', 'bazas', 'bonos', 'resumen'];
+const ORDEN_PASOS: PasoPartida[] = ['apuestas', 'puntos', 'resumen'];
+
+/** Las partidas guardadas con la versión anterior tenían los pasos "bazas" y "bonos": ahora son uno solo. */
+function normalizarPaso(paso: string): PasoPartida {
+  return paso === 'bazas' || paso === 'bonos' ? 'puntos' : (paso as PasoPartida);
+}
 
 const CONFIG_INICIAL: ConfiguracionMesa = {
   modoContenido: 'expansion',
@@ -214,7 +219,7 @@ export function usePartidaState({
             configuracionCargada.cartasPorRonda
           )
     );
-    setPasoPartida(partida.pasoPartida);
+    setPasoPartida(normalizarPaso(partida.pasoPartida));
     setResumenRondaActual(partida.resumenRondaActual);
     setEditandoRondaAnterior(partida.editandoRondaAnterior);
     setBackupRondaActual(partida.backupRondaActual);
@@ -472,7 +477,11 @@ export function usePartidaState({
     setJugadores((previos) => previos.map((jugador) => ({ ...jugador, ganadas: 0 })));
   }, []);
 
-  const avanzarAPasoBazas = useCallback(() => setPasoPartida('bazas'), []);
+  /** Cierra los envites y pasa a la hoja de puntos (bazas + bonos), arrancando por el primer jugador. */
+  const avanzarAPasoPuntos = useCallback(() => {
+    setJugadorSeleccionadoIdx(indiceJugadorInicial);
+    setPasoPartida('puntos');
+  }, [indiceJugadorInicial]);
 
   const puedeIrAPasoAnterior = useCallback(
     (pasoDestino: PasoPartida) => {
@@ -521,13 +530,6 @@ export function usePartidaState({
     },
     [pasoPartida, puedeIrAPasoAnterior, ultimaRondaEditable, configuracionMesa]
   );
-
-  const avanzarAPasoBonos = useCallback(() => {
-    if (totalGanadasAsignadas > cartasPorJugadorEnRonda) return 'bazas_excedidas' as const;
-    setJugadorSeleccionadoIdx(indiceJugadorInicial);
-    setPasoPartida('bonos');
-    return 'fase_actualizada' as const;
-  }, [totalGanadasAsignadas, cartasPorJugadorEnRonda, indiceJugadorInicial]);
 
   const cambiarCartasBlancas = useCallback((indice: number, delta: number) => {
     setJugadores((previos) =>
@@ -791,6 +793,55 @@ export function usePartidaState({
     ]
   );
 
+  /**
+   * Bribón de Roatán (propio o copiado por Kong) con los botones 0 / +10 / +20:
+   * al tocar uno se registra en el acto y reemplaza la elección anterior de ese pirata.
+   * "0" equivale a no arriesgar nada, así que quita el registro en lugar de gastar una habilidad.
+   */
+  const elegirPuntosBribon = useCallback(
+    (indiceJugador: number, pts: number, comoKong = false) => {
+      const jugador = jugadores[indiceJugador];
+      if (!jugador) return;
+      if (comoKong && !estaReglaActiva(configuracionMesa, 'primerOficialKong')) return;
+
+      const esDeEsteTipo = (h: { tipo: string; etiqueta: string }) =>
+        comoKong
+          ? h.tipo === 'Primer Oficial Kong' && h.etiqueta.includes('Bribón')
+          : h.tipo === 'Bribón de Roatán';
+
+      const previo = registroHabilidadesRonda.find(esDeEsteTipo);
+      if (previo && previo.jugadorIdx !== indiceJugador) return; // lo usó otro pirata
+      if (!previo && pts !== 0 && registroHabilidadesRonda.length >= MAX_HABILIDADES_POR_RONDA) return;
+
+      setRegistroHabilidadesRonda((previas) => {
+        const sin = previas.filter((h) => !esDeEsteTipo(h));
+        if (pts === 0) return sin;
+        return [
+          ...sin,
+          {
+            id: generarIdHabilidad(),
+            ronda: rondaActual,
+            jugadorIdx: indiceJugador,
+            jugadorNombre: jugador.nombre,
+            jugadorId: jugador.permanenteId,
+            tipo: comoKong ? 'Primer Oficial Kong' : 'Bribón de Roatán',
+            etiqueta: comoKong
+              ? 'Primer Oficial Kong (Copió Bribón de Roatán)'
+              : 'Bribón de Roatán (Apuesta de puntos)',
+            detalle: comoKong
+              ? `Copió apuesta de ${pts} pts (ambos conservan su apuesta de riesgo)`
+              : `Arriesgó una apuesta de ${pts} pts sobre el cumplimiento de su envite`,
+          },
+        ];
+      });
+      actualizarJugador(indiceJugador, {
+        bribonHabilidadPts: pts === 0 ? null : pts,
+        bribonStolenFrom: pts === 0 || !comoKong ? null : '(Copiado por Kong)',
+      });
+    },
+    [jugadores, configuracionMesa, registroHabilidadesRonda, rondaActual, actualizarJugador]
+  );
+
   const eliminarRegistroHabilidad = useCallback(
     (indice: number) => {
       const item = registroHabilidadesRonda[indice];
@@ -921,7 +972,7 @@ export function usePartidaState({
       );
       setJugadores(filtrarEventosJugadores(jugadoresRestaurados, configuracionMesa));
       setRondaActual(backupRondaActual.ronda);
-      setPasoPartida(backupRondaActual.pasoPartida);
+      setPasoPartida(normalizarPaso(backupRondaActual.pasoPartida));
       setJugadorSeleccionadoIdx(backupRondaActual.jugadorSeleccionadoIdx);
       setAlianzasBotinRonda(
         estaReglaActiva(configuracionMesa, 'botin')
@@ -1026,7 +1077,7 @@ export function usePartidaState({
   const cancelarModificacionRondaAnterior = useCallback(() => {
     if (!editandoRondaAnterior || !backupRondaActual) return;
     setRondaActual(backupRondaActual.ronda);
-    setPasoPartida(backupRondaActual.pasoPartida);
+    setPasoPartida(normalizarPaso(backupRondaActual.pasoPartida));
     setJugadorSeleccionadoIdx(backupRondaActual.jugadorSeleccionadoIdx);
     setJugadores(
       filtrarEventosJugadores(clonarJugadores(backupRondaActual.jugadoresCompletos), configuracionMesa)
@@ -1152,8 +1203,7 @@ export function usePartidaState({
     cambiarGanadas,
     maxGanadasPara,
     limpiarBazasRonda,
-    avanzarAPasoBazas,
-    avanzarAPasoBonos,
+    avanzarAPasoPuntos,
     puedeIrAPasoAnterior,
     irAPasoAnterior,
     cambiarCartasBlancas,
@@ -1172,6 +1222,7 @@ export function usePartidaState({
     aplicarHarryGigante,
     aplicarKongCopiaBribon,
     aplicarKongHarryGigante,
+    elegirPuntosBribon,
     eliminarRegistroHabilidad,
     guardarJugadorYContinuar,
     confirmarFinalizacionPartida,

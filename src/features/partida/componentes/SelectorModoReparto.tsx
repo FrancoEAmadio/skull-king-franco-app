@@ -50,7 +50,7 @@ export function SelectorModoReparto({
         {abierto && (
           <ul
             role="listbox"
-            className="mt-2 flex max-h-72 flex-col gap-1.5 overflow-y-auto rounded-2xl border border-slate-700 bg-[#0d1320] p-2"
+            className="mt-2 flex max-h-72 flex-col gap-1.5 overflow-y-auto rounded-2xl border border-slate-700 bg-slate-950 p-2"
           >
             {MODOS_REPARTO.map((modo) => {
               const activo = modo.id === configuracion.modoReparto;

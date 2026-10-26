@@ -3,15 +3,13 @@ import { useApp } from '../../estado/AppProvider';
 import { useWakeLock } from '../../ui/useWakeLock';
 import { ModalAviso } from '../../ui/ModalAviso';
 import { PasoApuestas } from './pasos/PasoApuestas';
-import { PasoBazas } from './pasos/PasoBazas';
-import { PasoBonos } from './pasos/PasoBonos';
+import { PasoPuntos } from './pasos/PasoPuntos';
 import { PasoResumen } from './pasos/PasoResumen';
 import type { PasoPartida } from '../../tipos';
 
 const PASOS: [PasoPartida, string][] = [
   ['apuestas', 'Envite'],
-  ['bazas', 'Bazas'],
-  ['bonos', 'Bonos'],
+  ['puntos', 'Puntos'],
   ['resumen', 'Resumen'],
 ];
 
@@ -124,7 +122,7 @@ export function PantallaPartida() {
         )}
 
         <div className="flex items-stretch gap-2">
-          {PASOS.map(([pasoId, etiqueta]) => {
+          {PASOS.map(([pasoId, etiqueta], i) => {
             const esActual = pasoPartida === pasoId;
             const puedeVolver = puedeIrAPasoAnterior(pasoId);
             return (
@@ -145,7 +143,7 @@ export function PantallaPartida() {
                     esActual ? 'text-amber-300' : puedeVolver ? 'text-emerald-300' : 'text-slate-400'
                   }`}
                 >
-                  {etiqueta}
+                  {i + 1}. {etiqueta}
                 </span>
               </button>
             );
@@ -167,8 +165,7 @@ export function PantallaPartida() {
       </header>
 
       {pasoPartida === 'apuestas' && <PasoApuestas />}
-      {pasoPartida === 'bazas' && <PasoBazas />}
-      {pasoPartida === 'bonos' && <PasoBonos />}
+      {pasoPartida === 'puntos' && <PasoPuntos />}
       {pasoPartida === 'resumen' && <PasoResumen />}
 
       <ModalAviso

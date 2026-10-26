@@ -1,12 +1,13 @@
 import { useApp } from '../../../estado/AppProvider';
 import { PildoraBono } from '../../../ui/PildoraBono';
+import { Seccion } from '../../../ui/Seccion';
 import { vibrar } from '../../../infra/vibracion';
 import type { EventoBono } from '../../../tipos';
 
 interface Props {
+  numero?: number;
   eventosBase: EventoBono[];
   eventosExpansion: EventoBono[];
-  sinBonosNormales: boolean;
 }
 
 const REEMPLAZADOS = new Set(['catorce_negro', 'catorce_color', 'ocho_expansion', 'siete_expansion', 'puntos_cartas']);
@@ -20,7 +21,7 @@ function detalleBono(evento: EventoBono, maximo: number): string {
   return `${signo}${evento.puntos} pts · máx ${maximo}`;
 }
 
-export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormales }: Props) {
+export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Props) {
   const { partida } = useApp();
   const {
     jugadorActual,
@@ -73,32 +74,19 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
     );
 
   return (
-    <div
-      className={`flex flex-col gap-3 p-3 ${
-        sinBonosNormales ? 'bg-red-950/30' : ''
-      }`}
-    >
+    <Seccion numero={numero} titulo="Bonos de la ronda">
       <div className="flex items-center justify-between gap-2">
-        <div>
-          <span className="block text-lg font-extrabold text-white">Bonos de la ronda</span>
-          <span className="block text-sm font-semibold text-slate-400">Tocá para sumar; al llegar al máximo vuelve a 0.</span>
-        </div>
+        <span className="block text-sm font-semibold text-slate-300">Tocá para sumar; al llegar al máximo vuelve a 0.</span>
         {tieneEventos && (
           <button
             type="button"
             onClick={limpiarTodosLosEventos}
-            className="btn-marron-oscuro shrink-0 rounded-xl px-3 py-2.5 text-base font-bold"
+            className="btn-marron-oscuro shrink-0 rounded-xl px-3 py-2 text-base font-bold"
           >
             🧹 Limpiar
           </button>
         )}
       </div>
-
-      {sinBonosNormales && (
-        <span className="rounded-xl bg-red-950/60 px-3 py-2 text-base font-bold text-red-300">
-          ⚠️ Falló el envite: no se cobran bonos normales.
-        </span>
-      )}
 
       <div className="flex flex-col gap-2">
         <span className="text-sm font-bold uppercase tracking-widest text-slate-300">Cartas de palo</span>
@@ -150,7 +138,7 @@ export function PanelEventosBono({ eventosBase, eventosExpansion, sinBonosNormal
       </div>
 
       {grupo('Capturas especiales', 'text-slate-300', base)}
-      {grupo('Expansión', 'text-purple-300', expansion)}
-    </div>
+      {grupo('Expansión', 'text-purple-200', expansion)}
+    </Seccion>
   );
 }
