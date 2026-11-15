@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Modal } from './Modal';
+import { EncabezadoModal, Modal } from './Modal';
 
 interface Props {
   abierto: boolean;
@@ -10,26 +10,13 @@ interface Props {
   zIndex?: string;
 }
 
-export function ModalAviso({
-  abierto,
-  titulo,
-  mensaje,
-  onCerrar,
-  textoBoton = 'Entendido',
-  zIndex = 'z-[70]',
-}: Props) {
+export function ModalAviso({ abierto, titulo, mensaje, onCerrar, textoBoton = 'Entendido', zIndex = 'z-[70]' }: Props) {
   return (
     <Modal abierto={abierto} onCerrar={onCerrar} ancho="max-w-xs" zIndex={zIndex}>
-      <div className="border-b border-amber-900/60 bg-slate-900 p-4 text-center">
-        <h3 className="text-2xl font-black text-amber-300">{titulo}</h3>
-      </div>
-      <div className="p-5 text-center text-base leading-relaxed text-slate-300">{mensaje}</div>
-      <div className="border-t border-amber-900/60 p-4">
-        <button
-          type="button"
-          onClick={onCerrar}
-          className="btn-blanco-marron w-full rounded-xl py-3 text-base font-black"
-        >
+      <EncabezadoModal titulo={titulo} onCerrar={onCerrar} />
+      <div className="p-4 text-center text-sm leading-relaxed text-slate-700">{mensaje}</div>
+      <div className="border-t border-slate-200 p-4">
+        <button type="button" onClick={onCerrar} className="btn-dorado w-full py-3 text-sm">
           {textoBoton}
         </button>
       </div>

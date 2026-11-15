@@ -172,15 +172,14 @@ export async function crearTarjetaResultado(datos: DatosResultado): Promise<Blob
   if (!ctx) return null;
 
   try {
-    await document.fonts?.load('72px "Pirata One"');
     await document.fonts?.load('800 30px "Cinzel"');
   } catch {
     /* si las fuentes no cargan se usan las de respaldo */
   }
 
   const fondo = ctx.createLinearGradient(0, 0, 0, alto);
-  fondo.addColorStop(0, '#131c2e');
-  fondo.addColorStop(1, '#090d16');
+  fondo.addColorStop(0, '#1e3a8a');
+  fondo.addColorStop(1, '#0b1437');
   ctx.fillStyle = fondo;
   ctx.fillRect(0, 0, ANCHO_TARJETA, alto);
 
@@ -191,7 +190,7 @@ export async function crearTarjetaResultado(datos: DatosResultado): Promise<Blob
 
   ctx.textAlign = 'center';
   ctx.fillStyle = '#fbbf24';
-  ctx.font = '120px "Pirata One", Georgia, serif';
+  ctx.font = '800 96px "Cinzel", Georgia, serif';
   ctx.fillText('Skull King', ANCHO_TARJETA / 2, 190);
   ctx.fillStyle = '#e2e8f0';
   ctx.font = '800 34px "Cinzel", Georgia, serif';

@@ -14,7 +14,7 @@ const PASOS: [PasoPartida, string][] = [
 ];
 
 export function PantallaPartida() {
-  const { partida, ajustes, setMenuHamburguesaAbierto, abrirPodio } = useApp();
+  const { partida, ajustes, setMenuHamburguesaAbierto, abrirPodio, setPantallaActual } = useApp();
   const {
     rondaActual,
     rondaVisible,
@@ -47,43 +47,45 @@ export function PantallaPartida() {
   };
 
   return (
-    <main className="flex w-full flex-1 flex-col gap-3 py-3">
+    <main className="flex w-full flex-1 flex-col gap-4 py-4">
       <header className="flex flex-col gap-3">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setMenuHamburguesaAbierto(true)}
-            aria-label="Abrir menú de la partida"
-            className="btn-marron-oscuro flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-amber-300"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.4} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+        <div className="flex items-center justify-between">
+          <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma px-3 py-2 text-sm">
+            ← Menú
           </button>
-          <div className="min-w-0 flex-1 text-center">
-            <h2 className="titulo-pirata whitespace-nowrap text-2xl leading-none text-amber-300">
-              Ronda {rondaVisible} <span className="text-slate-300">de {totalRondas}</span>
-            </h2>
-            <span className="text-base font-bold text-white">
-              {cartasPorJugadorVisibles} carta{cartasPorJugadorVisibles > 1 ? 's' : ''} en juego
-            </span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-blue-200">Partida en curso</span>
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMenuHamburguesaAbierto(true)}
+              aria-label="Abrir menú de la partida"
+              className="btn-fantasma h-11 w-11 p-0"
+            >
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden="true">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <div>
+              <span className="block text-xs font-black uppercase tracking-widest text-blue-200">
+                Ronda {rondaVisible} de {totalRondas}
+              </span>
+              <h2 className="font-display text-lg font-black leading-tight text-white">
+                {cartasPorJugadorVisibles} carta{cartasPorJugadorVisibles > 1 ? 's' : ''} en juego
+              </h2>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={abrirPodio}
-            aria-label="Ver podio y puntajes"
-            className="flex h-12 shrink-0 items-center gap-1.5 rounded-xl border border-emerald-500/60 bg-emerald-950/80 px-3 text-base font-bold text-emerald-200"
-          >
-            🏆 Podio
+          <button type="button" onClick={abrirPodio} aria-label="Ver tabla de puntajes" className="btn-claro px-3.5 py-2.5 text-xs">
+            🏆 Tabla
           </button>
         </div>
 
-        {/* Rondas: tocá la anterior para corregirla */}
         <div className="scroll-oculto -mx-1 flex gap-2 overflow-x-auto px-1 py-1" aria-label="Rondas">
           {Array.from({ length: totalRondas }, (_, i) => i + 1).map((numero) => {
             const esActual = numero === rondaVisible;
             const esPasada = numero < rondaVisible;
-            const esCorregible = numero === rondaVisible - 1 && puedeModificarRondaAnterior;
             return (
               <button
                 key={numero}
@@ -91,17 +93,13 @@ export function PantallaPartida() {
                 disabled={!esPasada}
                 onClick={() => tocarRonda(numero)}
                 aria-current={esActual ? 'step' : undefined}
-                aria-label={
-                  esActual ? `Ronda ${numero}, en curso` : esPasada ? `Corregir ronda ${numero}` : `Ronda ${numero}`
-                }
-                className={`flex h-12 min-w-12 shrink-0 items-center justify-center rounded-full text-xl font-black ${
+                aria-label={esActual ? `Ronda ${numero}, en curso` : esPasada ? `Corregir ronda ${numero}` : `Ronda ${numero}`}
+                className={`flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full text-base font-black ${
                   esActual
-                    ? 'ronda-actual'
-                    : esCorregible
-                      ? 'border-2 border-amber-300 bg-amber-950/60 text-amber-200'
-                      : esPasada
-                        ? 'border border-emerald-600/70 bg-emerald-950/60 text-emerald-300'
-                        : 'border border-slate-700 bg-slate-900/60 text-slate-500'
+                    ? 'border-2 border-oro bg-oro text-tinta-oro'
+                    : esPasada
+                      ? 'border border-blue-300/60 bg-blue-300/25 text-blue-100'
+                      : 'border border-white/15 bg-white/5 text-white/40'
                 }`}
               >
                 {numero}
@@ -111,17 +109,17 @@ export function PantallaPartida() {
         </div>
 
         {pasoPartida !== 'resumen' && jugadorInicial && jugadorReparte && (
-          <div className="tarjeta-marron flex items-center justify-between gap-2 px-4 py-3 text-base">
-            <div className="font-semibold text-amber-300">
-              ⚓ Arranca <strong className="text-white">{jugadorInicial.nombre}</strong>
-            </div>
-            <div className="font-semibold text-slate-300">
-              🃏 Reparte <strong className="text-white">{jugadorReparte.nombre}</strong>
-            </div>
+          <div className="flex items-center justify-between gap-2 rounded-xl bg-white/10 px-3 py-1.5 text-[11px] text-blue-100">
+            <span className="min-w-0 truncate">
+              ⚓ Arranca: <strong className="text-white">{jugadorInicial.nombre}</strong>
+            </span>
+            <span className="min-w-0 truncate">
+              🃏 Reparte: <strong className="text-white">{jugadorReparte.nombre}</strong>
+            </span>
           </div>
         )}
 
-        <div className="flex items-stretch gap-2">
+        <nav className="flex items-center gap-2" aria-label="Pasos de la ronda">
           {PASOS.map(([pasoId, etiqueta], i) => {
             const esActual = pasoPartida === pasoId;
             const puedeVolver = puedeIrAPasoAnterior(pasoId);
@@ -131,34 +129,23 @@ export function PantallaPartida() {
                 type="button"
                 onClick={() => irAPasoAnterior(pasoId)}
                 disabled={!puedeVolver}
-                className="flex flex-1 flex-col items-center gap-1.5 rounded-lg py-1"
+                aria-current={esActual ? 'step' : undefined}
+                className="flex flex-1 flex-col items-center gap-1 rounded-lg px-0.5 py-1 disabled:cursor-default"
               >
-                <span
-                  className={`h-2 w-full rounded-full ${
-                    esActual ? 'bg-amber-400' : puedeVolver ? 'bg-emerald-500' : 'bg-slate-700'
-                  }`}
-                />
-                <span
-                  className={`text-base font-bold ${
-                    esActual ? 'text-amber-300' : puedeVolver ? 'text-emerald-300' : 'text-slate-400'
-                  }`}
-                >
+                <span className={`h-1.5 w-full rounded-full ${esActual ? 'bg-white' : puedeVolver ? 'bg-blue-300' : 'bg-white/20'}`} />
+                <span className={`text-[10px] font-black uppercase ${esActual ? 'text-white' : puedeVolver ? 'text-blue-200' : 'text-white/40'}`}>
                   {i + 1}. {etiqueta}
                 </span>
               </button>
             );
           })}
-        </div>
+        </nav>
 
         {editandoRondaAnterior && (
-          <div className="flex items-center justify-between gap-2 rounded-xl border border-amber-500/70 bg-amber-950/50 px-4 py-3">
-            <span className="text-base font-bold text-amber-200">Corrigiendo la ronda {rondaActual}</span>
-            <button
-              type="button"
-              onClick={cancelarModificacionRondaAnterior}
-              className="btn-marron-oscuro rounded-lg px-3 py-2 text-base font-bold"
-            >
-              Cancelar
+          <div className="flex items-center justify-between gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2">
+            <span className="text-xs font-black text-amber-900">✏️ Corrigiendo la ronda {rondaActual}</span>
+            <button type="button" onClick={cancelarModificacionRondaAnterior} className="btn-claro px-2.5 py-1 text-[11px]">
+              Cancelar corrección
             </button>
           </div>
         )}

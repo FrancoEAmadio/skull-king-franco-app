@@ -24,39 +24,21 @@ export function PanelReglasOpcionales({ configuracion, onCambiar }: Props) {
   const [abierto, setAbierto] = useState(false);
 
   return (
-    <section className="tarjeta-marron p-4 flex flex-col gap-4">
+    <section className="tarjeta overflow-hidden">
       <button
         type="button"
         onClick={() => setAbierto(!abierto)}
-        className="w-full flex justify-between items-center text-left"
+        aria-expanded={abierto}
+        className="flex w-full items-center justify-between gap-2 px-4 py-3.5 text-left"
       >
-        <div>
-          <h3 className="text-lg font-extrabold text-amber-300 uppercase tracking-wider">
-            ⚙️ Reglas y Cartas Opcionales
-          </h3>
-          <p className="text-sm text-slate-300 mt-0.5 font-normal">
-            Activá o desactivá los elementos en juego.
-          </p>
-        </div>
-        <span className="text-amber-400 font-bold text-lg px-2">{abierto ? '▲' : '▼'}</span>
+        <h3 className="tarjeta-titulo !font-sans">5. Reglas y cartas opcionales</h3>
+        <span className="text-sm font-bold text-azul">{abierto ? '▲' : '▼'}</span>
       </button>
 
       {abierto && (
-        <div className="flex flex-col gap-4 pt-2 border-t border-slate-800">
-          <GrupoOpciones
-            titulo="🟣 Reglas Avanzadas"
-            color="text-purple-300"
-            opciones={OPCIONES_AVANZADAS}
-            configuracion={configuracion}
-            onCambiar={onCambiar}
-          />
-          <GrupoOpciones
-            titulo="🟠 Expansión"
-            color="text-amber-300"
-            opciones={OPCIONES_EXPANSION}
-            configuracion={configuracion}
-            onCambiar={onCambiar}
-          />
+        <div className="flex flex-col gap-3 px-4 pb-4">
+          <GrupoOpciones titulo="Reglas avanzadas" opciones={OPCIONES_AVANZADAS} configuracion={configuracion} onCambiar={onCambiar} />
+          <GrupoOpciones titulo="Expansión" opciones={OPCIONES_EXPANSION} configuracion={configuracion} onCambiar={onCambiar} />
         </div>
       )}
     </section>
@@ -65,37 +47,29 @@ export function PanelReglasOpcionales({ configuracion, onCambiar }: Props) {
 
 interface GrupoProps {
   titulo: string;
-  color: string;
   opciones: [keyof ReglasOpcionales, string][];
   configuracion: ConfiguracionMesa;
   onCambiar: (regla: keyof ReglasOpcionales, valor: boolean) => void;
 }
 
-function GrupoOpciones({ titulo, color, opciones, configuracion, onCambiar }: GrupoProps) {
-  const grupoDeshabilitado = opciones.every(
-    ([regla]) => !modoPermiteRegla(configuracion.modoContenido, regla)
-  );
-  const clasesContenedor = `flex flex-col gap-2.5 bg-slate-900/80 p-3 rounded-xl border border-slate-800 transition-all ${
-    grupoDeshabilitado ? 'opacity-40 pointer-events-none select-none' : ''
-  }`;
+function GrupoOpciones({ titulo, opciones, configuracion, onCambiar }: GrupoProps) {
+  const grupoDeshabilitado = opciones.every(([regla]) => !modoPermiteRegla(configuracion.modoContenido, regla));
 
   return (
-    <div className={clasesContenedor}>
-      <div className="flex items-center justify-between border-b border-slate-800 pb-1">
-        <span className={`text-sm font-bold ${color} uppercase tracking-wider`}>{titulo}</span>
-      </div>
+    <div className={`flex flex-col rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 ${grupoDeshabilitado ? 'opacity-50' : ''}`}>
+      <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">{titulo}</span>
       {opciones.map(([clave, etiqueta]) => {
         const deshabilitada = !modoPermiteRegla(configuracion.modoContenido, clave);
         return (
-          <label key={clave} className="flex items-center justify-between cursor-pointer py-1">
-            <span className="font-semibold text-base text-slate-200">{etiqueta}</span>
+          <div key={clave} className="flex items-center justify-between gap-3 border-t border-slate-200 first:border-t-0">
+            <span className="text-sm font-semibold text-tinta">{etiqueta}</span>
             <Toggle
-              tamano="sm"
+              etiqueta={etiqueta}
               checked={configuracion.reglasOpcionales[clave]}
               disabled={deshabilitada}
               onChange={(valor) => onCambiar(clave, valor)}
             />
-          </label>
+          </div>
         );
       })}
     </div>

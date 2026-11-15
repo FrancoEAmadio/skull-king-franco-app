@@ -8,38 +8,22 @@ export function SelectorJugadores() {
     partida: { idsJugadoresSeleccionados },
   } = useApp();
   const [selectorAbierto, setSelectorAbierto] = useState(false);
-
-  const faltanPiratas = idsJugadoresSeleccionados.length < MIN_JUGADORES;
+  const faltan = idsJugadoresSeleccionados.length < MIN_JUGADORES;
 
   return (
-    <section className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <label className="block text-base font-semibold text-slate-200">¿Quiénes juegan?</label>
-        <span className="text-sm font-medium text-amber-300/80">
-          El orden de toque define el turno
-        </span>
-      </div>
-
+    <section className="tarjeta flex flex-col gap-3 p-4">
+      <h3 className="tarjeta-titulo">3. Jugadores</h3>
       <button
         type="button"
         onClick={() => setSelectorAbierto(true)}
-        className={`btn-marron-oscuro flex w-full items-center justify-between rounded-2xl px-4 py-4 text-left ${
-          faltanPiratas ? 'titilar-amarillo' : ''
-        }`}
+        className={`btn-claro flex w-full items-center justify-between px-4 py-3.5 text-left ${faltan ? 'latir' : ''}`}
       >
-        <div>
-          <span className="block text-lg font-black text-white">Seleccionar jugadores</span>
-          <span className="mt-0.5 block text-sm font-bold uppercase tracking-wide text-slate-400">
-            Abrir listado de piratas
-          </span>
-        </div>
-        <span className="badge-orden-jugador shrink-0">{idsJugadoresSeleccionados.length}</span>
+        <span className="text-sm font-black">Seleccionar jugadores</span>
+        <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-azul-vivo px-2 text-xs font-black text-white">
+          {idsJugadoresSeleccionados.length}
+        </span>
       </button>
-
-      <ModalSeleccionJugadores
-        abierto={selectorAbierto}
-        onCerrar={() => setSelectorAbierto(false)}
-      />
+      <ModalSeleccionJugadores abierto={selectorAbierto} onCerrar={() => setSelectorAbierto(false)} />
     </section>
   );
 }

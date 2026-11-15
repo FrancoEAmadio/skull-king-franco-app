@@ -1,233 +1,189 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
-import { useSwipeHorizontal } from '../../ui/useSwipeHorizontal';
 import { CATALOGO_CARTAS_WIKI } from '../../datos/cartasDatos';
 import { CATEGORIAS_REGLAS_WIKI } from '../../datos/reglasDatos';
-import type { CartaWiki } from '../../tipos';
+import type { ModoContenido } from '../../tipos';
+import { Jerarquias } from './Jerarquias';
 
-type Vista = 'manual' | 'cartas';
-type FiltroCarta = 'Todos' | CartaWiki['modo'];
+type Vista = 'manual' | 'cartas' | 'jerarquias';
 
-const FILTROS: FiltroCarta[] = ['Todos', 'Juego Base', 'Reglas Avanzadas', 'Expansión'];
+const MODOS: { id: ModoContenido; etiqueta: string }[] = [
+  { id: 'base', etiqueta: 'Juego base' },
+  { id: 'avanzado', etiqueta: 'Reglas avanzadas' },
+  { id: 'expansion', etiqueta: 'Expansión' },
+];
 
-function iconoModo(modo: CartaWiki['modo']): string {
-  if (modo === 'Juego Base') return '🟢';
-  if (modo === 'Reglas Avanzadas') return '🟣';
-  return '🟠';
+function permitida(modoCarta: string, modo: ModoContenido): boolean {
+  if (modoCarta === 'Juego Base') return true;
+  if (modoCarta === 'Reglas Avanzadas') return modo !== 'base';
+  return modo === 'expansion';
 }
 
-function estiloBadgeModo(modo: CartaWiki['modo']): string {
-  if (modo === 'Juego Base') return 'bg-emerald-950 text-emerald-300 border-emerald-800';
-  if (modo === 'Reglas Avanzadas') return 'bg-purple-950 text-purple-300 border-purple-800';
-  return 'bg-amber-950 text-amber-300 border-amber-800';
+function Campo({ etiqueta, texto }: { etiqueta: string; texto: string }) {
+  return (
+    <div className="flex flex-col">
+      <dt className="text-[10px] font-black uppercase tracking-widest text-azul">{etiqueta}</dt>
+      <dd className="text-xs leading-snug text-slate-700">{texto}</dd>
+    </div>
+  );
 }
 
 export function PantallaReglas() {
-  const { setPantallaActual } = useApp();
+  const { setPantallaActual, partida } = useApp();
   const [vista, setVista] = useState<Vista>('manual');
+  const [modo, setModo] = useState<ModoContenido>(partida.hayPartidaGuardada ? partida.configuracionMesa.modoContenido : 'base');
   const [acordeonAbierto, setAcordeonAbierto] = useState<string | null>('general');
   const [reglasAbiertas, setReglasAbiertas] = useState<Record<string, boolean>>({});
   const [termino, setTermino] = useState('');
-  const [filtro, setFiltro] = useState<FiltroCarta>('Todos');
-  const filtroRef = useRef<HTMLButtonElement | null>(null);
 
-  const indiceFiltro = useMemo(() => FILTROS.indexOf(filtro), [filtro]);
+  const cartas = useMemo(() => {
+    const q = termino.trim().toLowerCase();
+    return CATALOGO_CARTAS_WIKI.filter(
+      (c) => permitida(c.modo, modo) && (!q || c.nombre.toLowerCase().includes(q) || c.descripcion.toLowerCase().includes(q))
+    );
+  }, [termino, modo]);
 
-  const avanzarFiltro = () => setFiltro(FILTROS[(indiceFiltro + 1) % FILTROS.length]);
-  const retrocederFiltro = () =>
-    setFiltro(FILTROS[(indiceFiltro - 1 + FILTROS.length) % FILTROS.length]);
-
-  useEffect(() => {
-    filtroRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      inline: 'center',
-      block: 'nearest',
-    });
-  }, [filtro]);
-
-  const { iniciarPointer, finalizarPointer } = useSwipeHorizontal({
-    onSwipeIzquierda: avanzarFiltro,
-    onSwipeDerecha: retrocederFiltro,
-  });
-
-  const cartasFiltradas = useMemo(() => {
-    const busqueda = termino.toLowerCase();
-    return CATALOGO_CARTAS_WIKI.filter((carta) => {
-      const coincideTexto =
-        carta.nombre.toLowerCase().includes(busqueda) ||
-        carta.descripcion.toLowerCase().includes(busqueda);
-      const coincideFiltro = filtro === 'Todos' || carta.modo === filtro;
-      return coincideTexto && coincideFiltro;
-    });
-  }, [termino, filtro]);
-
-  const toggleAcordeon = (id: string) =>
-    setAcordeonAbierto((actual) => (actual === id ? null : id));
-
-  const toggleRegla = (clave: string) =>
-    setReglasAbiertas((actual) => ({ ...actual, [clave]: !actual[clave] }));
+  const botonesModo = (
+    <div className="grid grid-cols-3 gap-2">
+      {MODOS.map((m) => (
+        <button
+          key={m.id}
+          type="button"
+          aria-pressed={modo === m.id}
+          onClick={() => setModo(m.id)}
+          className={`min-h-12 px-1 py-2 text-xs font-extrabold leading-tight ${modo === m.id ? 'opcion opcion-sel' : 'opcion'}`}
+        >
+          {m.etiqueta}
+        </button>
+      ))}
+    </div>
+  );
 
   return (
-    <main className="py-6 w-full">
-      <div className="w-full pb-4">
-        <button
-          onClick={() => setPantallaActual('inicio')}
-          className="mb-4 text-base text-amber-300 font-bold"
-        >
-          ← Volver al menú
-        </button>
-        <h2 className="text-3xl font-bold mb-1 text-white">Manual y Jerarquía del Juego</h2>
-        <p className="text-sm text-slate-300 mb-4">Organizado por categorías y expansiones</p>
+    <main className="entrar flex w-full flex-col gap-4 py-4">
+      <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma self-start px-3 py-2 text-sm">
+        ← Volver al menú
+      </button>
+      <h2 className="font-display text-2xl font-black text-white">Manual, Cartas y Reglas</h2>
 
-        <div className="grid grid-cols-2 gap-2 mb-4">
+      <div className="grid grid-cols-3 gap-2">
+        {(
+          [
+            ['manual', '📖 Reglas del juego'],
+            ['cartas', '🃏 Catálogo de cartas'],
+            ['jerarquias', '🧭 Orden de jerarquías'],
+          ] as const
+        ).map(([id, etiqueta]) => (
           <button
-            onClick={() => setVista('manual')}
-            className={`py-2.5 px-3 rounded-xl font-bold text-sm border text-center ${
-              vista === 'manual' ? 'btn-blanco-marron' : 'btn-marron-oscuro'
-            }`}
+            key={id}
+            type="button"
+            aria-pressed={vista === id}
+            onClick={() => setVista(id)}
+            className={`min-h-14 px-1 py-2 text-xs leading-tight ${vista === id ? 'btn-primario' : 'btn-fantasma'}`}
           >
-            📖 Reglas del Juego
+            {etiqueta}
           </button>
-          <button
-            onClick={() => setVista('cartas')}
-            className={`py-2.5 px-3 rounded-xl font-bold text-sm border text-center ${
-              vista === 'cartas' ? 'btn-blanco-marron' : 'btn-marron-oscuro'
-            }`}
-          >
-            🃏 Catálogo de Cartas
-          </button>
-        </div>
-
-        {vista === 'cartas' && (
-          <div className="flex flex-col gap-2">
-            <div className="relative flex items-center">
-              <input
-                value={termino}
-                onChange={(e) => setTermino(e.target.value.trimStart())}
-                onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
-                type="text"
-                placeholder="🔍 Buscar carta..."
-                className="w-full rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-white bg-slate-900 border border-slate-700 focus:outline-none focus:border-amber-500"
-              />
-              {termino.length > 0 && (
-                <button
-                  onClick={() => setTermino('')}
-                  className="absolute right-2.5 flex items-center justify-center w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-bold"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-            <div
-              className="flex gap-1.5 overflow-x-auto pb-1 scroll-oculto"
-              style={{ scrollBehavior: 'smooth' }}
-            >
-              {FILTROS.map((f) => (
-                <button
-                  key={f}
-                  ref={f === filtro ? filtroRef : undefined}
-                  onClick={() => setFiltro(f)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-bold whitespace-nowrap text-center ${
-                    filtro === f
-                      ? 'btn-blanco-marron text-black'
-                      : 'bg-slate-900 border border-slate-800 text-slate-300'
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        ))}
       </div>
 
-      {vista === 'manual' ? (
+      {vista !== 'manual' && botonesModo}
+
+      {vista === 'manual' && (
         <div className="flex flex-col gap-2.5">
-          {CATEGORIAS_REGLAS_WIKI.map((categoria) => (
-            <div key={categoria.id} className="border border-slate-800 rounded-xl overflow-hidden">
-              <button
-                onClick={() => toggleAcordeon(categoria.id)}
-                className="w-full p-3.5 bg-slate-900 flex justify-between items-center font-bold text-amber-300 text-base"
-              >
-                <span>{categoria.titulo}</span>
-                <span>{acordeonAbierto === categoria.id ? '▲' : '▼'}</span>
-              </button>
-              {acordeonAbierto === categoria.id && (
-                <div className="p-4 bg-slate-950 text-sm text-slate-300 flex flex-col gap-3 border-t border-slate-800">
-                  {categoria.items.map((regla, idx) => {
-                    const clave = `${categoria.id}-${idx}`;
-                    const abierta = reglasAbiertas[clave] ?? false;
-                    return (
-                      <div
-                        key={clave}
-                        className="border-b border-slate-800/60 pb-3 last:border-none last:pb-0"
-                      >
-                        <button
-                          onClick={() => toggleRegla(clave)}
-                          className="w-full text-left font-bold text-white flex justify-between items-center py-1"
-                        >
-                          <span>{regla.titulo}</span>
-                          <span className="text-sm text-amber-400 font-normal">
-                            {abierta ? '−' : '+'}
-                          </span>
-                        </button>
-                        {abierta && (
-                          <div className="mt-2 text-slate-300 bg-slate-900/60 p-3 rounded-lg border border-slate-800/80">
-                            <p className="leading-relaxed whitespace-pre-line">{regla.texto}</p>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div
-          onPointerDown={iniciarPointer}
-          onPointerUp={finalizarPointer}
-          style={{ touchAction: 'pan-y' }}
-          className="flex flex-col gap-3 select-none"
-        >
-          {cartasFiltradas.map((carta) => (
-            <article key={carta.id} className="tarjeta-marron p-3.5 flex flex-col gap-3">
-              <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                <span
-                  className={`shrink-0 whitespace-nowrap text-sm font-extrabold px-2 py-0.5 rounded-md border ${estiloBadgeModo(
-                    carta.modo
-                  )}`}
+          {CATEGORIAS_REGLAS_WIKI.map((categoria) => {
+            const abierta = acordeonAbierto === categoria.id;
+            return (
+              <div key={categoria.id} className="overflow-hidden rounded-xl border border-white/20">
+                <button
+                  type="button"
+                  onClick={() => setAcordeonAbierto(abierta ? null : categoria.id)}
+                  aria-expanded={abierta}
+                  className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-black ${
+                    abierta ? 'bg-azul text-white' : 'bg-white text-azul'
+                  }`}
                 >
-                  {iconoModo(carta.modo)} {carta.modo}
-                </span>
-                <span className="min-w-0 text-sm font-bold leading-tight text-slate-400">
-                  Cantidad: {carta.cantidad}
-                </span>
+                  <span>{categoria.titulo}</span>
+                  <span>{abierta ? '▲' : '▼'}</span>
+                </button>
+                {abierta && (
+                  <div className="flex flex-col gap-2 bg-white p-3 text-sm text-slate-700">
+                    {categoria.items.map((regla, idx) => {
+                      const clave = `${categoria.id}-${idx}`;
+                      const abiertaRegla = reglasAbiertas[clave] ?? false;
+                      return (
+                        <div key={clave} className="border-b border-slate-100 pb-2 last:border-none last:pb-0">
+                          <button
+                            type="button"
+                            onClick={() => setReglasAbiertas((a) => ({ ...a, [clave]: !a[clave] }))}
+                            className="flex min-h-11 w-full items-center justify-between text-left font-bold text-tinta"
+                          >
+                            <span>{regla.titulo}</span>
+                            <span className="px-2 text-azul">{abiertaRegla ? '−' : '+'}</span>
+                          </button>
+                          {abiertaRegla && <p className="mt-1 whitespace-pre-line rounded-lg bg-slate-50 p-3 text-xs leading-relaxed">{regla.texto}</p>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-              <div className="flex gap-3 items-start">
+            );
+          })}
+        </div>
+      )}
+
+      {vista === 'cartas' && (
+        <div className="flex flex-col gap-3">
+          <div className="relative flex items-center">
+            <input
+              value={termino}
+              onChange={(e) => setTermino(e.target.value.trimStart())}
+              type="text"
+              placeholder="🔍 Buscar carta..."
+              aria-label="Buscar carta"
+              className="campo pr-11"
+            />
+            {termino.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setTermino('')}
+                aria-label="Borrar búsqueda"
+                className="absolute right-1.5 flex h-9 w-9 items-center justify-center rounded-full text-slate-500"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          {cartas.length === 0 && <div className="tarjeta p-6 text-center text-sm text-slate-500">No hay cartas que coincidan.</div>}
+          {cartas.map((carta) => (
+            <article key={carta.id} className="tarjeta overflow-hidden">
+              <div className="flex items-center justify-between gap-2 px-4 pt-3">
+                <h3 className="font-display text-base font-black text-azul">{carta.nombre}</h3>
+                <span className="shrink-0 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-black text-azul">{carta.cantidad}</span>
+              </div>
+              <div className="mx-4 mt-2 flex justify-center rounded-xl bg-gradient-to-b from-blue-50 to-slate-100 p-3">
                 <img
                   src={`./${carta.imagen}`}
                   alt={carta.nombre}
-                  className="w-16 h-22 object-cover rounded-lg border border-slate-700 bg-slate-900 shrink-0"
+                  className="h-44 rounded-lg border border-slate-200 bg-white object-contain shadow"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
                 />
-                <div className="flex flex-col gap-1">
-                  <h4 className="text-base font-extrabold text-white">{carta.nombre}</h4>
-                  <p className="text-sm text-slate-300 leading-relaxed">{carta.descripcion}</p>
-                  {carta.habilidad && (
-                    <p className="text-sm text-amber-300 font-semibold mt-1 bg-amber-950/30 p-1.5 rounded border border-amber-900/40">
-                      ⚡ {carta.habilidad}
-                    </p>
-                  )}
-                </div>
               </div>
+              <dl className="flex flex-col gap-2 p-4">
+                <p className="text-xs text-slate-600">{carta.descripcion}</p>
+                {carta.habilidad && <Campo etiqueta="Habilidad" texto={carta.habilidad} />}
+                <Campo etiqueta="Gana contra" texto={carta.ganaContra} />
+                <Campo etiqueta="Pierde contra" texto={carta.pierdeContra} />
+                {carta.bonificacion && <Campo etiqueta="Bonificación" texto={carta.bonificacion} />}
+              </dl>
             </article>
           ))}
         </div>
       )}
+
+      {vista === 'jerarquias' && <Jerarquias modo={modo} />}
     </main>
   );
 }

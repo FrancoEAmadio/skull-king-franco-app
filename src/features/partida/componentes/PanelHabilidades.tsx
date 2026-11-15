@@ -32,8 +32,8 @@ function Opcion({
       aria-pressed={activa}
       disabled={deshabilitada}
       onClick={onClick}
-      className={`min-h-12 rounded-xl px-3 py-2 text-base font-bold leading-tight disabled:opacity-35 ${
-        activa ? 'opcion-activa' : 'opcion-inactiva'
+      className={`min-h-11 px-3 py-2 text-sm font-bold leading-tight disabled:opacity-35 ${
+        activa ? 'opcion opcion-sel' : 'opcion'
       }`}
     >
       {children}
@@ -68,8 +68,8 @@ function TogglesBribon({
               vibrar();
               onElegir(pts);
             }}
-            className={`min-h-12 rounded-xl py-3 text-lg font-black disabled:opacity-40 ${
-              activo ? 'opcion-activa' : 'opcion-inactiva'
+            className={`min-h-11 py-3 text-base font-black disabled:opacity-40 ${
+              activo ? 'opcion opcion-sel' : 'opcion'
             }`}
           >
             {pts === 0 ? '0' : `+${pts}`}
@@ -102,7 +102,8 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
   if (!jugadorActual) return null;
 
   const nombre = jugadorActual.nombre;
-  const kongActivo = estaReglaActiva(configuracionMesa, 'primerOficialKong');
+  const kongActivo =
+    configuracionMesa.modoContenido === 'expansion' && estaReglaActiva(configuracionMesa, 'primerOficialKong');
 
   const registroBribon = registroHabilidadesRonda.find((h) => h.tipo === 'Bribón de Roatán');
   const bribonDeOtro = !!registroBribon && registroBribon.jugadorIdx !== jugadorSeleccionadoIdx;
@@ -114,12 +115,16 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
   const kongBribonDeOtro = !!registroKongBribon && registroKongBribon.jugadorIdx !== jugadorSeleccionadoIdx;
   const ptsKongBribon = registroKongBribon && !kongBribonDeOtro ? (jugadorActual.bribonHabilidadPts ?? 0) : 0;
 
+  const registroHarry = registroHabilidadesRonda.find((h) => h.tipo === 'Harry el Gigante');
+  const bribonDeEste = !!registroBribon && registroBribon.jugadorIdx === jugadorSeleccionadoIdx;
+  const harryDeEste = !!registroHarry && registroHarry.jugadorIdx === jugadorSeleccionadoIdx;
   const bribonUsado = esHabilidadYaRegistrada('Bribón de Roatán');
   const harryUsado = esHabilidadYaRegistrada('Harry el Gigante');
 
   // Regla: Kong solo copia una habilidad que ya se usó antes en la ronda (Bribón o Harry) y que no copió ya.
-  const kongPuedeCopiarBribon = bribonUsado && (!registroKongBribon || !kongBribonDeOtro);
-  const kongPuedeCopiarHarry = harryUsado && !esKongYaRegistradoCon('Harry');
+  // Kong copia una habilidad que ya usó OTRO jugador: quien usó Bribón no puede copiar Bribón (y lo mismo con Harry).
+  const kongPuedeCopiarBribon = bribonUsado && !bribonDeEste && (!registroKongBribon || !kongBribonDeOtro);
+  const kongPuedeCopiarHarry = harryUsado && !harryDeEste && !esKongYaRegistradoCon('Harry');
   const kongHabilitado = kongPuedeCopiarBribon || kongPuedeCopiarHarry;
 
   const habilitada: Record<HabId, boolean> = {
@@ -147,7 +152,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
             ? aplicarKongHarryGigante(jugadorSeleccionadoIdx, 1)
             : aplicarHarryGigante(jugadorSeleccionadoIdx, 1)
         }
-        className="min-h-12 rounded-xl bg-emerald-700 py-2.5 text-base font-extrabold text-white active:scale-[0.98]"
+        className="min-h-11 rounded-xl bg-emerald-700 py-2.5 text-sm font-extrabold text-tinta active:scale-[0.98]"
       >
         +1 al envite
       </button>
@@ -158,7 +163,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
             ? aplicarKongHarryGigante(jugadorSeleccionadoIdx, -1)
             : aplicarHarryGigante(jugadorSeleccionadoIdx, -1)
         }
-        className="min-h-12 rounded-xl bg-rose-800 py-2.5 text-base font-extrabold text-white active:scale-[0.98]"
+        className="min-h-11 rounded-xl bg-rose-700 py-2.5 text-sm font-extrabold text-tinta active:scale-[0.98]"
       >
         −1 al envite
       </button>
@@ -174,11 +179,11 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
       onToggle={onToggle}
     >
       {habilidadesBloqueadasPorLimite ? (
-        <p className="py-1 text-center text-base text-slate-300">Se alcanzó el límite de 3 habilidades por ronda.</p>
+        <p className="py-1 text-center text-base text-slate-500">Límite de 3 habilidades por ronda.</p>
       ) : (
         <>
-          <span className="text-left text-lg font-black text-white">
-            Habilidad pirata de <span className="text-amber-300">{nombre}</span>
+          <span className="text-left text-lg font-black text-tinta">
+            Habilidad pirata de <span className="text-azul">{nombre}</span>
           </span>
 
           <div className="grid grid-cols-1 gap-2">
@@ -204,8 +209,8 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
               >
                 Primer Oficial Kong
                 {!kongHabilitado && (
-                  <span className="block text-sm font-semibold text-slate-300">
-                    Primero hay que usar a Bribón o a Harry
+                  <span className="block text-sm font-semibold text-slate-500">
+                    Otro jugador tiene que haber usado Bribón o Harry
                   </span>
                 )}
               </Opcion>
@@ -214,7 +219,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
 
           {habilidadEfectiva === 'bribon_rotan' && (
             <div className="flex flex-col gap-2 text-left">
-              <span className="text-sm font-bold uppercase text-slate-300">
+              <span className="text-sm font-bold uppercase text-slate-500">
                 Puntos en juego (+ si cumple, − si falla)
               </span>
               <TogglesBribon
@@ -224,7 +229,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
                 onElegir={(pts) => elegirPuntosBribon(jugadorSeleccionadoIdx, pts)}
               />
               {bribonDeOtro && (
-                <span className="text-sm font-semibold text-amber-300">
+                <span className="text-sm font-semibold text-azul">
                   El Bribón de Roatán ya lo usó {registroBribon?.jugadorNombre} en esta ronda.
                 </span>
               )}
@@ -233,8 +238,8 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
 
           {habilidadEfectiva === 'harry_gigante' && (
             <div className="flex flex-col gap-2 text-left">
-              <span className="text-base text-slate-200">
-                Modifica el envite de <strong className="text-white">{nombre}</strong> (hoy: {jugadorActual.apuesta}):
+              <span className="text-base text-slate-700">
+                Modifica el envite de <strong className="text-tinta">{nombre}</strong> (hoy: {jugadorActual.apuesta}):
               </span>
               {botonesHarry(false)}
             </div>
@@ -242,7 +247,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
 
           {kongActivo && habilidadEfectiva === 'kong' && (
             <div className="flex flex-col gap-2.5 text-left">
-              <span className="text-sm font-bold uppercase text-slate-300">Kong copia la habilidad de:</span>
+              <span className="text-sm font-bold uppercase text-slate-500">Kong copia la habilidad de:</span>
               <div className="grid grid-cols-2 gap-2">
                 <Opcion
                   activa={copiadaEfectiva === 'Bribón de Roatán'}
@@ -269,15 +274,15 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
                     onElegir={(pts) => elegirPuntosBribon(jugadorSeleccionadoIdx, pts, true)}
                   />
                   {kongBribonDeOtro && (
-                    <span className="text-sm font-semibold text-amber-300">
+                    <span className="text-sm font-semibold text-azul">
                       Kong ya copió al Bribón con {registroKongBribon?.jugadorNombre} en esta ronda.
                     </span>
                   )}
                 </>
               ) : (
                 <>
-                  <span className="text-base text-slate-200">
-                    Modifica el envite de <strong className="text-white">{nombre}</strong> con la copia de Harry:
+                  <span className="text-base text-slate-700">
+                    Modifica el envite de <strong className="text-tinta">{nombre}</strong> con la copia de Harry:
                   </span>
                   {botonesHarry(true)}
                 </>
@@ -289,23 +294,23 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
 
       {registroHabilidadesRonda.length > 0 && (
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-bold uppercase text-slate-300">Habilidades en esta ronda</span>
+          <span className="text-sm font-bold uppercase text-slate-500">Habilidades en esta ronda</span>
           {registroHabilidadesRonda.map((h, idx) => (
             <div
               key={h.id}
-              className="flex items-center justify-between rounded-xl border border-purple-400/40 bg-slate-950/80 p-2.5 text-base"
+              className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-base"
             >
               <div className="flex flex-col text-left">
-                <span className="font-bold text-purple-200">
-                  {h.etiqueta} <span className="text-sm text-slate-300">({h.jugadorNombre})</span>
+                <span className="font-bold text-azul">
+                  {h.etiqueta} <span className="text-sm text-slate-500">({h.jugadorNombre})</span>
                 </span>
-                <span className="mt-0.5 text-sm text-slate-300">{h.detalle}</span>
+                <span className="mt-0.5 text-sm text-slate-500">{h.detalle}</span>
               </div>
               <button
                 type="button"
                 onClick={() => eliminarRegistroHabilidad(idx)}
                 aria-label={`Quitar ${h.etiqueta}`}
-                className="min-h-10 min-w-10 rounded bg-slate-800 px-2 py-1 text-base font-bold text-red-300"
+                className="min-h-10 min-w-10 rounded bg-slate-100 px-2 py-1 text-base font-bold text-red-700"
               >
                 ✕
               </button>

@@ -43,8 +43,8 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
 
       {!limiteAlcanzado && (
         <>
-          <span className="text-base font-bold text-white">
-            Alianza de <span className="text-amber-300">{activo.nombre}</span> con:
+          <span className="text-sm font-bold text-tinta">
+            Alianza de <span className="text-azul">{activo.nombre}</span> con:
           </span>
           <div className="flex flex-wrap gap-2">
             {otros.map(({ jug, idx }) => (
@@ -53,8 +53,8 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
                 type="button"
                 aria-pressed={idxOtro === idx}
                 onClick={() => setIdxOtro(idx)}
-                className={`rounded-xl px-4 py-2.5 text-base font-bold ${
-                  idxOtro === idx ? 'btn-blanco-marron' : 'btn-marron-oscuro'
+                className={`px-4 py-2.5 text-sm ${
+                  idxOtro === idx ? 'btn-dorado' : 'btn-claro'
                 }`}
               >
                 {jug.nombre}
@@ -64,9 +64,9 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
           <button
             type="button"
             onClick={registrar}
-            className="btn-blanco-marron w-full rounded-xl py-3 text-base active:scale-[0.98]"
+            className="btn-dorado w-full py-3 text-sm"
           >
-            + Registrar alianza (+20 pts c/u si ambos aciertan)
+            + Registrar alianza
           </button>
         </>
       )}
@@ -76,14 +76,14 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
           {alianzasBotinRonda.map((alianza, idx) => (
             <span
               key={idx}
-              className="flex items-center gap-2 rounded-full border border-amber-700/60 bg-slate-900 py-1 pl-3 pr-1 text-base font-bold text-amber-300"
+              className="flex items-center gap-2 rounded-full border border-oro bg-slate-50 py-1 pl-3 pr-1 text-base font-bold text-azul"
             >
               {alianza.nombreA} 🤝 {alianza.nombreB}
               <button
                 type="button"
                 onClick={() => eliminarAlianzaBotin(idx)}
                 aria-label={`Borrar alianza ${alianza.nombreA} y ${alianza.nombreB}`}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-red-400"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-red-700"
               >
                 ✕
               </button>

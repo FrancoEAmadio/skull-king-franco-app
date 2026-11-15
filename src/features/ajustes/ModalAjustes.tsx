@@ -8,7 +8,8 @@ import {
 import { copiarLink, descargarArchivo } from '../../infra/compartir';
 import { Toggle } from '../../ui/Toggle';
 import { ModalFeedback } from './ModalFeedback';
-import { Modal } from '../../ui/Modal';
+import { EncabezadoModal, Modal } from '../../ui/Modal';
+import { configurarVibracion, vibracionSoportada, vibrar } from '../../infra/vibracion';
 import { ModalAviso } from '../../ui/ModalAviso';
 
 export function ModalAjustes() {
@@ -87,67 +88,66 @@ export function ModalAjustes() {
     });
   };
 
+  const wakeLockOk = typeof navigator !== 'undefined' && 'wakeLock' in navigator;
+  const vibrarOk = vibracionSoportada();
+
   return (
     <>
       <Modal abierto={ajustesAbiertos} onCerrar={cerrar} ancho="max-w-md" zIndex="z-[60]" cerrarAlHacerClickAfuera>
-        <div className="flex shrink-0 items-center justify-between border-b border-amber-900/60 bg-slate-900 p-4">
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-widest text-amber-300">Ajustes</h3>
-            <span className="text-2xl font-bold text-white">Preferencias y datos</span>
-          </div>
-          <button
-            type="button"
-            onClick={cerrar}
-            aria-label="Cerrar ajustes"
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-2xl font-bold text-slate-300 hover:bg-slate-700 hover:text-white"
-          >
-            ✕
-          </button>
-        </div>
+        <EncabezadoModal titulo="Ajustes" subtitulo="Preferencias y datos" onCerrar={cerrar} />
 
-        <div className="scroll-oculto flex flex-1 flex-col gap-4 overflow-y-auto p-4">
-          <section className="flex flex-col gap-4 rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
+        <div className="scroll-oculto flex flex-1 flex-col gap-3 overflow-y-auto bg-slate-50 p-4">
+          <section className="tarjeta flex flex-col gap-1 p-4">
             <div className="flex items-center justify-between gap-3">
-              <div>
-                <span className="block text-lg font-black text-white">Pantalla siempre encendida</span>
-                <span className="block text-base text-slate-300">Durante la partida, para que el celu no se bloquee.</span>
+              <div className="min-w-0">
+                <span className="block text-sm font-black text-tinta">Pantalla siempre encendida</span>
+                <span className="block text-xs text-slate-500">
+                  {wakeLockOk ? 'Durante la partida.' : 'No disponible en este dispositivo.'}
+                </span>
               </div>
               <Toggle
-                checked={ajustes.mantenerPantallaEncendida}
+                etiqueta="Pantalla siempre encendida"
+                disabled={!wakeLockOk}
+                checked={wakeLockOk && ajustes.mantenerPantallaEncendida}
                 onChange={(valor) => cambiarAjustes({ mantenerPantallaEncendida: valor })}
               />
             </div>
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <span className="block text-lg font-black text-white">Vibración al tocar</span>
-                <span className="block text-base text-slate-300">Solo en celulares compatibles.</span>
+            <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-1">
+              <div className="min-w-0">
+                <span className="block text-sm font-black text-tinta">Vibración al tocar</span>
+                <span className="block text-xs text-slate-500">
+                  {vibrarOk ? 'Respuesta táctil en los botones.' : 'No disponible en este dispositivo.'}
+                </span>
               </div>
-              <Toggle checked={ajustes.vibracion} onChange={(valor) => cambiarAjustes({ vibracion: valor })} />
+              <Toggle
+                etiqueta="Vibración al tocar"
+                disabled={!vibrarOk}
+                checked={vibrarOk && ajustes.vibracion}
+                onChange={(valor) => {
+                  cambiarAjustes({ vibracion: valor });
+                  if (valor) {
+                    configurarVibracion(true);
+                    vibrar(30);
+                  }
+                }}
+              />
             </div>
-            <button type="button" onClick={() => void copiar()} className="btn-marron-oscuro w-full rounded-xl py-3.5 text-lg">
+            <button type="button" onClick={() => void copiar()} className="btn-claro mt-2 w-full py-3 text-sm">
               {linkCopiado ? '✅ ¡Link copiado!' : '🔗 Copiar link de la página'}
             </button>
           </section>
 
-          <section className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
-            <h4 className="text-base font-black text-amber-300">💾 Copia de seguridad</h4>
-            <p className="mb-3 mt-1 text-sm leading-relaxed text-slate-300">
-              Tus jugadores, estadísticas e historial viven solo en este dispositivo. Exportalos a un archivo
-              .json para guardarlos o pasarlos a otro celular, y después importalos desde ahí.
-            </p>
-            <p className="mb-3 text-sm text-slate-400">
-              Ahora: {jugadoresPermanentes.length} jugador{jugadoresPermanentes.length === 1 ? '' : 'es'} ·{' '}
-              {historialPartidas.length} partida{historialPartidas.length === 1 ? '' : 's'} en el historial.
+          <section className="tarjeta p-4">
+            <h4 className="tarjeta-titulo">💾 Copia de seguridad</h4>
+            <p className="mb-3 mt-1 text-xs leading-relaxed text-slate-500">
+              {jugadoresPermanentes.length} jugador{jugadoresPermanentes.length === 1 ? '' : 'es'} ·{' '}
+              {historialPartidas.length} partida{historialPartidas.length === 1 ? '' : 's'} en este dispositivo. Al importar, se suman sin borrar nada.
             </p>
             <div className="grid grid-cols-2 gap-2">
-              <button type="button" onClick={exportar} className="btn-blanco-marron rounded-xl py-3 text-base">
+              <button type="button" onClick={exportar} className="btn-primario py-3 text-sm">
                 ⬇ Exportar
               </button>
-              <button
-                type="button"
-                onClick={() => archivoRef.current?.click()}
-                className="btn-marron-oscuro rounded-xl py-3 text-base"
-              >
+              <button type="button" onClick={() => archivoRef.current?.click()} className="btn-claro py-3 text-sm">
                 ⬆ Importar
               </button>
             </div>
@@ -158,22 +158,11 @@ export function ModalAjustes() {
               className="hidden"
               onChange={(evento) => void importar(evento.target.files?.[0])}
             />
-            <p className="mt-2 text-sm leading-relaxed text-slate-400">
-              Al importar, los datos se suman a los actuales: no se borra nada y las partidas repetidas se
-              omiten.
-            </p>
           </section>
 
-          <section className="rounded-2xl border border-slate-700 bg-slate-900/70 p-4">
-            <h4 className="text-lg font-black text-amber-300">Tu opinión</h4>
-            <p className="mb-3 mt-1 text-base leading-relaxed text-slate-300">
-              ¿Encontraste un error o tenés una idea para mejorar la app? Contanos.
-            </p>
-            <button
-              type="button"
-              onClick={() => setFeedbackAbierto(true)}
-              className="btn-marron-oscuro w-full rounded-xl py-3.5 text-lg"
-            >
+          <section className="tarjeta p-4">
+            <h4 className="tarjeta-titulo">Tu opinión</h4>
+            <button type="button" onClick={() => setFeedbackAbierto(true)} className="btn-claro mt-3 w-full py-3 text-sm">
               💬 Enviar comentarios o reportar error
             </button>
           </section>

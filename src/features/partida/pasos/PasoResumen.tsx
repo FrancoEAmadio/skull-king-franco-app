@@ -1,4 +1,33 @@
+import type { ReactNode } from 'react';
 import { useApp } from '../../../estado/AppProvider';
+
+const signo = (n: number) => `${n > 0 ? '+' : ''}${n}`;
+
+interface Linea {
+  etiqueta: string;
+  valor: string;
+  tachada?: boolean;
+}
+
+function Grupo({ titulo, lineas, subtotal }: { titulo: string; lineas: Linea[]; subtotal?: number }): ReactNode {
+  if (lineas.length === 0) return null;
+  return (
+    <div className="flex flex-col">
+      <div className="flex items-center justify-between pb-1">
+        <span className="text-[11px] font-black uppercase tracking-wider text-azul">{titulo}</span>
+        {subtotal !== undefined && (
+          <span className={`text-sm font-black ${subtotal < 0 ? 'text-rojo-osc' : 'text-azul'}`}>{signo(subtotal)}</span>
+        )}
+      </div>
+      {lineas.map((linea, i) => (
+        <div key={`${linea.etiqueta}-${i}`} className="fila-puntaje py-1.5 text-sm text-slate-700">
+          <span className={`fila-puntaje-nombre ${linea.tachada ? 'tachado-rojo text-slate-400' : ''}`}>{linea.etiqueta}</span>
+          <span className={`fila-puntaje-valor ${linea.tachada ? 'tachado-rojo text-slate-400' : ''}`}>{linea.valor}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function PasoResumen() {
   const { partida, abrirPodio } = useApp();
@@ -9,6 +38,7 @@ export function PasoResumen() {
     rondaVisible,
     irASiguienteRonda,
     confirmarFinalizacionPartida,
+    irAPasoAnterior,
   } = partida;
 
   const confirmarResultadoFinal = () => {
@@ -17,149 +47,94 @@ export function PasoResumen() {
   };
 
   return (
-    <section className="flex flex-col gap-4 flex-1 overflow-y-auto">
-      <div className="tarjeta-marron p-3.5 border-l-4 border-amber-500">
-        <span className="text-sm font-bold text-amber-300 uppercase block">
-          3. Resumen de la Ronda {rondaVisible}
-        </span>
-        <span className="text-sm text-slate-300 block mt-0.5">
-          {partidaFinalizada
-            ? '¡Partida finalizada! Resultados acumulados.'
-            : partidaPendienteFinalizar
-              ? 'Revisá el resultado antes de confirmar definitivamente la partida.'
-              : 'Puntaje de la ronda antes de continuar.'}
-        </span>
+    <section className="entrar flex flex-1 flex-col gap-4">
+      <div className="tarjeta p-4">
+        <span className="tarjeta-titulo block">Resumen de la ronda {rondaVisible}</span>
+        {(partidaFinalizada || partidaPendienteFinalizar) && (
+          <span className="mt-1 block text-xs text-slate-500">
+            {partidaFinalizada ? 'Partida finalizada.' : 'Revisá el resultado antes de confirmar la partida.'}
+          </span>
+        )}
       </div>
 
-      {resumenRondaActual.map((res) => (
-        <div key={res.nombre} className="tarjeta-marron p-3.5 flex flex-col gap-2">
-          <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-            <span className="font-black text-white text-xl">{res.nombre}</span>
-            <span
-              className={`text-sm font-bold px-2 py-1 rounded-full ${
-                res.acierto
-                  ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                  : 'bg-red-950 text-red-400 border border-red-800'
-              }`}
-            >
-              {res.acierto ? '✓ Acertó' : '✕ No acertó'} ({res.ganadas} de {res.apuesta})
-            </span>
-          </div>
+      {resumenRondaActual.map((res) => {
+        const cobradas = res.bonosCobradas ?? [];
+        const esHabilidad = (etiqueta: string) => /\((Acertada|Fallada)\)/.test(etiqueta);
+        const habilidades = cobradas.filter((b) => esHabilidad(b.etiqueta));
+        const otras = cobradas.filter((b) => !esHabilidad(b.etiqueta));
+        const bonos = otras.filter((b) => b.subtotal >= 0);
+        const penal = otras.filter((b) => b.subtotal < 0);
+        const registradas = (res.habilidadesRegistradas ?? []).filter((h) => !/Bribón/.test(h.etiqueta));
+        const suma = (lista: typeof cobradas) => lista.reduce((acc, b) => acc + b.subtotal, 0);
+        const fmt = (b: (typeof cobradas)[number]) => ({
+          etiqueta: `${b.etiqueta}${b.cantidad > 1 ? ` ×${b.cantidad}` : ''}`,
+          valor: signo(b.subtotal),
+        });
+        const lineasHab: Linea[] = [
+          ...habilidades.map(fmt),
+          ...registradas.map((h) => ({ etiqueta: h.etiqueta, valor: 'Envite' })),
+        ];
 
-          <div className="flex justify-between text-sm text-slate-300">
-            <span>Puntaje base:</span>
-            <span className="font-bold text-white">
-              {res.puntajeBase > 0 ? '+' : ''}
-              {res.puntajeBase}
-            </span>
-          </div>
-
-          {res.bonosCobradas && res.bonosCobradas.length > 0 && (
-            <div className="flex flex-col gap-1">
-              <span className="text-sm text-emerald-400 font-bold uppercase">
-                ✓ Bonificaciones y Apuestas:
-              </span>
-              {res.bonosCobradas.map((b, i) => (
-                <div
-                  key={`rc-${i}`}
-                  className={`flex justify-between text-sm px-2 py-1 rounded-lg border ${
-                    b.subtotal >= 0
-                      ? 'text-emerald-300 bg-emerald-950/30 border-emerald-900/40'
-                      : 'text-red-300 bg-red-950/30 border-red-900/40'
-                  }`}
-                >
-                  <span>
-                    {b.etiqueta} {b.cantidad > 1 && `×${b.cantidad}`}
-                  </span>
-                  <span className="font-bold">
-                    {b.subtotal > 0 ? '+' : ''}
-                    {b.subtotal}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {res.bonosNoCobradas && res.bonosNoCobradas.length > 0 && (
-            <div className="flex flex-col gap-1">
-              <span className="text-sm text-slate-400 font-bold uppercase">
-                ✕ Bonos no cobrados por fallar envite:
-              </span>
-              {res.bonosNoCobradas.map((b, i) => (
-                <div
-                  key={`rn-${i}`}
-                  className="flex justify-between text-sm text-slate-400 bg-slate-900/60 px-2 py-1 rounded-lg border border-slate-800"
-                >
-                  <span className="tachado-rojo">
-                    {b.etiqueta} {b.cantidad > 1 && `×${b.cantidad}`}
-                  </span>
-                  <span className="tachado-rojo">
-                    {b.subtotal > 0 ? '+' : ''}
-                    {b.subtotal}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {res.habilidadesRegistradas && res.habilidadesRegistradas.length > 0 && (
-            <div className="flex flex-col gap-1">
-              <span className="text-sm text-purple-300 font-bold uppercase">
-                🏴‍☠️ Habilidades usadas:
-              </span>
-              {res.habilidadesRegistradas.map((hab, i) => (
-                <div
-                  key={`rh-${i}`}
-                  className="text-sm text-purple-200 bg-purple-950/30 px-2 py-1 rounded-lg border border-purple-900/40"
-                >
-                  {hab.etiqueta}
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="flex justify-between items-end pt-2 border-t border-slate-800">
-            <div className="flex flex-col">
-              <span className="text-sm text-slate-400 uppercase font-bold">Total ronda</span>
+        return (
+          <article key={res.nombre} className="tarjeta flex flex-col gap-3 p-4">
+            <header className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
+              <h3 className="min-w-0 flex-1 truncate font-display text-lg font-black text-azul">{res.nombre}</h3>
               <span
-                className={`font-black text-2xl ${
-                  res.totalRonda >= 0 ? 'text-emerald-400' : 'text-red-400'
+                className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-black ${
+                  res.acierto ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'
                 }`}
               >
-                {res.totalRonda > 0 ? '+' : ''}
-                {res.totalRonda}
+                {res.acierto ? '✓ Acertó' : '✕ No acertó'} ({res.ganadas} de {res.apuesta})
               </span>
-            </div>
-            <div className="flex flex-col text-right">
-              <span className="text-sm text-amber-300/70 uppercase font-bold">Acumulado</span>
-              <span className="font-black text-3xl text-amber-400">{res.acumuladoNuevo}</span>
-            </div>
-          </div>
-        </div>
-      ))}
+            </header>
 
-      {partidaFinalizada ? (
-        <button
-          onClick={abrirPodio}
-          className="w-full mt-1 py-4 btn-blanco-marron text-xl rounded-2xl font-black shadow-xl"
-        >
-          🏁 Ver Resultado Final
-        </button>
-      ) : partidaPendienteFinalizar ? (
-        <button
-          onClick={confirmarResultadoFinal}
-          className="w-full mt-1 py-4 btn-blanco-marron text-xl rounded-2xl font-black shadow-xl"
-        >
-          Confirmar Resultado Final
-        </button>
-      ) : (
-        <button
-          onClick={irASiguienteRonda}
-          className="w-full mt-1 py-4 btn-blanco-marron text-xl rounded-2xl font-black shadow-xl"
-        >
-          Siguiente Ronda ➔
-        </button>
-      )}
+            <Grupo titulo="Base" lineas={[{ etiqueta: 'Puntaje base', valor: signo(res.puntajeBase) }]} />
+            <Grupo titulo="Bonos" lineas={bonos.map(fmt)} subtotal={suma(bonos)} />
+            <Grupo titulo="Habilidades" lineas={lineasHab} subtotal={suma(habilidades)} />
+            <Grupo titulo="Penalizaciones" lineas={penal.map(fmt)} subtotal={suma(penal)} />
+            <Grupo
+              titulo="No cobrados por fallar"
+              lineas={(res.bonosNoCobradas ?? []).map((b) => ({
+                etiqueta: `${b.etiqueta}${b.cantidad > 1 ? ` ×${b.cantidad}` : ''}`,
+                valor: signo(b.subtotal),
+                tachada: true,
+              }))}
+            />
+
+            <div className="fila-puntaje !items-end border-t border-slate-200 pt-3">
+              <div className="fila-puntaje-valor !text-left">
+                <span className="block text-[10px] font-bold uppercase text-slate-400">Puntaje de la ronda</span>
+                <span className={`text-2xl font-black ${res.totalRonda < 0 ? 'text-rojo-osc' : 'text-azul'}`}>{signo(res.totalRonda)}</span>
+              </div>
+              <div className="min-w-0 flex-1 text-right">
+                <span className="block text-[10px] font-bold uppercase text-slate-400">Nuevo acumulado</span>
+                <span className="whitespace-nowrap text-3xl font-black text-tinta">{res.acumuladoNuevo}</span>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+
+      <div className="barra-inferior mt-auto grid gap-2">
+        {partidaFinalizada ? (
+          <button type="button" onClick={abrirPodio} className="btn-dorado w-full py-4 text-base">
+            🏁 Ver resultado final
+          </button>
+        ) : partidaPendienteFinalizar ? (
+          <button type="button" onClick={confirmarResultadoFinal} className="btn-dorado w-full py-4 text-base">
+            🏁 Confirmar resultado final
+          </button>
+        ) : (
+          <button type="button" onClick={irASiguienteRonda} className="btn-dorado w-full py-4 text-base">
+            Confirmar ronda y seguir ➔
+          </button>
+        )}
+        {!partidaFinalizada && (
+          <button type="button" onClick={() => irAPasoAnterior('puntos')} className="btn-fantasma w-full py-3 text-sm">
+            ← Corregir puntos
+          </button>
+        )}
+      </div>
     </section>
   );
 }

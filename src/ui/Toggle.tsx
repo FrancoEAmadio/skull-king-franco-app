@@ -1,28 +1,29 @@
+import { vibrar } from '../infra/vibracion';
+
 interface Props {
   checked: boolean;
   onChange: (nuevo: boolean) => void;
   disabled?: boolean;
-  tamano?: 'md' | 'sm';
+  etiqueta?: string;
 }
 
-export function Toggle({ checked, onChange, disabled, tamano = 'md' }: Props) {
-  const clasesContenedor =
-    tamano === 'sm'
-      ? "w-12 h-7 after:h-6 after:w-6"
-      : "w-[3.75rem] h-8 after:h-7 after:w-7";
-
+/** Interruptor real: un botón con role="switch", área táctil de 44 px. */
+export function Toggle({ checked, onChange, disabled, etiqueta }: Props) {
   return (
-    <div className="relative inline-flex items-center">
-      <input
-        type="checkbox"
-        checked={checked}
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.checked)}
-        className="sr-only peer"
-      />
-      <div
-        className={`${clasesContenedor} bg-slate-800 border border-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:transition-all peer-checked:bg-amber-500`}
-      />
-    </div>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={etiqueta}
+      disabled={disabled}
+      onClick={(e) => {
+        e.stopPropagation();
+        vibrar();
+        onChange(!checked);
+      }}
+      className="inline-flex h-11 min-w-11 shrink-0 items-center justify-center disabled:opacity-40"
+    >
+      <span className={`switch ${checked ? 'switch-on' : ''}`} />
+    </button>
   );
 }

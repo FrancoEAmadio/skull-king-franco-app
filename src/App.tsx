@@ -21,9 +21,9 @@ function ContenidoApp() {
       {pantallaActual === 'jugadores' && <PantallaJugadores />}
       {pantallaActual === 'reglas' && <PantallaReglas />}
 
-      <footer className="pie-pagina mt-6 w-full border-t border-slate-700 pt-3 text-center">
-        <p className="text-base font-semibold text-slate-300">Desarrollado por Franco Ezequiel Amadio</p>
-        <p className="mt-0.5 text-sm font-medium text-slate-500">Colaboración de Mateo Álvarez</p>
+      <footer className="pie-pagina mt-6 w-full pt-3 text-center text-xs font-medium text-blue-200/70">
+        <span className="block">Desarrollado por Franco Ezequiel Amadio</span>
+        <span className="block">Colaboración de Mateo Álvarez</span>
       </footer>
 
       <ModalPodio />

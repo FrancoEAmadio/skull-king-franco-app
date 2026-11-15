@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { ModalAviso } from '../../ui/ModalAviso';
+import { vibrar } from '../../infra/vibracion';
 import type { ConfiguracionMesa, ModoContenido, ModoRepartoId, ReglasOpcionales } from '../../tipos';
 import { reglasOpcionalesPorDefectoDelModo } from '../../dominio/disponibilidadContenido';
 import { MAX_RONDAS_PERSONALIZADO, MAX_CARTAS_POR_RONDA } from '../../constantes';
@@ -9,10 +10,10 @@ import { SelectorJugadores } from './componentes/SelectorJugadores';
 import { SelectorModoReparto } from './componentes/SelectorModoReparto';
 import { ConfiguradorRepartoPersonalizado } from './componentes/ConfiguradorRepartoPersonalizado';
 
-const MODOS_CONTENIDO: { id: ModoContenido; etiqueta: string; color: string }[] = [
-  { id: 'base', etiqueta: 'Juego Base', color: '#22c55e' },
-  { id: 'avanzado', etiqueta: 'Reglas Avanzadas', color: '#a855f7' },
-  { id: 'expansion', etiqueta: 'Expansión', color: '#f97316' },
+const MODOS_CONTENIDO: { id: ModoContenido; etiqueta: string }[] = [
+  { id: 'base', etiqueta: 'Juego Base' },
+  { id: 'avanzado', etiqueta: 'Reglas Avanzadas' },
+  { id: 'expansion', etiqueta: 'Expansión' },
 ];
 
 export function PantallaNuevaPartida() {
@@ -81,7 +82,7 @@ export function PantallaNuevaPartida() {
 
   if (configurandoPersonalizado) {
     return (
-      <main className="py-6 flex flex-col w-full overflow-y-auto">
+      <main className="flex w-full flex-col py-4">
         <ConfiguradorRepartoPersonalizado
           cartasPorRondaInicial={configuracionMesa.cartasPorRonda}
           maxRondas={MAX_RONDAS_PERSONALIZADO}
@@ -93,39 +94,36 @@ export function PantallaNuevaPartida() {
     );
   }
 
+  const maxPiratasHabilidad = configuracionMesa.modoContenido === 'expansion' ? 'Bribón, Harry y Kong' : 'Bribón y Harry';
+
   return (
-    <main className="py-6 flex flex-col gap-6 w-full overflow-y-auto">
-      <div className="flex items-center justify-between">
+    <main className="entrar flex w-full flex-col gap-4 py-4">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-3xl font-bold text-white">Configurar Mesa</h2>
+          <span className="text-xs font-black uppercase tracking-widest text-blue-200">Nueva partida</span>
+          <h2 className="font-display text-2xl font-black text-white">Configurar mesa</h2>
         </div>
-        <button
-          onClick={() => setPantallaActual('inicio')}
-          className="text-base text-amber-300 hover:text-white font-bold"
-        >
+        <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma px-3 py-2 text-sm">
           ✕ Cancelar
         </button>
       </div>
 
-      <section className="flex flex-col gap-3">
-        <label className="block text-sm uppercase tracking-wider text-amber-300 font-bold">
-          📦 Modo de Contenido de la Mesa
-        </label>
+      <section className="tarjeta flex flex-col gap-3 p-4">
+        <h3 className="tarjeta-titulo">1. Modo de contenido</h3>
         <div className="grid grid-cols-3 gap-2">
           {MODOS_CONTENIDO.map((modo) => {
             const seleccionado = configuracionMesa.modoContenido === modo.id;
             return (
               <button
                 key={modo.id}
+                type="button"
                 onClick={() => cambiarModoContenido(modo.id)}
                 aria-pressed={seleccionado}
-                className={`flex min-h-24 flex-col items-center justify-start gap-2 rounded-2xl px-1.5 pt-4 pb-3 text-center text-base font-extrabold leading-tight transition-all ${
-                  seleccionado ? 'opcion-activa' : 'opcion-inactiva'
+                className={`flex min-h-16 items-center justify-center px-1.5 py-3 text-center text-sm font-extrabold leading-tight ${
+                  seleccionado ? 'opcion opcion-sel' : 'opcion'
                 }`}
               >
-                <span className="punto-modo" style={{ backgroundColor: modo.color }} />
-                <span>{modo.etiqueta}</span>
-                <span className={`text-sm ${seleccionado ? 'text-amber-300' : 'text-transparent'}`}>✓ Elegido</span>
+                {modo.etiqueta}
               </button>
             );
           })}
@@ -140,43 +138,40 @@ export function PantallaNuevaPartida() {
 
       <SelectorJugadores />
 
-      <section className="grid grid-cols-2 gap-3">
-        <TarjetaOpcion
-          titulo="🃏 Comodines de bonificación"
-          detalle="Cartas blancas: +5 a +50 pts"
-          activo={configuracionMesa.usarComodinesBonificacion}
-          onChange={(valor) => actualizarConfig('usarComodinesBonificacion', valor)}
-        />
-        <TarjetaOpcion
-          titulo="🏴‍☠️ Reglas del Bribón"
-          detalle="Metralla o Bala de cañón"
-          activo={configuracionMesa.usarModoBribon}
-          onChange={(valor) => actualizarConfig('usarModoBribon', valor)}
-        />
-        <TarjetaOpcion
-          titulo="✨ Habilidades de piratas"
-          detalle="Bribón, Harry y Kong"
-          activo={configuracionMesa.usarHabilidadesPiratas}
-          onChange={(valor) => actualizarConfig('usarHabilidadesPiratas', valor)}
-        />
-        <TarjetaOpcion
-          titulo="💰 Bonos al fallar envite"
-          detalle="Se cobran aunque falles"
-          activo={configuracionMesa.cobrarBonosSinAcierto}
-          onChange={(valor) => actualizarConfig('cobrarBonosSinAcierto', valor)}
-        />
+      <section className="tarjeta flex flex-col gap-3 p-4">
+        <h3 className="tarjeta-titulo">4. Reglas de la mesa</h3>
+        <div className="grid grid-cols-2 gap-2.5">
+          <TarjetaOpcion
+            titulo="🃏 Comodines de bonificación"
+            detalle="Cartas blancas: +5 a +50 pts"
+            activo={configuracionMesa.usarComodinesBonificacion}
+            onChange={(valor) => actualizarConfig('usarComodinesBonificacion', valor)}
+          />
+          <TarjetaOpcion
+            titulo="🏴‍☠️ Reglas del Bribón"
+            detalle="Metralla o Bala de cañón"
+            activo={configuracionMesa.usarModoBribon}
+            onChange={(valor) => actualizarConfig('usarModoBribon', valor)}
+          />
+          <TarjetaOpcion
+            titulo="✨ Habilidades de piratas"
+            detalle={maxPiratasHabilidad}
+            activo={configuracionMesa.usarHabilidadesPiratas}
+            onChange={(valor) => actualizarConfig('usarHabilidadesPiratas', valor)}
+          />
+          <TarjetaOpcion
+            titulo="💰 Bonos al fallar envite"
+            detalle="Se cobran aunque falles"
+            activo={configuracionMesa.cobrarBonosSinAcierto}
+            onChange={(valor) => actualizarConfig('cobrarBonosSinAcierto', valor)}
+          />
+        </div>
       </section>
 
-      <PanelReglasOpcionales
-        configuracion={configuracionMesa}
-        onCambiar={cambiarReglaOpcional}
-      />
+      <PanelReglasOpcionales configuracion={configuracionMesa} onCambiar={cambiarReglaOpcional} />
 
-      <button
-        onClick={intentarComenzarPartida}
-        className="w-full mt-2 py-4 btn-blanco-marron text-xl rounded-2xl font-black shadow-xl"
-      >
-        Empezar Partida ➔
+      <button type="button" onClick={intentarComenzarPartida} className="btn-dorado mt-1 w-full py-4 text-lg">
+        Empezar partida ➔
       </button>
 
       <ModalAviso
@@ -196,23 +191,23 @@ interface TarjetaOpcionProps {
   onChange: (valor: boolean) => void;
 }
 
-/** Tarjeta que funciona como botón: iluminada si está activa, apagada si no. Se pueden activar varias. */
+/** Tarjeta-botón: activa = borde dorado + tinte (igual que el modo de contenido). */
 function TarjetaOpcion({ titulo, detalle, activo, onChange }: TarjetaOpcionProps) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={activo}
-      onClick={() => onChange(!activo)}
-      className={`flex min-h-[6.5rem] flex-col items-start justify-between gap-1 rounded-2xl p-3.5 text-left ${
-        activo ? 'opcion-activa' : 'opcion-inactiva'
+      onClick={() => {
+        vibrar();
+        onChange(!activo);
+      }}
+      className={`flex min-h-[6.5rem] flex-col items-start justify-between gap-1 p-3 text-left ${
+        activo ? 'opcion opcion-sel' : 'opcion'
       }`}
     >
-      <span className="text-base font-black leading-tight">{titulo}</span>
-      <span className={`text-sm font-semibold leading-tight ${activo ? 'text-amber-300' : 'text-slate-400'}`}>
-        {activo ? '✓ ' : ''}
-        {detalle}
-      </span>
+      <span className="text-sm font-black leading-tight">{titulo}</span>
+      <span className="text-xs font-semibold leading-tight text-slate-500">{detalle}</span>
     </button>
   );
 }
