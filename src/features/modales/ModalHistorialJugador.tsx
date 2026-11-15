@@ -1,114 +1,59 @@
 import { useApp } from '../../estado/AppProvider';
-import { Modal } from '../../ui/Modal';
+import { EncabezadoModal, Modal } from '../../ui/Modal';
 import type { EntradaHistorialRonda } from '../../tipos';
+
+const signo = (n: number) => `${n > 0 ? '+' : ''}${n}`;
 
 export function ModalHistorialJugador() {
   const { jugadorViendoHistorial, cerrarHistorialJugador } = useApp();
 
   return (
-    <Modal
-      abierto={!!jugadorViendoHistorial}
-      onCerrar={cerrarHistorialJugador}
-      ancho="max-w-md"
-      zIndex="z-[70]"
-      cerrarAlHacerClickAfuera
-    >
+    <Modal abierto={!!jugadorViendoHistorial} onCerrar={cerrarHistorialJugador} ancho="max-w-md" zIndex="z-[70]" cerrarAlHacerClickAfuera>
       {jugadorViendoHistorial && (
         <>
-          <div className="flex justify-between items-center bg-slate-900 border-b border-amber-900/60 p-4 shrink-0 shadow-md">
-            <div>
-              <h3 className="text-base font-black text-amber-300 tracking-widest uppercase">
-                Auditoría de Puntaje
-              </h3>
-              <span className="text-white font-bold text-3xl">
-                {jugadorViendoHistorial.nombre}
-              </span>
-            </div>
-            <button
-              onClick={cerrarHistorialJugador}
-              className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl w-10 h-10 flex items-center justify-center font-bold text-2xl"
-            >
-              ✕
-            </button>
-          </div>
+          <EncabezadoModal titulo={jugadorViendoHistorial.nombre} subtitulo="Auditoría de puntaje" onCerrar={cerrarHistorialJugador} />
 
-          <div className="overflow-y-auto flex-1 flex flex-col gap-4 scroll-oculto p-4 overscroll-contain">
+          <div className="scroll-oculto flex flex-1 flex-col gap-3 overflow-y-auto overscroll-contain bg-slate-50 p-4">
             {(jugadorViendoHistorial.historial as EntradaHistorialRonda[]).map((ronda) => (
-              <div
-                key={ronda.ronda}
-                className="bg-slate-900 border border-slate-700 p-3.5 rounded-xl text-sm relative shadow-lg"
-              >
-                <div
-                  className={`absolute left-0 top-0 bottom-0 w-1.5 ${
-                    ronda.acierto ? 'bg-emerald-500' : 'bg-red-500'
-                  }`}
-                />
-                <div className="flex justify-between items-center border-b border-slate-700/60 pb-2 mb-2 pl-3">
-                  <span className="font-black text-amber-400 text-xl">
-                    RONDA {ronda.ronda}
-                  </span>
+              <div key={ronda.ronda} className="rounded-xl border border-slate-200 bg-white p-3.5 text-sm shadow-sm">
+                <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
+                  <span className="font-display text-base font-black text-azul">Ronda {ronda.ronda}</span>
                   <span
-                    className={`font-bold text-sm px-2 py-0.5 rounded ${
-                      ronda.acierto
-                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                        : 'bg-red-950 text-red-400 border border-red-800'
+                    className={`rounded-full border px-2.5 py-0.5 text-[11px] font-black ${
+                      ronda.acierto ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'
                     }`}
                   >
-                    Envite: {ronda.apuesta} | Bazas: {ronda.ganadas}
+                    Envite {ronda.apuesta} · Bazas {ronda.ganadas}
                   </span>
                 </div>
 
-                <div className="pl-3 flex flex-col gap-1.5">
-                  <div className="flex justify-between">
-                    <span className="text-slate-300">Puntaje Base:</span>
-                    <span className="text-white font-bold">
-                      {ronda.puntajeBase > 0 ? '+' : ''}
-                      {ronda.puntajeBase}
-                    </span>
+                <div className="flex flex-col">
+                  <div className="fila-puntaje py-1">
+                    <span className="fila-puntaje-nombre text-slate-600">Puntaje base</span>
+                    <span className="fila-puntaje-valor">{signo(ronda.puntajeBase)}</span>
                   </div>
-
                   {ronda.bonosCobradas.map((b, i) => (
-                    <div key={`bc-${i}`} className="flex justify-between text-emerald-300">
-                      <span>{b.etiqueta}:</span>
-                      <span className="font-bold">
-                        {b.subtotal > 0 ? '+' : ''}
-                        {b.subtotal} pts
-                      </span>
+                    <div key={`bc-${i}`} className="fila-puntaje py-1">
+                      <span className="fila-puntaje-nombre text-slate-600">{b.etiqueta}</span>
+                      <span className={`fila-puntaje-valor ${b.subtotal < 0 ? 'text-rojo-osc' : 'text-emerald-700'}`}>{signo(b.subtotal)}</span>
                     </div>
                   ))}
-
                   {ronda.bonosNoCobradas.map((b, i) => (
-                    <div key={`bn-${i}`} className="flex justify-between text-slate-400">
-                      <span className="tachado-rojo">{b.etiqueta}:</span>
-                      <span className="tachado-rojo">
-                        {b.subtotal > 0 ? '+' : ''}
-                        {b.subtotal} pts
-                      </span>
+                    <div key={`bn-${i}`} className="fila-puntaje py-1 text-slate-400">
+                      <span className="fila-puntaje-nombre tachado-rojo">{b.etiqueta}</span>
+                      <span className="fila-puntaje-valor tachado-rojo">{signo(b.subtotal)}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-2 pt-2 border-t border-slate-700/80 pl-3 flex justify-between items-end">
+                <div className="fila-puntaje !items-end mt-2 border-t border-slate-100 pt-2">
                   <div>
-                    <span className="text-sm text-slate-400 uppercase font-bold">
-                      Total ronda
-                    </span>
-                    <span
-                      className={`font-black text-xl block ${
-                        ronda.totalRonda >= 0 ? 'text-emerald-400' : 'text-red-400'
-                      }`}
-                    >
-                      {ronda.totalRonda > 0 ? '+' : ''}
-                      {ronda.totalRonda}
-                    </span>
+                    <span className="block text-[10px] font-bold uppercase text-slate-400">Total ronda</span>
+                    <span className={`text-xl font-black ${ronda.totalRonda >= 0 ? 'text-azul' : 'text-rojo-osc'}`}>{signo(ronda.totalRonda)}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-sm text-amber-300/70 uppercase font-bold">
-                      Acumulado
-                    </span>
-                    <span className="font-black text-2xl text-amber-400 block">
-                      {ronda.acumuladoNuevo}
-                    </span>
+                    <span className="block text-[10px] font-bold uppercase text-slate-400">Acumulado</span>
+                    <span className="text-2xl font-black text-tinta">{ronda.acumuladoNuevo}</span>
                   </div>
                 </div>
               </div>

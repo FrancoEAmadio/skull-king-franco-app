@@ -39,6 +39,13 @@ export function calcularPromedioPuntos(jugador: JugadorPermanente): number {
   return Math.round(est.sumaPuntos / est.partidasJugadas);
 }
 
+/** Porcentaje de partidas ganadas (un empate en 1.er puesto cuenta como victoria). */
+export function calcularPorcentajeVictorias(jugador: JugadorPermanente): number {
+  const est = jugador.estadisticas;
+  if (!est.partidasJugadas) return 0;
+  return Math.round((est.victorias / est.partidasJugadas) * 100);
+}
+
 export function calcularPorcentajeAciertos(jugador: JugadorPermanente): number {
   const est = jugador.estadisticas;
   const total = est.apuestasAcertadas + est.apuestasFalladas;

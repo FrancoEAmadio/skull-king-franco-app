@@ -191,7 +191,6 @@ export function buscarRendimiento(
 
 export type MetricaComparable =
   | 'porcentajeVictorias'
-  | 'promedioPuntos'
   | 'precisionEnvites'
   | 'efectividadBonos'
   | 'mejorRacha'
@@ -210,7 +209,6 @@ export interface FilaComparacion {
 
 const METRICAS: { metrica: MetricaComparable; etiqueta: string; sufijo: string }[] = [
   { metrica: 'porcentajeVictorias', etiqueta: 'Victorias', sufijo: '%' },
-  { metrica: 'promedioPuntos', etiqueta: 'Promedio por partida', sufijo: ' pts' },
   { metrica: 'puntosPorRonda', etiqueta: 'Puntos por ronda', sufijo: ' pts' },
   { metrica: 'precisionEnvites', etiqueta: 'Envites acertados', sufijo: '%' },
   { metrica: 'efectividadBonos', etiqueta: 'Bonos cobrados', sufijo: '%' },

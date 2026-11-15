@@ -4,8 +4,12 @@ export function configurarVibracion(habilitada: boolean): void {
   activa = habilitada;
 }
 
+export function vibracionSoportada(): boolean {
+  return typeof navigator !== 'undefined' && 'vibrate' in navigator;
+}
+
 /** Vibración corta de feedback táctil (solo en dispositivos que la soportan). */
-export function vibrar(milisegundos = 8): void {
+export function vibrar(milisegundos = 18): void {
   if (!activa) return;
   try {
     navigator.vibrate?.(milisegundos);

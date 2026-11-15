@@ -35,7 +35,7 @@ import {
 } from '../../dominio/cierreRonda';
 import { calcularBonoCartasBlancas, calcularPuntajeRonda } from '../../dominio/puntuacion';
 import { calcularBonosAlianzasBotin } from '../../dominio/alianzas';
-import { calcularMaximoDisponible, limitesPuntosCartas } from '../../dominio/bonos';
+import { calcularMaximoDisponible, limitesPuntosCartas, motivoTopeBono, sanearEventosEspeciales } from '../../dominio/bonos';
 import { aplicarFinDePartida, recalcularEstadisticasDesdeHistorial } from '../../dominio/estadisticas';
 import {
   estaDisponibleEventoBono,
@@ -140,7 +140,14 @@ export function usePartidaState({
   jugadoresPermanentes,
   actualizarJugadoresPermanentes,
 }: Argumentos) {
-  const [configuracionMesa, setConfiguracionMesa] = useState<ConfiguracionMesa>(CONFIG_INICIAL);
+  const [configuracionMesa, setConfiguracionMesaCruda] = useState<ConfiguracionMesa>(
+    normalizarConfiguracionPorModo(CONFIG_INICIAL)
+  );
+  /** Toda escritura de la configuración pasa por acá: nada de otro modo (ej. Kong en Base) puede quedar activo. */
+  const setConfiguracionMesa = useCallback(
+    (nueva: ConfiguracionMesa) => setConfiguracionMesaCruda(normalizarConfiguracionPorModo(nueva)),
+    []
+  );
   const [idsJugadoresSeleccionados, setIdsJugadoresSeleccionados] = useState<string[]>([]);
 
   const [jugadores, setJugadores] = useState<Jugador[]>([]);
@@ -192,9 +199,23 @@ export function usePartidaState({
         ...partida.configuracionMesa.reglasOpcionales,
       },
     });
-    const jugadoresCargados = filtrarEventosJugadores(
-      partida.jugadores,
+    const cartasCargadas =
+      partida.cartasPorRondaActivas.length > 0
+        ? partida.cartasPorRondaActivas
+        : obtenerCartasPorRondaDelModo(configuracionCargada.modoReparto, configuracionCargada.cartasPorRonda);
+    const registrosCargados = filtrarRegistrosHabilidadDisponibles(
+      partida.registroHabilidadesRonda,
       configuracionCargada
+    );
+    const jugadoresCargados = sanearEventosEspeciales(
+      filtrarEventosJugadores(partida.jugadores, configuracionCargada),
+      {
+        configuracion: configuracionCargada,
+        cartasPorJugadorEnRonda: calcularCartasPorJugadorEnRonda(cartasCargadas, partida.rondaActual),
+        piratasEnHabilidades: registrosCargados.filter((h) => h.tipo !== 'Primer Oficial Kong').length,
+        kongEnHabilidad: registrosCargados.some((h) => h.tipo === 'Primer Oficial Kong'),
+        alianzasBotin: partida.alianzasBotinRonda.length,
+      }
     );
 
     setHayPartidaGuardada(true);
@@ -253,6 +274,15 @@ export function usePartidaState({
   const cartasPorJugadorEnRonda = useMemo(
     () => calcularCartasPorJugadorEnRonda(cartasPorRondaActivas, rondaActual),
     [cartasPorRondaActivas, rondaActual]
+  );
+
+  const contextoExtraBonos = useMemo(
+    () => ({
+      piratasEnHabilidades: registroHabilidadesRonda.filter((h) => h.tipo !== 'Primer Oficial Kong').length,
+      kongEnHabilidad: registroHabilidadesRonda.some((h) => h.tipo === 'Primer Oficial Kong'),
+      alianzasBotin: alianzasBotinRonda.length,
+    }),
+    [registroHabilidadesRonda, alianzasBotinRonda]
   );
 
   const rondaVisible =
@@ -550,6 +580,7 @@ export function usePartidaState({
         jugadores,
         configuracion: configuracionMesa,
         cartasPorJugadorEnRonda,
+        ...contextoExtraBonos,
       });
       const nuevo = Math.max(0, Math.min(maximo, actual + delta));
       actualizarJugador(jugadorSeleccionadoIdx, {
@@ -562,6 +593,7 @@ export function usePartidaState({
       jugadores,
       configuracionMesa,
       cartasPorJugadorEnRonda,
+      contextoExtraBonos,
       actualizarJugador,
     ]
   );
@@ -573,9 +605,10 @@ export function usePartidaState({
       jugadores,
       configuracion: configuracionMesa,
       cartasPorJugadorEnRonda,
+      ...contextoExtraBonos,
     });
     return { minimoUnidades: minimo / 5, maximoUnidades: maximo / 5 };
-  }, [jugadorSeleccionadoIdx, jugadores, configuracionMesa, cartasPorJugadorEnRonda]);
+  }, [jugadorSeleccionadoIdx, jugadores, configuracionMesa, cartasPorJugadorEnRonda, contextoExtraBonos]);
 
   const ajustarPuntosCartas = useCallback(
     (delta: number) => {
@@ -607,6 +640,18 @@ export function usePartidaState({
         cartasPorJugadorEnRonda,
       }),
     [jugadorSeleccionadoIdx, jugadores, configuracionMesa, cartasPorJugadorEnRonda]
+  );
+
+  const motivoTopeBonoCb = useCallback(
+    (idEvento: string) =>
+      motivoTopeBono(idEvento, {
+        jugadorSeleccionadoIdx,
+        jugadores,
+        configuracion: configuracionMesa,
+        cartasPorJugadorEnRonda,
+        ...contextoExtraBonos,
+      }),
+    [jugadorSeleccionadoIdx, jugadores, configuracionMesa, cartasPorJugadorEnRonda, contextoExtraBonos]
   );
 
   const borrarBonoInmediato = useCallback(
@@ -1211,6 +1256,7 @@ export function usePartidaState({
     obtenerCantidadBono,
     obtenerMaximoBono,
     borrarBonoInmediato,
+    motivoTopeBono: motivoTopeBonoCb,
     ajustarPuntosCartas,
     limitePuntosCartas,
     limpiarTodosLosEventos,

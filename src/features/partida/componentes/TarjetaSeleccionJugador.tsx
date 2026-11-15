@@ -18,22 +18,20 @@ export function TarjetaSeleccionJugador({ jugador, posicionSeleccion, onSeleccio
       type="button"
       onClick={onSeleccionar}
       aria-pressed={seleccionado}
-      className={`flex w-full items-center gap-3 rounded-2xl border p-3.5 text-left ${
-        seleccionado ? 'btn-blanco-marron' : 'btn-marron-oscuro'
-      }`}
+      className={`flex w-full items-center gap-3 p-3 text-left ${seleccionado ? 'opcion opcion-sel' : 'opcion'}`}
     >
       <AvatarPirata emoji={avatarDe(jugador.id, jugador.avatar)} tamano="md" activo={seleccionado} />
       <div className="min-w-0 flex-1">
-        <span className={`block truncate text-2xl font-black ${seleccionado ? 'text-amber-950' : 'text-white'}`}>
-          {jugador.nombre}
-        </span>
-        <span className={`mt-0.5 block text-[0.95rem] font-bold ${seleccionado ? 'text-amber-900' : 'text-slate-300'}`}>
-          {partidasJugadas} {partidasJugadas === 1 ? 'partida' : 'partidas'} · 🏆 {victorias}{' '}
-          {victorias === 1 ? 'victoria' : 'victorias'}
+        <span className="block truncate font-display text-lg font-black text-azul">{jugador.nombre}</span>
+        <span className="mt-0.5 block text-xs font-bold text-slate-500">
+          {partidasJugadas} {partidasJugadas === 1 ? 'partida' : 'partidas'} · 🏆 {victorias} {victorias === 1 ? 'victoria' : 'victorias'}
         </span>
       </div>
       {seleccionado && (
-        <span className="badge-orden-jugador !h-9 !w-9 shrink-0 !text-lg" aria-label={`Puesto ${posicionSeleccion}`}>
+        <span
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-azul-vivo text-sm font-black text-white"
+          aria-label={`Puesto ${posicionSeleccion}`}
+        >
           {posicionSeleccion}
         </span>
       )}

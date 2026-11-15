@@ -21,75 +21,48 @@ export function ModalMenuHamburguesa() {
     window.setTimeout(() => setCopiado(false), 2200);
   };
 
-  const claseOpcion =
-    'flex min-h-14 w-full items-center gap-3 rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-left text-lg font-bold text-white hover:bg-slate-800';
+  const claseOpcion = 'btn-claro !justify-start w-full gap-3 px-4 py-3.5 text-left text-sm';
 
   if (!menuHamburguesaAbierto) {
     return <ModalFeedback abierto={feedbackAbierto} onCerrar={() => setFeedbackAbierto(false)} />;
   }
 
   return (
-    <>
-    <div className="fixed inset-0 z-50 flex items-start justify-start bg-black/80 p-4" onClick={cerrar}>
-      <div className="tarjeta-marron mt-12 flex w-full max-w-sm flex-col gap-4 p-5" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between border-b border-slate-700 pb-3">
-          <span className="text-xl font-black text-amber-300">Menú de la partida</span>
+    <div className="fixed inset-0 z-50 flex items-start justify-start bg-black/70 p-4 backdrop-blur-sm" onClick={cerrar}>
+      <div className="tarjeta entrar mt-12 flex w-full max-w-sm flex-col gap-3 p-4" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+          <span className="font-display text-lg font-black text-azul">Menú de la partida</span>
           <button
             type="button"
             onClick={cerrar}
             aria-label="Cerrar menú"
-            className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-800 text-2xl font-bold text-slate-300"
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-xl font-bold text-slate-600"
           >
             ✕
           </button>
         </div>
-        <div className="flex flex-col gap-2.5">
-          <button
-            type="button"
-            onClick={() => {
-              cerrar();
-              setPantallaActual('inicio');
-            }}
-            className={claseOpcion}
-          >
+        <div className="flex flex-col gap-2">
+          <button type="button" onClick={() => { cerrar(); setPantallaActual('inicio'); }} className={claseOpcion}>
             🏠 Volver al inicio
           </button>
           <button type="button" onClick={() => void copiar()} className={claseOpcion}>
             {copiado ? '✅ ¡Link copiado!' : '🔗 Copiar link de la página'}
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              cerrar();
-              setFeedbackAbierto(true);
-            }}
-            className={claseOpcion}
-          >
+          <button type="button" onClick={() => { cerrar(); setFeedbackAbierto(true); }} className={claseOpcion}>
             💬 Tu opinión o reportar error
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              cerrar();
-              setAjustesAbiertos(true);
-            }}
-            className={claseOpcion}
-          >
+          <button type="button" onClick={() => { cerrar(); setAjustesAbiertos(true); }} className={claseOpcion}>
             ⚙️ Ajustes
           </button>
           <button
             type="button"
-            onClick={() => {
-              cerrar();
-              partida.descartarPartidaActual();
-            }}
-            className="flex min-h-14 w-full items-center gap-3 rounded-xl border border-red-700 bg-red-950/80 px-4 py-3 text-left text-lg font-bold text-red-200 hover:bg-red-900"
+            onClick={() => { cerrar(); partida.descartarPartidaActual(); }}
+            className="btn-peligro !justify-start w-full gap-3 px-4 py-3.5 text-left text-sm"
           >
             🗑️ Descartar partida
           </button>
         </div>
       </div>
     </div>
-    </>
   );
 }

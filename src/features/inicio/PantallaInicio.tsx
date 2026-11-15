@@ -1,4 +1,5 @@
 import { useApp } from '../../estado/AppProvider';
+import { SimboloPirata } from '../../ui/SimboloPirata';
 import { useInstalarPWA } from '../../ui/useInstalarPWA';
 
 export function PantallaInicio() {
@@ -6,73 +7,53 @@ export function PantallaInicio() {
   const { puedeInstalar, instalar, mostrarAyudaIOS } = useInstalarPWA();
 
   return (
-    <main className="my-auto flex w-full flex-col items-center py-4 text-center">
+    <main className="entrar my-auto flex w-full flex-col items-center py-4 text-center">
+      <div className="mb-3 flex items-center gap-3 text-oro-claro" aria-hidden="true">
+        <SimboloPirata nombre="skull" tamano={28} />
+        <SimboloPirata nombre="sables" tamano={28} />
+        <SimboloPirata nombre="ancla" tamano={28} />
+        <SimboloPirata nombre="corona" tamano={28} />
+      </div>
       <img
         src="./archivos/iconos/tapa.png"
-        alt="Skull King"
-        className="mb-3 h-auto max-h-[24dvh] w-auto max-w-full rounded-3xl border border-amber-500/40 object-contain shadow-2xl drop-shadow-[0_10px_18px_rgba(245,158,11,0.3)]"
-        onError={(e) => {
-          e.currentTarget.style.display = 'none';
-        }}
+        alt="Manual de Skull King"
+        className="h-auto max-h-[24dvh] w-auto max-w-full rounded-3xl border border-oro/40 object-contain shadow-2xl"
       />
-
-      <h1 className="titulo-pirata mb-1 text-6xl text-white">Skull King</h1>
-      <p className="mb-5 text-base font-bold uppercase tracking-[0.25em] text-amber-300">Anotador de puntos</p>
+      <h1 className="mt-3 font-display text-5xl font-black tracking-wide text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">Skull King</h1>
+      <p className="mb-8 mt-2 text-xs font-bold uppercase tracking-[0.25em] text-blue-200">Anotador de puntos</p>
 
       <div className="flex w-full flex-col gap-3">
-        <button
-          type="button"
-          onClick={partida.irANuevaPartida}
-          className="btn-blanco-marron w-full rounded-2xl py-5 text-2xl shadow-lg"
-        >
+        <button type="button" onClick={partida.irANuevaPartida} className="btn-dorado w-full py-4 text-lg">
           🏴‍☠️ Nueva Partida
         </button>
         {partida.hayPartidaGuardada && (
-          <button
-            type="button"
-            onClick={() => setPantallaActual('partida')}
-            className="btn-marron-oscuro w-full rounded-2xl border-amber-400/60 py-5 text-2xl text-amber-300"
-          >
-            ▶️ Continuar Partida
+          <button type="button" onClick={() => setPantallaActual('partida')} className="btn-primario latir w-full py-4 text-lg">
+            ▶ Continuar Partida
           </button>
         )}
-        <button
-          type="button"
-          onClick={() => setPantallaActual('jugadores')}
-          className="btn-marron-oscuro w-full rounded-2xl py-5 text-xl"
-        >
+        <button type="button" onClick={() => setPantallaActual('jugadores')} className="btn-claro w-full py-4 text-lg">
           👥 Jugadores, Estadísticas e Historial
         </button>
-        <button
-          type="button"
-          onClick={() => setPantallaActual('reglas')}
-          className="btn-marron-oscuro w-full rounded-2xl py-5 text-xl"
-        >
+        <button type="button" onClick={() => setPantallaActual('reglas')} className="btn-claro w-full py-4 text-lg">
           📖 Manual, Cartas y Reglas
         </button>
       </div>
 
       <div className="mt-6 flex w-full flex-col items-center gap-2">
         {puedeInstalar && (
-          <button
-            type="button"
-            onClick={() => void instalar()}
-            className="btn-marron-oscuro w-full rounded-2xl py-4 text-lg"
-          >
+          <button type="button" onClick={() => void instalar()} className="btn-fantasma w-full py-3 text-sm">
             📲 Instalar la app en este dispositivo
           </button>
         )}
         {mostrarAyudaIOS && (
-          <p className="text-base text-slate-300">
-            📲 Para instalarla en iPhone: tocá Compartir y elegí «Añadir a pantalla de inicio».
-          </p>
+          <p className="text-xs text-blue-200">📲 Para instalarla en iPhone: tocá Compartir y elegí «Añadir a pantalla de inicio».</p>
         )}
         <button
           type="button"
           onClick={() => setAjustesAbiertos(true)}
-          className="px-3 py-3 text-base font-bold text-slate-300 underline underline-offset-4"
+          className="min-h-11 px-3 py-2 text-xs font-bold text-blue-200 underline underline-offset-4"
         >
-          ⚙️ Ajustes
+          ⚙️ Ajustes y copia de seguridad
         </button>
       </div>
     </main>

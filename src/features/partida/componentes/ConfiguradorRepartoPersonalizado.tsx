@@ -65,69 +65,35 @@ export function ConfiguradorRepartoPersonalizado({
   };
 
   return (
-    <section className="tarjeta-marron p-4 flex flex-col gap-4">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h2 className="text-xl font-bold text-white">Reparto personalizado</h2>
-        <button
-          type="button"
-          onClick={onCancelar}
-          className="text-sm font-bold text-amber-300 hover:text-white"
-        >
+    <section className="tarjeta flex flex-col gap-4 p-4">
+      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+        <h2 className="font-display text-lg font-black text-azul">Reparto personalizado</h2>
+        <button type="button" onClick={onCancelar} className="min-h-11 px-2 text-sm font-bold text-azul-vivo">
           Cancelar
         </button>
       </div>
 
       {paso === 'rondas' ? (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4">
           <div>
-            <span className="text-sm uppercase tracking-widest text-amber-400 font-bold block">
-              Paso 1 de 2
-            </span>
-            <p className="text-base text-slate-300 mt-1">
-              ¿Cuántas rondas tendrá la partida?
-            </p>
+            <span className="tarjeta-titulo block">Paso 1 de 2</span>
+            <p className="mt-1 text-sm text-slate-600">¿Cuántas rondas tendrá la partida? (1 a {maxRondas})</p>
           </div>
-
-          <FichasNumero
-            etiqueta="Cantidad de rondas"
-            min={1}
-            max={maxRondas}
-            valor={cantidadRondas}
-            onElegir={ajustarCantidadRondas}
-          />
-
-          <span className="text-sm text-slate-400 text-center">
-            Mínimo 1, máximo {maxRondas} rondas
-          </span>
-
-          <button
-            type="button"
-            onClick={avanzarACartas}
-            className="w-full py-3.5 btn-blanco-marron rounded-2xl font-black"
-          >
+          <FichasNumero etiqueta="Cantidad de rondas" min={1} max={maxRondas} valor={cantidadRondas} onElegir={ajustarCantidadRondas} />
+          <button type="button" onClick={avanzarACartas} className="btn-dorado w-full py-3.5 text-base">
             Continuar ➔
           </button>
         </div>
       ) : (
         <div className="flex flex-col gap-4">
           <div>
-            <span className="text-sm uppercase tracking-widest text-amber-400 font-bold block">
-              Paso 2 de 2
-            </span>
-            <p className="text-base text-slate-300 mt-1">
-              Configurá las cartas por ronda:
-            </p>
+            <span className="tarjeta-titulo block">Paso 2 de 2</span>
+            <p className="mt-1 text-sm text-slate-600">Cartas por ronda:</p>
           </div>
-
-          <div className="flex flex-col gap-0.5 pr-1">
+          <div className="flex flex-col">
             {cartasPorRonda.map((cantidad, indice) => (
-              <div
-                key={indice}
-                className="flex flex-col gap-2 py-3 border-b border-slate-800/60 last:border-b-0"
-              >
-                <span className="text-base font-bold text-slate-200">
-                  Ronda - {indice + 1}
-                </span>
+              <div key={indice} className="flex flex-col gap-2 border-b border-slate-100 py-3 last:border-b-0">
+                <span className="text-sm font-bold text-tinta">Ronda {indice + 1}</span>
                 <FichasNumero
                   etiqueta={`Cartas de la ronda ${indice + 1}`}
                   min={1}
@@ -138,20 +104,11 @@ export function ConfiguradorRepartoPersonalizado({
               </div>
             ))}
           </div>
-
-          <div className="flex flex-col gap-2 pt-2">
-            <button
-              type="button"
-              onClick={() => onGuardar(cartasPorRonda)}
-              className="w-full py-3.5 btn-blanco-marron rounded-2xl font-black"
-            >
-              Guardar y volver al menú
+          <div className="flex flex-col gap-2">
+            <button type="button" onClick={() => onGuardar(cartasPorRonda)} className="btn-dorado w-full py-3.5 text-base">
+              Guardar y volver
             </button>
-            <button
-              type="button"
-              onClick={() => setPaso('rondas')}
-              className="w-full py-3 btn-marron-oscuro rounded-2xl font-bold"
-            >
+            <button type="button" onClick={() => setPaso('rondas')} className="btn-claro w-full py-3 text-sm">
               Volver
             </button>
           </div>

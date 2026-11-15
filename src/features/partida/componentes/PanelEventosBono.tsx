@@ -1,5 +1,5 @@
 import { useApp } from '../../../estado/AppProvider';
-import { PildoraBono } from '../../../ui/PildoraBono';
+import { StepperBono } from '../../../ui/StepperBono';
 import { Seccion } from '../../../ui/Seccion';
 import { vibrar } from '../../../infra/vibracion';
 import type { EventoBono } from '../../../tipos';
@@ -30,8 +30,8 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
     ajustarPuntosCartas,
     limitePuntosCartas,
     cambiarCantidadBono,
-    borrarBonoInmediato,
     limpiarTodosLosEventos,
+    motivoTopeBono,
   } = partida;
 
   if (!jugadorActual) return null;
@@ -44,101 +44,82 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
   const base = eventosBase.filter((e) => !REEMPLAZADOS.has(e.id));
   const expansion = eventosExpansion.filter((e) => !REEMPLAZADOS.has(e.id));
 
-  const tocar = (evento: EventoBono) => {
-    const cantidad = obtenerCantidadBono(evento.id);
-    const maximo = obtenerMaximoBono(evento.id);
-    if (cantidad >= maximo) borrarBonoInmediato(evento.id);
-    else cambiarCantidadBono(evento.id, 1);
-  };
-
-  const grupo = (titulo: string, color: string, eventos: EventoBono[]) =>
+  const grupo = (titulo: string, eventos: EventoBono[]) =>
     eventos.length > 0 && (
       <div className="flex flex-col gap-2">
-        <span className={`text-sm font-bold uppercase tracking-widest ${color}`}>{titulo}</span>
-        <div className="grid grid-cols-1 gap-2.5">
-          {eventos.map((evento) => {
-            const maximo = obtenerMaximoBono(evento.id);
-            return (
-              <PildoraBono
-                key={evento.id}
-                nombre={nombreCorto(evento.etiqueta)}
-                detalle={detalleBono(evento, maximo)}
-                cantidad={obtenerCantidadBono(evento.id)}
-                maximo={maximo}
-                onTocar={() => tocar(evento)}
-              />
-            );
-          })}
-        </div>
+        <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">{titulo}</span>
+        {eventos.map((evento) => {
+          const maximo = obtenerMaximoBono(evento.id);
+          return (
+            <StepperBono
+              key={evento.id}
+              nombre={nombreCorto(evento.etiqueta)}
+              detalle={detalleBono(evento, maximo)}
+              cantidad={obtenerCantidadBono(evento.id)}
+              maximo={maximo}
+              motivoTope={motivoTopeBono(evento.id)}
+              onMas={() => cambiarCantidadBono(evento.id, 1)}
+              onMenos={() => cambiarCantidadBono(evento.id, -1)}
+            />
+          );
+        })}
       </div>
     );
 
   return (
     <Seccion numero={numero} titulo="Bonos de la ronda">
-      <div className="flex items-center justify-between gap-2">
-        <span className="block text-sm font-semibold text-slate-300">Tocá para sumar; al llegar al máximo vuelve a 0.</span>
-        {tieneEventos && (
-          <button
-            type="button"
-            onClick={limpiarTodosLosEventos}
-            className="btn-marron-oscuro shrink-0 rounded-xl px-3 py-2 text-base font-bold"
-          >
-            🧹 Limpiar
-          </button>
-        )}
-      </div>
+      {tieneEventos && (
+        <button type="button" onClick={limpiarTodosLosEventos} className="btn-claro self-end px-3 py-2 text-xs">
+          🧹 Limpiar bonos
+        </button>
+      )}
 
       <div className="flex flex-col gap-2">
-        <span className="text-sm font-bold uppercase tracking-widest text-slate-300">Cartas de palo</span>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              vibrar();
-              ajustarPuntosCartas(1);
-            }}
-            disabled={enMaximo}
-            aria-label={`Puntos por cartas capturadas: ${puntosCartas}. Tocá para sumar 5`}
-            className={`pildora-bono pildora-tope col-span-2 w-full ${puntosCartas !== 0 ? 'pildora-bono-activa' : ''}`}
-          >
-            <span className="text-base font-extrabold leading-tight">Puntos por cartas capturadas</span>
-            <span className={`text-sm font-bold ${puntosCartas !== 0 ? 'text-amber-950/80' : 'text-amber-300'}`}>
-              {enMaximo ? `Máximo de la ronda: ${limitePuntosCartas.maximoUnidades * 5} pts` : '14, 8 y 7 · cada toque suma +5'}
-            </span>
-            <span className="pildora-contador !min-w-[3.4rem] px-2 text-base" aria-hidden="true">
-              {puntosCartas > 0 ? '+' : ''}
-              {puntosCartas}
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              vibrar();
-              ajustarPuntosCartas(-1);
-            }}
-            disabled={enMinimo}
-            aria-label="Restar 5 puntos"
-            className="btn-marron-oscuro min-h-12 rounded-2xl text-xl font-black"
-          >
-            −5
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              vibrar();
-              ajustarPuntosCartas(-puntosCartas / 5);
-            }}
-            disabled={puntosCartas === 0}
-            aria-label="Borrar puntos por cartas capturadas"
-            className="min-h-12 rounded-2xl border border-red-700 bg-red-950/70 text-xl font-black text-red-300 disabled:opacity-30"
-          >
-            ✕
-          </button>
+        <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Cartas de palo</span>
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <span className="block text-sm font-extrabold leading-tight text-tinta">Puntos por cartas capturadas</span>
+              <span className="block text-xs font-semibold text-slate-500">
+                {enMaximo ? `Máximo: ${limitePuntosCartas.maximoUnidades * 5} pts` : '14, 8 y 7 · de a 5 pts'}
+              </span>
+            </div>
+            <div className="stepper" role="group" aria-label="Puntos por cartas capturadas">
+              <button
+                type="button"
+                className="stepper-btn"
+                disabled={enMinimo}
+                aria-label="Restar 5 puntos"
+                onClick={() => {
+                  vibrar();
+                  ajustarPuntosCartas(-1);
+                }}
+              >
+                −
+              </button>
+              <span className="stepper-valor !min-w-[3.2rem] !text-lg" aria-live="polite">
+                {puntosCartas > 0 ? '+' : ''}
+                {puntosCartas}
+              </span>
+              <button
+                type="button"
+                className="stepper-btn"
+                disabled={enMaximo}
+                aria-label="Sumar 5 puntos"
+                onClick={() => {
+                  vibrar();
+                  ajustarPuntosCartas(1);
+                }}
+              >
+                +
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {grupo('Capturas especiales', 'text-slate-300', base)}
-      {grupo('Expansión', 'text-purple-200', expansion)}
+      {grupo('Capturas especiales', base)}
+      {grupo('Expansión', expansion)}
     </Seccion>
   );
 }

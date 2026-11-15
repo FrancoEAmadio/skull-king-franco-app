@@ -109,11 +109,11 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
               x2={ANCHO - MARGEN.der}
               y1={y(marca)}
               y2={y(marca)}
-              stroke="#334155"
+              stroke="#e2e8f0"
               strokeWidth={1}
               strokeDasharray="2 4"
             />
-            <text x={MARGEN.izq - 5} y={y(marca) + 3.5} textAnchor="end" fontSize={11} fill="#94a3b8">
+            <text x={MARGEN.izq - 5} y={y(marca) + 3.5} textAnchor="end" fontSize={11} fill="#64748b">
               {formatear(marca)}
             </text>
           </g>
@@ -138,7 +138,7 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
               y={ALTO - 8}
               textAnchor="middle"
               fontSize={11}
-              fill={indice === indiceActivo ? '#fbbf24' : '#94a3b8'}
+              fill={indice === indiceActivo ? '#1d4ed8' : '#64748b'}
               fontWeight={indice === indiceActivo ? 700 : 400}
             >
               {etiquetaX(indice)}
@@ -152,7 +152,7 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
             x2={x(indiceActivo)}
             y1={MARGEN.arr}
             y2={ALTO - MARGEN.aba}
-            stroke="#fbbf24"
+            stroke="#1d4ed8"
             strokeWidth={1}
             strokeOpacity={0.6}
           />
@@ -174,14 +174,14 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
                 strokeLinejoin="round"
                 strokeLinecap="round"
               />
-              <circle cx={x(ultimo)} cy={y(serie.puntos[ultimo]!)} r={3.8} fill={color} stroke="#090d16" strokeWidth={1.5} />
+              <circle cx={x(ultimo)} cy={y(serie.puntos[ultimo]!)} r={3.8} fill={color} stroke="#ffffff" strokeWidth={1.5} />
               {indiceActivo !== null && indiceActivo <= ultimo && (
                 <circle
                   cx={x(indiceActivo)}
                   cy={y(serie.puntos[indiceActivo]!)}
                   r={4.2}
                   fill={color}
-                  stroke="#090d16"
+                  stroke="#ffffff"
                   strokeWidth={1.5}
                 />
               )}
@@ -207,19 +207,19 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
       </svg>
 
       {detalle && indiceActivo !== null && (
-        <div className="rounded-xl border border-amber-500/30 bg-slate-950/80 p-2.5">
-          <span className="mb-1.5 block text-sm font-black uppercase tracking-wide text-amber-300">
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
+          <span className="mb-1.5 block text-sm font-black uppercase tracking-wide text-azul">
             {indiceActivo === 0 ? 'Punto de partida' : `Tras la ${etiquetaX(indiceActivo)}`}
           </span>
           <ul className="grid grid-cols-2 gap-x-3 gap-y-1">
             {detalle.map((fila, posicion) => (
               <li key={fila.nombre} className="flex items-center justify-between gap-2 text-sm">
-                <span className="flex min-w-0 items-center gap-1.5 text-slate-200">
-                  <span className="text-sm text-slate-400">{posicion + 1}.</span>
+                <span className="flex min-w-0 items-center gap-1.5 text-slate-700">
+                  <span className="text-sm text-slate-500">{posicion + 1}.</span>
                   <span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: fila.color }} />
                   <span className="truncate">{fila.nombre}</span>
                 </span>
-                <span className={`font-black ${fila.valor >= 0 ? 'text-white' : 'text-red-400'}`}>
+                <span className={`font-black ${fila.valor >= 0 ? 'text-tinta' : 'text-rojo-osc'}`}>
                   {formatear(fila.valor)}
                 </span>
               </li>
@@ -238,15 +238,15 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
               role="switch"
               aria-checked={prendida}
               onClick={() => alternar(serie.nombre)}
-              className={`flex min-h-11 items-center gap-2 rounded-full border px-3.5 py-1.5 text-base font-bold ${
+              className={`flex min-h-11 items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-bold ${
                 prendida
-                  ? 'border-amber-400 bg-amber-500/15 text-amber-100'
-                  : 'border-slate-700 bg-slate-900/80 text-slate-500 line-through'
+                  ? 'border-oro bg-amber-50 text-tinta'
+                  : 'border-slate-200 bg-slate-100 text-slate-400 line-through'
               }`}
             >
               <span
                 className="inline-block h-3 w-3 rounded-full"
-                style={{ backgroundColor: prendida ? colorDe(serie.nombre) : '#475569' }}
+                style={{ backgroundColor: prendida ? colorDe(serie.nombre) : '#cbd5e1' }}
               />
               {serie.nombre}
             </button>

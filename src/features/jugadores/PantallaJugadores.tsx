@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
-import { calcularPromedioPuntos } from '../../dominio/estadisticas';
+import { calcularPorcentajeVictorias } from '../../dominio/estadisticas';
 import { calcularRendimientos, construirSeriesEvolucion } from '../../dominio/comparativas';
 import { GraficoEvolucion } from '../../ui/GraficoEvolucion';
 import { AVATARES, avatarDe } from '../../datos/avatares';
@@ -54,30 +54,39 @@ export function PantallaJugadores() {
     setJugadorPendienteEliminar(null);
   };
 
+  const estadisticasOrdenadas = useMemo(
+    () =>
+      [...jugadoresPermanentes].sort(
+        (a, b) =>
+          b.estadisticas.victorias - a.estadisticas.victorias ||
+          calcularPorcentajeVictorias(b) - calcularPorcentajeVictorias(a) ||
+          b.estadisticas.partidasJugadas - a.estadisticas.partidasJugadas ||
+          a.nombre.localeCompare(b.nombre)
+      ),
+    [jugadoresPermanentes]
+  );
+
   return (
-    <main className="py-6 overflow-y-auto w-full flex flex-col gap-4">
-      <button
-        onClick={() => setPantallaActual('inicio')}
-        className="text-base text-amber-300 font-bold self-start"
-      >
+    <main className="entrar flex w-full flex-col gap-4 py-4">
+      <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma self-start px-3 py-2 text-sm">
         ← Volver al menú
       </button>
-      <h2 className="text-3xl font-bold text-white">Jugadores, Estadísticas e Historial</h2>
+      <h2 className="font-display text-2xl font-black text-white">Jugadores, Estadísticas e Historial</h2>
 
       <div className="grid grid-cols-3 gap-2">
         {(
           [
             ['gestor', '👤 Jugadores'],
-            ['historial', '📜 Historial'],
             ['estadisticas', '📊 Estadísticas'],
+            ['historial', '📜 Historial'],
           ] as const
         ).map(([id, etiqueta]) => (
           <button
             key={id}
+            type="button"
             onClick={() => setVista(id)}
-            className={`py-2.5 px-2 rounded-xl font-bold text-sm border ${
-              vista === id ? 'btn-blanco-marron' : 'btn-marron-oscuro'
-            }`}
+            aria-pressed={vista === id}
+            className={`px-1 py-3 text-xs ${vista === id ? 'btn-primario' : 'btn-fantasma'}`}
           >
             {etiqueta}
           </button>
@@ -86,106 +95,104 @@ export function PantallaJugadores() {
 
       {vista === 'gestor' && (
         <div className="flex flex-col gap-3">
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setAvatarAbierto(avatarAbierto === 'nuevo' ? null : 'nuevo')}
-              aria-label="Elegir icono del nuevo pirata"
-              className="btn-marron-oscuro flex shrink-0 items-center justify-center rounded-xl px-2"
-            >
-              <AvatarPirata emoji={avatarNuevo} tamano="md" />
-            </button>
-            <input
-              value={nombreNuevo}
-              onChange={(e) => setNombreNuevo(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && crear()}
-              type="text"
-              placeholder="Nombre del nuevo pirata..."
-              className="flex-1 rounded-xl px-3.5 py-2.5 text-base text-white bg-slate-900 border border-slate-700 focus:outline-none focus:border-amber-500"
-            />
-            <button onClick={crear} className="px-4 py-2.5 btn-blanco-marron rounded-xl font-bold text-base">
-              + Crear
-            </button>
-          </div>
-          {avatarAbierto === 'nuevo' && (
-            <SelectorAvatar
-              valor={avatarNuevo}
-              onCambiar={(emoji) => {
-                setAvatarNuevo(emoji);
-                setAvatarAbierto(null);
-              }}
-            />
-          )}
+          <section className="tarjeta flex flex-col gap-3 p-4">
+            <h3 className="tarjeta-titulo">Nueva tarjeta de jugador</h3>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setAvatarAbierto(avatarAbierto === 'nuevo' ? null : 'nuevo')}
+                aria-label="Elegir icono del nuevo pirata"
+                className="btn-claro shrink-0 px-2"
+              >
+                <AvatarPirata emoji={avatarNuevo} tamano="md" />
+              </button>
+              <input
+                value={nombreNuevo}
+                onChange={(e) => setNombreNuevo(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && crear()}
+                type="text"
+                placeholder="Nombre del nuevo pirata..."
+                className="campo min-w-0 flex-1"
+              />
+              <button type="button" onClick={crear} className="btn-primario shrink-0 px-4 text-sm">
+                + Crear
+              </button>
+            </div>
+            {avatarAbierto === 'nuevo' && (
+              <SelectorAvatar
+                valor={avatarNuevo}
+                onCambiar={(emoji) => {
+                  setAvatarNuevo(emoji);
+                  setAvatarAbierto(null);
+                }}
+              />
+            )}
+          </section>
 
           {jugadoresPermanentes.length === 0 ? (
-            <div className="tarjeta-marron p-8 text-center text-slate-300 text-base">
-              Todavía no hay tarjetas de jugadores. ¡Creá la primera arriba!
-            </div>
+            <div className="tarjeta p-8 text-center text-sm text-slate-500">Todavía no hay tarjetas de jugadores. ¡Creá la primera arriba!</div>
           ) : (
             jugadoresPermanentes.map((jug) => (
               <div key={jug.id} className="flex flex-col gap-2">
-              <div className="tarjeta-marron p-3.5 flex items-center justify-between gap-2">
-                {edicion?.id === jug.id ? (
-                  <div className="flex-1 flex gap-2">
-                    <input
-                      value={edicion.nombre}
-                      onChange={(e) => setEdicion({ ...edicion, nombre: e.target.value })}
-                      onKeyDown={(e) => e.key === 'Enter' && guardarEdicion()}
-                      type="text"
-                      className="flex-1 rounded-lg px-2.5 py-1.5 text-base text-white bg-slate-900 border border-amber-600 focus:outline-none"
-                    />
-                    <button onClick={guardarEdicion} className="text-emerald-400 font-bold px-2">
-                      ✓
-                    </button>
-                    <button onClick={() => setEdicion(null)} className="text-slate-400 font-bold px-2">
-                      ✕
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => setAvatarAbierto(avatarAbierto === jug.id ? null : jug.id)}
-                      aria-label={`Cambiar icono de ${jug.nombre}`}
-                      className="shrink-0"
-                    >
-                      <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} tamano="lg" />
-                    </button>
-                    <button onClick={() => verEstadisticasJugador(jug)} className="min-w-0 flex-1 text-left">
-                      <span className="font-black text-white text-xl block truncate">{jug.nombre}</span>
-                      <span className="text-base text-slate-300">
-                        {jug.estadisticas.partidasJugadas} partida
-                        {jug.estadisticas.partidasJugadas === 1 ? '' : 's'} · 🏆{' '}
-                        {jug.estadisticas.victorias} · Prom. {calcularPromedioPuntos(jug)} pts
-                      </span>
-                    </button>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <button
-                        onClick={() => iniciarEdicion(jug)}
-                        className="h-12 w-12 btn-marron-oscuro rounded-xl text-xl"
-                      >
-                        ✏️
+                <div className="tarjeta flex items-center justify-between gap-2 p-3">
+                  {edicion?.id === jug.id ? (
+                    <div className="flex flex-1 gap-2">
+                      <input
+                        value={edicion.nombre}
+                        onChange={(e) => setEdicion({ ...edicion, nombre: e.target.value })}
+                        onKeyDown={(e) => e.key === 'Enter' && guardarEdicion()}
+                        type="text"
+                        className="campo min-w-0 flex-1"
+                      />
+                      <button type="button" onClick={guardarEdicion} aria-label="Guardar nombre" className="btn-primario h-11 w-11 shrink-0">
+                        ✓
                       </button>
-                      <button
-                        onClick={() => setJugadorPendienteEliminar(jug)}
-                        aria-label={`Eliminar a ${jug.nombre}`}
-                        className="h-12 w-12 bg-red-950/80 border border-red-800 text-red-300 rounded-xl text-xl"
-                      >
-                        🗑️
+                      <button type="button" onClick={() => setEdicion(null)} aria-label="Cancelar edición" className="btn-claro h-11 w-11 shrink-0">
+                        ✕
                       </button>
                     </div>
-                  </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setAvatarAbierto(avatarAbierto === jug.id ? null : jug.id)}
+                        aria-label={`Cambiar icono de ${jug.nombre}`}
+                        className="shrink-0"
+                      >
+                        <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} tamano="lg" />
+                      </button>
+                      <button type="button" onClick={() => verEstadisticasJugador(jug)} className="min-w-0 flex-1 text-left">
+                        <span className="block truncate font-display text-lg font-black text-azul">{jug.nombre}</span>
+                        <span className="text-xs font-semibold text-slate-500">
+                          {jug.estadisticas.partidasJugadas} partida{jug.estadisticas.partidasJugadas === 1 ? '' : 's'} · 🏆{' '}
+                          {jug.estadisticas.victorias} · {jug.estadisticas.partidasJugadas ? `${calcularPorcentajeVictorias(jug)}% victorias` : 'sin partidas'}
+                        </span>
+                      </button>
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        <button type="button" onClick={() => iniciarEdicion(jug)} aria-label={`Editar a ${jug.nombre}`} className="btn-claro h-10 w-10 text-lg">
+                          ✏️
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setJugadorPendienteEliminar(jug)}
+                          aria-label={`Eliminar a ${jug.nombre}`}
+                          className="btn-claro h-10 w-10 text-lg !text-rojo-osc"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+                {avatarAbierto === jug.id && (
+                  <SelectorAvatar
+                    valor={avatarDe(jug.id, jug.avatar)}
+                    onCambiar={(emoji) => {
+                      cambiarAvatarJugadorPermanente(jug.id, emoji);
+                      setAvatarAbierto(null);
+                    }}
+                  />
                 )}
-              </div>
-              {avatarAbierto === jug.id && (
-                <SelectorAvatar
-                  valor={avatarDe(jug.id, jug.avatar)}
-                  onCambiar={(emoji) => {
-                    cambiarAvatarJugadorPermanente(jug.id, emoji);
-                    setAvatarAbierto(null);
-                  }}
-                />
-              )}
               </div>
             ))
           )}
@@ -198,32 +205,35 @@ export function PantallaJugadores() {
         <div className="flex flex-col gap-3">
           <TablaComparativa />
           {jugadoresPermanentes.length === 0 ? (
-            <div className="tarjeta-marron p-8 text-center text-slate-300 text-base">
-              Creá tarjetas de jugadores para ver sus estadísticas.
-            </div>
+            <div className="tarjeta p-8 text-center text-sm text-slate-500">Creá tarjetas de jugadores para ver sus estadísticas.</div>
           ) : (
-            jugadoresPermanentes.map((jug) => (
+            estadisticasOrdenadas.map((jug, posicion) => (
               <button
                 key={jug.id}
+                type="button"
                 onClick={() => verEstadisticasJugador(jug)}
-                className="tarjeta-marron p-3.5 flex items-center justify-between text-left"
+                className="tarjeta flex items-center gap-3 p-3 text-left"
               >
-                <div>
-                  <span className="font-black text-white text-lg block">🏴‍☠️ {jug.nombre}</span>
-                  <span className="text-sm text-slate-400">
-                    {jug.estadisticas.partidasJugadas} partidas · 🥇 {jug.estadisticas.victorias} · 🥈{' '}
-                    {jug.estadisticas.segundoPuesto} · 🥉 {jug.estadisticas.tercerPuesto}
+                <span className="w-6 shrink-0 text-center text-sm font-black text-slate-400">{posicion + 1}</span>
+                <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} tamano="md" />
+                <div className="min-w-0 flex-1">
+                  <span className="block truncate font-display text-base font-black text-azul">{jug.nombre}</span>
+                  <span className="text-xs font-semibold text-slate-500">
+                    {jug.estadisticas.partidasJugadas} jugadas · 🏆 {jug.estadisticas.victorias}
+                    {jug.estadisticas.mejorPartida !== null ? ` · récord ${jug.estadisticas.mejorPartida}` : ''}
                   </span>
                 </div>
-                <span className="text-amber-300 font-black text-xl">
-                  {calcularPromedioPuntos(jug)} <span className="text-sm font-normal">pts prom.</span>
+                <span className="shrink-0 text-right">
+                  <span className="block font-display text-2xl font-black text-azul">
+                    {jug.estadisticas.partidasJugadas ? `${calcularPorcentajeVictorias(jug)}%` : '—'}
+                  </span>
+                  <span className="block text-[10px] font-bold uppercase text-slate-400">victorias</span>
                 </span>
               </button>
             ))
           )}
         </div>
       )}
-      {/* Sombreado del último item para no perder botón lejos, se usa scroll natural del main */}
       <span className="hidden">{partida.hayPartidaGuardada}</span>
 
       <ModalConfirmarEliminacionJugador
@@ -243,8 +253,9 @@ function TablaComparativa() {
         .filter((r) => r.partidas > 0)
         .sort(
           (a, b) =>
+            b.victorias - a.victorias ||
             b.porcentajeVictorias - a.porcentajeVictorias ||
-            b.promedioPuntos - a.promedioPuntos ||
+            b.partidas - a.partidas ||
             a.nombre.localeCompare(b.nombre)
         ),
     [partida.historialPartidas, jugadoresPermanentes]
@@ -253,19 +264,16 @@ function TablaComparativa() {
   if (rendimientos.length === 0) return null;
 
   return (
-    <section className="tarjeta-marron p-3.5">
-      <h3 className="mb-1 text-base font-black text-amber-300">⚔️ Comparativa de la tripulación</h3>
-      <p className="mb-3 text-sm leading-relaxed text-slate-400">
-        Ordenada por victorias y puntos. Tocá un nombre para ver su perfil completo contra el resto.
-      </p>
+    <section className="tarjeta p-4">
+      <h3 className="tarjeta-titulo mb-3">⚔️ Comparativa de la tripulación</h3>
       <div className="-mx-1 overflow-x-auto">
         <table className="w-full min-w-[19rem] border-collapse text-sm">
           <thead>
-            <tr className="text-left text-sm uppercase tracking-wide text-slate-400">
+            <tr className="text-left text-[11px] uppercase tracking-wide text-slate-400">
               <th className="px-1 pb-2 font-bold">Pirata</th>
               <th className="px-1 pb-2 text-right font-bold">PJ</th>
               <th className="px-1 pb-2 text-right font-bold">Vict.</th>
-              <th className="px-1 pb-2 text-right font-bold">Prom.</th>
+              <th className="px-1 pb-2 text-right font-bold">% Vict.</th>
               <th className="px-1 pb-2 text-right font-bold">Envites</th>
               <th className="px-1 pb-2 text-right font-bold">Racha</th>
             </tr>
@@ -276,13 +284,13 @@ function TablaComparativa() {
                 (j) => r.clave === `id:${j.id}` || r.clave === `n:${j.nombre.trim().toLowerCase()}`
               );
               return (
-                <tr key={r.clave} className="border-t border-slate-800">
-                  <td className="max-w-[7rem] px-1 py-2 font-bold text-white">
+                <tr key={r.clave} className="border-t border-slate-100">
+                  <td className="max-w-[7rem] px-1 py-2 font-bold text-tinta">
                     {tarjeta ? (
                       <button
                         type="button"
                         onClick={() => verEstadisticasJugador(tarjeta)}
-                        className="block max-w-full truncate text-left text-amber-200 underline decoration-dotted underline-offset-2"
+                        className="block max-w-full truncate text-left text-azul underline decoration-dotted underline-offset-2"
                       >
                         {r.nombre}
                       </button>
@@ -290,13 +298,11 @@ function TablaComparativa() {
                       <span className="block truncate">{r.nombre}</span>
                     )}
                   </td>
-                  <td className="px-1 py-2 text-right text-slate-300">{r.partidas}</td>
-                  <td className="px-1 py-2 text-right text-slate-300">
-                    {r.victorias} <span className="text-slate-400">({r.porcentajeVictorias}%)</span>
-                  </td>
-                  <td className="px-1 py-2 text-right font-bold text-white">{r.promedioPuntos}</td>
-                  <td className="px-1 py-2 text-right text-slate-300">{r.precisionEnvites}%</td>
-                  <td className="px-1 py-2 text-right text-slate-300">{r.mejorRacha}</td>
+                  <td className="px-1 py-2 text-right text-slate-600">{r.partidas}</td>
+                  <td className="px-1 py-2 text-right text-slate-600">{r.victorias}</td>
+                  <td className="px-1 py-2 text-right font-bold text-azul">{r.partidas ? `${r.porcentajeVictorias}%` : '—'}</td>
+                  <td className="px-1 py-2 text-right text-slate-600">{r.precisionEnvites}%</td>
+                  <td className="px-1 py-2 text-right text-slate-600">{r.mejorRacha}</td>
                 </tr>
               );
             })}
@@ -330,53 +336,39 @@ function VistaHistorial() {
     });
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        {historialPartidas.length > 0 && (
-          <button
-            onClick={borrarTodoElHistorial}
-            className="text-sm bg-red-950/80 hover:bg-red-900 border border-red-800 text-red-200 px-3 py-1.5 rounded-xl font-bold"
-          >
-            Borrar Historial
-          </button>
-        )}
-      </div>
+    <div className="flex flex-col gap-3">
+      {historialPartidas.length > 0 && (
+        <button type="button" onClick={borrarTodoElHistorial} className="btn-peligro self-end px-3 py-2 text-xs">
+          Borrar historial
+        </button>
+      )}
       {historialPartidas.length === 0 ? (
-        <div className="tarjeta-marron p-8 text-center text-slate-300 text-base">
-          No hay partidas registradas.
-        </div>
+        <div className="tarjeta p-8 text-center text-sm text-slate-500">No hay partidas registradas.</div>
       ) : (
         historialPartidas.map((partidaGuardada, hIndex) => (
-          <div key={hIndex} className="tarjeta-marron p-4 flex flex-col gap-3">
-            <div className="flex justify-between items-center border-b border-amber-900/50 pb-2">
-              <span className="text-sm font-bold text-amber-300">{partidaGuardada.fecha}</span>
-              <button
-                onClick={() => eliminarPartidaHistorial(hIndex)}
-                className="text-sm text-slate-400 hover:text-red-400 font-bold"
-              >
+          <div key={hIndex} className="tarjeta flex flex-col gap-3 p-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+              <span className="text-xs font-black uppercase tracking-wider text-azul">{partidaGuardada.fecha}</span>
+              <button type="button" onClick={() => eliminarPartidaHistorial(hIndex)} className="min-h-11 px-2 text-xs font-bold text-rojo-osc">
                 ✕ Eliminar
               </button>
             </div>
             <div className="flex flex-col gap-1.5">
               {partidaGuardada.ranking.map((jug, jIndex) => (
-                <div
+                <button
+                  type="button"
                   key={jIndex}
                   onClick={() => verHistorialJugador(jug)}
-                  className={`flex justify-between items-center px-3 py-2 rounded-xl text-base font-semibold cursor-pointer transition-colors hover:brightness-110 ${
-                    jIndex === 0
-                      ? 'btn-blanco-marron'
-                      : 'bg-amber-950/40 text-slate-200 border border-amber-900/30'
-                  }`}
+                  className={`flex items-center justify-between px-3 py-2 text-left ${jIndex === 0 ? 'opcion opcion-sel' : 'opcion'}`}
                 >
-                  <div className="flex flex-col">
-                    <span>
-                      {jIndex === 0 ? '🥇' : jIndex === 1 ? '🥈' : jIndex === 2 ? '🥉' : `${jIndex + 1}.`}{' '}
-                      {jug.nombre}
+                  <span className="flex min-w-0 flex-col">
+                    <span className="truncate text-sm font-bold text-tinta">
+                      {jIndex === 0 ? '🥇' : jIndex === 1 ? '🥈' : jIndex === 2 ? '🥉' : `${jIndex + 1}.`} {jug.nombre}
                     </span>
-                    <span className="text-sm opacity-80">🔍 Tocá para ver historial</span>
-                  </div>
-                  <span className="font-extrabold text-amber-300">{jug.puntos} pts</span>
-                </div>
+                    <span className="text-[11px] text-slate-500">Ver desglose por ronda</span>
+                  </span>
+                  <span className="shrink-0 pl-2 font-black text-tinta">{jug.puntos} pts</span>
+                </button>
               ))}
             </div>
             {partidaGuardada.ranking.some((jug) => jug.historial.length > 1) && (
@@ -385,13 +377,11 @@ function VistaHistorial() {
                   type="button"
                   onClick={() => alternarGrafico(hIndex)}
                   aria-expanded={graficosAbiertos.has(hIndex)}
-                  className="btn-marron-oscuro rounded-xl py-2.5 text-sm"
+                  className="btn-claro py-2.5 text-xs"
                 >
                   {graficosAbiertos.has(hIndex) ? '▲ Ocultar evolución' : '📈 Ver evolución por ronda'}
                 </button>
-                {graficosAbiertos.has(hIndex) && (
-                  <GraficoPartidaHistorial jugadores={partidaGuardada.ranking} />
-                )}
+                {graficosAbiertos.has(hIndex) && <GraficoPartidaHistorial jugadores={partidaGuardada.ranking} />}
               </>
             )}
           </div>

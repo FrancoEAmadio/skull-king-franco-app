@@ -16,7 +16,7 @@ export function ModalConfirmarEliminacionJugador({ jugador, onCancelar, onConfir
         jugador && (
           <>
             ¿Estás seguro de que querés eliminar a{' '}
-            <span className="text-amber-300">{jugador.nombre}</span>?
+            <span className="text-azul">{jugador.nombre}</span>?
           </>
         )
       }
