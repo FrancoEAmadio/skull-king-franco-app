@@ -3,6 +3,7 @@ import { useApp } from '../../estado/AppProvider';
 import { CATALOGO_CARTAS_WIKI } from '../../datos/cartasDatos';
 import { CATEGORIAS_REGLAS_WIKI } from '../../datos/reglasDatos';
 import type { ModoContenido } from '../../tipos';
+import { useSwipeHorizontal } from '../../ui/useSwipeHorizontal';
 import { Jerarquias } from './Jerarquias';
 
 type Vista = 'manual' | 'cartas' | 'jerarquias';
@@ -36,6 +37,14 @@ export function PantallaReglas() {
   const [reglasAbiertas, setReglasAbiertas] = useState<Record<string, boolean>>({});
   const [termino, setTermino] = useState('');
 
+  // Deslizar a los costados cambia de modo, solo en Catálogo y Jerarquías.
+  const indiceModo = MODOS.findIndex((m) => m.id === modo);
+  const { iniciarTouch, finalizarTouch } = useSwipeHorizontal({
+    onSwipeIzquierda: () => indiceModo < MODOS.length - 1 && setModo(MODOS[indiceModo + 1]!.id),
+    onSwipeDerecha: () => indiceModo > 0 && setModo(MODOS[indiceModo - 1]!.id),
+  });
+  const gestos = vista === 'manual' ? {} : { onTouchStart: iniciarTouch, onTouchEnd: finalizarTouch };
+
   const cartas = useMemo(() => {
     const q = termino.trim().toLowerCase();
     return CATALOGO_CARTAS_WIKI.filter(
@@ -60,7 +69,7 @@ export function PantallaReglas() {
   );
 
   return (
-    <main className="entrar flex w-full flex-col gap-4 py-4">
+    <main className="entrar flex w-full flex-1 flex-col gap-4 py-4" {...gestos}>
       <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma self-start px-3 py-2 text-sm">
         ← Volver al menú
       </button>
