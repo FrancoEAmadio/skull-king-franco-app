@@ -12,10 +12,10 @@ interface Props {
 }
 
 const PALOS: { id: string; titulo: string; tono: TonoChip; aclaracion: string }[] = [
-  { id: 'siete_expansion', titulo: '−5', tono: 'rojo', aclaracion: '(7)' },
-  { id: 'ocho_expansion', titulo: '+5', tono: 'verde', aclaracion: '(8)' },
-  { id: 'catorce_color', titulo: '+10', tono: 'dorado', aclaracion: '(14)' },
-  { id: 'catorce_negro', titulo: '+20', tono: 'negro', aclaracion: '(14 negro)' },
+  { id: 'siete_expansion', titulo: '−5', tono: 'rojo', aclaracion: 'capturó un 7' },
+  { id: 'ocho_expansion', titulo: '+5', tono: 'verde', aclaracion: 'capturó un 8' },
+  { id: 'catorce_color', titulo: '+10', tono: 'dorado', aclaracion: 'capturó un 14' },
+  { id: 'catorce_negro', titulo: '+20', tono: 'negro', aclaracion: 'capturó el 14 negro' },
 ];
 
 const ESPECIALES: Record<string, { titulo: string }> = {

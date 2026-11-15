@@ -17,8 +17,8 @@ interface Props {
 
 const TONOS: Record<TonoChip, { reposo: string; activo: string }> = {
   neutro: { reposo: 'bg-white border-slate-300 text-tinta', activo: 'bg-amber-50 border-oro text-tinta ring-2 ring-oro/40' },
-  rojo: { reposo: 'bg-red-50 border-red-200 text-red-700', activo: 'bg-red-100 border-red-500 text-red-800 ring-2 ring-red-300' },
-  verde: { reposo: 'bg-emerald-50 border-emerald-200 text-emerald-700', activo: 'bg-emerald-100 border-emerald-500 text-emerald-800 ring-2 ring-emerald-300' },
+  rojo: { reposo: 'bg-red-50 border-red-300 text-red-700', activo: 'bg-red-100 border-red-500 text-red-800 ring-2 ring-red-300' },
+  verde: { reposo: 'bg-emerald-50 border-emerald-300 text-emerald-700', activo: 'bg-emerald-100 border-emerald-500 text-emerald-800 ring-2 ring-emerald-300' },
   dorado: { reposo: 'bg-amber-50 border-amber-300 text-amber-800', activo: 'bg-amber-200 border-oro-osc text-amber-900 ring-2 ring-oro/50' },
   negro: { reposo: 'bg-slate-100 border-slate-800 text-slate-900', activo: 'bg-slate-300 border-black text-black ring-2 ring-slate-500' },
 };
