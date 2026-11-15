@@ -5,7 +5,7 @@ import { calcularPorcentajeAciertos, calcularPorcentajeVictorias } from '../../d
 function Dato({ valor, etiqueta, color = 'text-azul' }: { valor: string | number; etiqueta: string; color?: string }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
-      <span className={`block font-display text-xl font-black ${color}`}>{valor}</span>
+      <span className={`block text-xl font-black ${color}`}>{valor}</span>
       <span className="text-[11px] font-bold uppercase leading-tight text-slate-500">{etiqueta}</span>
     </div>
   );

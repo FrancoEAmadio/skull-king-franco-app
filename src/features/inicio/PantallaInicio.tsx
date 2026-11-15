@@ -24,15 +24,27 @@ export function PantallaInicio() {
   };
 
   return (
-    <main className="entrar mx-auto my-auto flex w-full max-w-xl flex-col items-center py-4 text-center">
+    <main className="entrar relative mx-auto my-auto flex w-full max-w-xl flex-col items-center py-4 text-center">
+      <button
+        type="button"
+        onClick={() => setAjustesAbiertos(true)}
+        aria-label="Ajustes y copia de seguridad"
+        className="btn-fantasma absolute right-0 top-0 h-11 w-11 !rounded-full p-0"
+      >
+        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="3.2" />
+          <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.65 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06A2 2 0 1 1 7.08 4.14l.06.06a1.7 1.7 0 0 0 1.87.34h0A1.7 1.7 0 0 0 10.04 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v0A1.7 1.7 0 0 0 21 10.04H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z" />
+        </svg>
+      </button>
       <img
-        src="./archivos/iconos/icon-512.png"
+        src="./archivos/iconos/logo-home.png"
         alt="Skull King"
-        className="h-auto w-48 max-w-[55%] drop-shadow-[0_10px_24px_rgba(0,0,0,0.55)]"
+        className="mt-10 h-auto w-44 max-w-[50%] rounded-[1.75rem] border-2 border-oro/70 shadow-2xl"
       />
-      <h1 className="mb-7 mt-3 font-display text-5xl font-black tracking-wide text-oro-claro drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+      <h1 className="mt-4 font-display text-5xl font-black tracking-wide text-oro-claro drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
         Skull King
       </h1>
+      <p className="mb-7 mt-1 text-xs font-bold uppercase tracking-[0.25em] text-white">Anotador de puntos</p>
 
       <div className="flex w-full flex-col gap-3">
         <button type="button" onClick={partida.irANuevaPartida} className="btn-dorado w-full py-4 text-lg">
@@ -60,13 +72,6 @@ export function PantallaInicio() {
         {mostrarAyudaIOS && (
           <p className="text-xs text-amber-100">Para instalarla en iPhone: tocá Compartir y elegí «Añadir a pantalla de inicio».</p>
         )}
-        <button
-          type="button"
-          onClick={() => setAjustesAbiertos(true)}
-          className="min-h-11 px-3 py-2 text-sm font-bold text-amber-100 underline underline-offset-4"
-        >
-          Ajustes y copia de seguridad
-        </button>
       </div>
 
       <Modal abierto={eligiendo} onCerrar={() => setEligiendo(false)} ancho="max-w-md" cerrarAlHacerClickAfuera>

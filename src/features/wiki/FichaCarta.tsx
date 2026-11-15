@@ -27,7 +27,7 @@ export function FichaCarta({ ids, titulo, onCerrar }: Props) {
         {cartas.map((c) => (
           <article key={c.id} className="tarjeta flex flex-col gap-3 p-4">
             <div className="flex items-center justify-between gap-2">
-              {cartas.length > 1 && <h3 className="font-display text-lg font-black text-azul">{c.nombre}</h3>}
+              {cartas.length > 1 && <h3 className="text-lg font-black text-azul">{c.nombre}</h3>}
               <span className="shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-black text-azul">{c.cantidad}</span>
             </div>
             <div className="flex justify-center rounded-xl bg-gradient-to-b from-amber-50 to-stone-100 p-3">

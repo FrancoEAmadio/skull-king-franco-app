@@ -49,7 +49,7 @@ export function ModalPodio() {
     <>
       <Modal abierto={mostrarPodio} onCerrar={cerrarPodio} ancho="max-w-sm" cerrarAlHacerClickAfuera={!partidaFinalizada}>
         <EncabezadoModal
-          titulo={`🏆 ${partidaFinalizada ? 'Resultado final' : 'Tabla general'}`}
+          titulo={partidaFinalizada ? 'Resultado final' : 'Tabla general'}
           subtitulo={`${rondasJugadas} ronda${rondasJugadas === 1 ? '' : 's'} jugada${rondasJugadas === 1 ? '' : 's'}`}
           onCerrar={cerrarPodio}
         />
@@ -67,8 +67,8 @@ export function ModalPodio() {
                   {index + 1}.º
                 </span>
                 <span className="flex min-w-0 flex-col">
-                  <span className="block truncate font-display font-black text-azul">{jugador.nombre}</span>
-                  <span className="text-xs text-slate-500">🔍 Ver auditoría</span>
+                  <span className="block truncate font-black text-azul">{jugador.nombre}</span>
+                  <span className="text-xs text-slate-500">Ver detalles de {rondasJugadas === 1 ? 'la ronda' : 'las rondas'}</span>
                 </span>
               </span>
               <span className="shrink-0 pl-2 text-xl font-black text-tinta">{jugador.puntos} pts</span>

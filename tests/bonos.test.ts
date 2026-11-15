@@ -69,3 +69,21 @@ describe('topes de cartas especiales', () => {
     expect(r[1]!.eventosBono.pirata_por_sk).toBe(0);
   });
 });
+
+describe('presupuesto de cartas de la mesa', () => {
+  const ganando = (e: Record<string, number>, ganadas = 1) => ({ nombre: 'x', ganadas, eventosBono: e }) as unknown as Jugador;
+  it('SK con 4 piratas en 5 jugadores/1 carta agota la mesa: sin palos, Botín ni habilidades', async () => {
+    const { hayCartaLibre } = await import('../src/dominio/bonos');
+    const j = [ganando({ pirata_por_sk: 4 }), ganando({}, 0), ganando({}, 0), ganando({}, 0), ganando({}, 0)];
+    const c = ctx(j, 0, 1, 'expansion');
+    expect(calcularMaximoDisponible('catorce_color', c)).toBe(0);
+    expect(calcularMaximoDisponible('catorce_negro', c)).toBe(0);
+    expect(calcularMaximoDisponible('siete_expansion', c)).toBe(0);
+    expect(hayCartaLibre(c, { alianza: true })).toBe(false);
+    expect(hayCartaLibre(c, { habilidad: true })).toBe(false);
+  });
+  it('con una carta libre todavía entra un palo', () => {
+    const j = [ganando({ pirata_por_sk: 2 }), ganando({}, 0), ganando({}, 0), ganando({}, 0), ganando({}, 0)];
+    expect(calcularMaximoDisponible('catorce_color', ctx(j, 0, 1, 'expansion'))).toBeGreaterThan(0);
+  });
+});

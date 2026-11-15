@@ -88,6 +88,9 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
     configuracionMesa,
     registroHabilidadesRonda,
     habilidadesBloqueadasPorLimite,
+    hayCartaLibreHabilidad,
+    hayCartaLibreKong,
+    cartasPorJugadorEnRonda,
     esHabilidadYaRegistrada,
     esKongYaRegistradoCon,
     aplicarHarryGigante,
@@ -128,10 +131,17 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
   const kongPuedeCopiarHarry = harryUsado && !harryDeEste && !esKongYaRegistradoCon('Harry');
   const kongHabilitado = kongPuedeCopiarBribon || kongPuedeCopiarHarry;
 
+  // Con una sola carta por jugador, quien ya registró su carta como Skull King, Kong o Davy Jones no tiene otra para una habilidad.
+  const ev = jugadorActual.eventosBono;
+  const cartaPropiaUsada =
+    cartasPorJugadorEnRonda <= 1 &&
+    ['pirata_por_sk', 'sk_por_sirena', 'kong_por_sk_sirena', 'monstruo_davy'].some((id) => (Number(ev[id]) || 0) > 0);
+  const sinCartas = cartaPropiaUsada || (!hayCartaLibreHabilidad && !hayCartaLibreKong);
+
   const habilitada: Record<HabId, boolean> = {
-    bribon_rotan: !bribonDeOtro,
-    harry_gigante: !harryUsado,
-    kong: kongActivo && kongHabilitado,
+    bribon_rotan: !bribonDeOtro && hayCartaLibreHabilidad,
+    harry_gigante: !harryUsado && hayCartaLibreHabilidad,
+    kong: kongActivo && kongHabilitado && hayCartaLibreKong,
   };
   const habilidadEfectiva: HabId | null = habilitada[habSeleccionada]
     ? habSeleccionada
@@ -187,8 +197,10 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
       abierto={abierto}
       onToggle={onToggle}
     >
-      {habilidadesBloqueadasPorLimite ? (
-        <p className="py-1 text-center text-base text-slate-500">Límite de 3 habilidades por ronda.</p>
+      {habilidadesBloqueadasPorLimite || sinCartas ? (
+        <p className="py-1 text-center text-base text-slate-500">
+          {habilidadesBloqueadasPorLimite ? `Límite de ${maxHabilidadesRonda} habilidades por ronda.` : 'No quedan cartas disponibles para una habilidad.'}
+        </p>
       ) : (
         <>
           <span className="text-left text-lg font-black text-tinta">
