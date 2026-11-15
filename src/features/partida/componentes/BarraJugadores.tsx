@@ -49,12 +49,12 @@ export function BarraJugadores({ items, indice, onIr }: Props) {
                   onClick={() => onIr(posicion)}
                   className={`selector-jugador ${activo ? 'text-azul' : 'text-white/80 active:bg-white/10'}`}
                 >
-                  <span className="selector-jugador-nombre text-xs font-black">{item.nombre}</span>
-                  <span className={`selector-jugador-total text-[11px] font-bold ${activo ? 'text-azul-vivo' : 'opacity-75'}`}>
+                  <span className="selector-jugador-nombre text-xs font-bold">{item.nombre}</span>
+                  <span className={`selector-jugador-total text-[11px] font-semibold ${activo ? 'text-azul-vivo' : 'opacity-75'}`}>
                     {item.detalle}
                     {item.proyeccion !== undefined && (
                       <span
-                        className={`ml-1 text-[10px] font-black ${
+                        className={`ml-1 text-[10px] font-bold ${
                           item.proyeccion < 0 ? (activo ? 'text-rojo' : 'text-red-300') : activo ? 'text-emerald-600' : 'text-emerald-300'
                         }`}
                       >

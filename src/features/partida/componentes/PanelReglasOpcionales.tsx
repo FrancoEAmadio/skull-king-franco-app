@@ -33,7 +33,7 @@ export function PanelReglasOpcionales({ configuracion, onCambiar }: Props) {
         className="flex w-full items-center justify-between gap-2 px-4 py-3.5 text-left"
       >
         <h3 className="tarjeta-titulo">5. Reglas y cartas opcionales</h3>
-        <span className="text-sm font-bold text-azul">{abierto ? '▲' : '▼'}</span>
+        <span className="text-sm font-semibold text-azul">{abierto ? '▲' : '▼'}</span>
       </button>
       {abierto && (
         <div className="flex flex-col gap-4 px-4 pb-4">
@@ -56,7 +56,7 @@ function Grupo({ titulo, opciones, configuracion, onCambiar }: GrupoProps) {
   const sinModo = opciones.every(([regla]) => !modoPermiteRegla(configuracion.modoContenido, regla));
   return (
     <div className={`flex flex-col gap-2 ${sinModo ? 'opacity-45' : ''}`}>
-      <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+      <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
         {titulo}
         {sinModo && ' · no disponible en este modo'}
       </span>
@@ -79,7 +79,7 @@ function Grupo({ titulo, opciones, configuracion, onCambiar }: GrupoProps) {
                 activo ? 'opcion opcion-sel' : 'opcion'
               }`}
             >
-              <span className="text-sm font-black leading-tight">{nombre}</span>
+              <span className="text-sm font-bold leading-tight">{nombre}</span>
               <span className="text-xs font-semibold leading-tight text-slate-500">{detalle}</span>
             </button>
           );

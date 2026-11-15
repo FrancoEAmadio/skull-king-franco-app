@@ -86,7 +86,7 @@ function Palos({ modo, onFicha }: { modo: ModoContenido; onFicha: OnFicha }) {
       {items.map((it) => (
         <button type="button" key={it.id} onClick={() => onFicha([it.carta], it.nombre)} className="flex flex-col items-center gap-1">
           <img src={`./${it.archivo}`} alt="" className="w-16 rounded-md bg-white object-cover shadow" style={{ aspectRatio: '0.7', border: `2px solid ${it.color}` }} />
-          <span className="text-center text-[10px] font-black leading-tight" style={{ color: it.color }}>{it.nombre}</span>
+          <span className="text-center text-[10px] font-bold leading-tight" style={{ color: it.color }}>{it.nombre}</span>
         </button>
       ))}
     </div>
@@ -182,7 +182,7 @@ function SinBazas({ modo, onFicha }: { modo: ModoContenido; onFicha: OnFicha }) 
         {lista.map((c) => (
           <button type="button" key={c.id} onClick={() => onFicha([c.id], c.nombre)} className="flex w-[47%] flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center">
             <img src={`./${img(c.id)}`} alt="" className="w-14 rounded-md bg-white object-cover shadow" style={{ aspectRatio: '0.7' }} />
-            <span className="text-xs font-black text-azul">{c.nombre}</span>
+            <span className="text-xs font-bold text-azul">{c.nombre}</span>
             <span className="text-[11px] leading-tight text-slate-600">{c.frase}</span>
           </button>
         ))}
@@ -204,13 +204,13 @@ function Preguntas({ modo }: { modo: ModoContenido }) {
     <section className="tarjeta overflow-hidden">
       <button type="button" onClick={() => setAbierto(!abierto)} aria-expanded={abierto} className="flex min-h-12 w-full items-center justify-between px-4 py-3 text-left">
         <h3 className="tarjeta-titulo !font-sans">Preguntas frecuentes</h3>
-        <span className="text-sm font-bold text-azul">{abierto ? '▲' : '▼'}</span>
+        <span className="text-sm font-semibold text-azul">{abierto ? '▲' : '▼'}</span>
       </button>
       {abierto && (
         <dl className="flex flex-col gap-3 px-4 pb-4">
           {faq.map(([p, r]) => (
             <div key={p}>
-              <dt className="text-sm font-bold text-tinta">{p}</dt>
+              <dt className="text-sm font-semibold text-tinta">{p}</dt>
               <dd className="text-sm text-slate-600">{r}</dd>
             </div>
           ))}

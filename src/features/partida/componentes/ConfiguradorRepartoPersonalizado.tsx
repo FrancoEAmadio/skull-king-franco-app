@@ -67,8 +67,8 @@ export function ConfiguradorRepartoPersonalizado({
   return (
     <section className="tarjeta flex flex-col gap-4 p-4">
       <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-        <h2 className="font-display text-lg font-black text-azul">Reparto personalizado</h2>
-        <button type="button" onClick={onCancelar} className="min-h-11 px-2 text-sm font-bold text-azul-vivo">
+        <h2 className="font-display text-lg font-bold text-azul">Reparto personalizado</h2>
+        <button type="button" onClick={onCancelar} className="min-h-11 px-2 text-sm font-semibold text-azul-vivo">
           Cancelar
         </button>
       </div>
@@ -93,7 +93,7 @@ export function ConfiguradorRepartoPersonalizado({
           <div className="flex flex-col">
             {cartasPorRonda.map((cantidad, indice) => (
               <div key={indice} className="flex flex-col gap-2 border-b border-slate-100 py-3 last:border-b-0">
-                <span className="text-sm font-bold text-tinta">Ronda {indice + 1}</span>
+                <span className="text-sm font-semibold text-tinta">Ronda {indice + 1}</span>
                 <FichasNumero
                   etiqueta={`Cartas de la ronda ${indice + 1}`}
                   min={1}

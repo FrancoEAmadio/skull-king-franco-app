@@ -14,9 +14,9 @@ function Grupo({ titulo, lineas, subtotal }: { titulo: string; lineas: Linea[]; 
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between pb-1">
-        <span className="text-[11px] font-black uppercase tracking-wider text-azul">{titulo}</span>
+        <span className="text-[11px] font-bold uppercase tracking-wider text-azul">{titulo}</span>
         {subtotal !== undefined && (
-          <span className={`text-sm font-black ${subtotal < 0 ? 'text-rojo-osc' : 'text-azul'}`}>{signo(subtotal)}</span>
+          <span className={`text-sm font-bold ${subtotal < 0 ? 'text-rojo-osc' : 'text-azul'}`}>{signo(subtotal)}</span>
         )}
       </div>
       {lineas.map((linea, i) => (
@@ -78,9 +78,9 @@ export function PasoResumen() {
         return (
           <article key={res.nombre} className="tarjeta flex flex-col gap-3 p-4">
             <header className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
-              <h3 className="min-w-0 flex-1 truncate text-lg font-black text-azul">{res.nombre}</h3>
+              <h3 className="min-w-0 flex-1 truncate text-lg font-bold text-azul">{res.nombre}</h3>
               <span
-                className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-black ${
+                className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-bold ${
                   res.acierto ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'
                 }`}
               >
@@ -103,12 +103,12 @@ export function PasoResumen() {
 
             <div className="fila-puntaje !items-end border-t border-slate-200 pt-3">
               <div className="fila-puntaje-valor !text-left">
-                <span className="block text-[10px] font-bold uppercase text-slate-400">Puntaje de la ronda</span>
-                <span className={`text-2xl font-black ${res.totalRonda < 0 ? 'text-rojo-osc' : 'text-azul'}`}>{signo(res.totalRonda)}</span>
+                <span className="block text-[10px] font-semibold uppercase text-slate-400">Puntaje de la ronda</span>
+                <span className={`text-2xl font-bold ${res.totalRonda < 0 ? 'text-rojo-osc' : 'text-azul'}`}>{signo(res.totalRonda)}</span>
               </div>
               <div className="min-w-0 flex-1 text-right">
-                <span className="block text-[10px] font-bold uppercase text-slate-400">Nuevo acumulado</span>
-                <span className="whitespace-nowrap text-3xl font-black text-tinta">{res.acumuladoNuevo}</span>
+                <span className="block text-[10px] font-semibold uppercase text-slate-400">Nuevo acumulado</span>
+                <span className="whitespace-nowrap text-3xl font-bold text-tinta">{res.acumuladoNuevo}</span>
               </div>
             </div>
           </article>

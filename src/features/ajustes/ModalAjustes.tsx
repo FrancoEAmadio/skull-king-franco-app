@@ -101,7 +101,7 @@ export function ModalAjustes() {
           <section className="tarjeta flex flex-col gap-1 p-4">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <span className="block text-sm font-black text-tinta">Pantalla siempre encendida</span>
+                <span className="block text-sm font-bold text-tinta">Pantalla siempre encendida</span>
                 <span className="block text-xs text-slate-500">
                   {wakeLockOk ? 'Durante la partida.' : 'No disponible en este dispositivo.'}
                 </span>
@@ -115,7 +115,7 @@ export function ModalAjustes() {
             </div>
             <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-1">
               <div className="min-w-0">
-                <span className="block text-sm font-black text-tinta">Vibración al tocar</span>
+                <span className="block text-sm font-bold text-tinta">Vibración al tocar</span>
                 <span className="block text-xs text-slate-500">
                   {vibrarOk ? 'Respuesta táctil en los botones.' : 'No disponible en este dispositivo.'}
                 </span>

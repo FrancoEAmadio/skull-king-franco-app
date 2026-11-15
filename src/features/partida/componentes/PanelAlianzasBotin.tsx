@@ -74,7 +74,7 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
 
       {!limiteAlcanzado && !sinBazas && (
         <>
-          <span className="text-sm font-bold text-tinta">
+          <span className="text-sm font-semibold text-tinta">
             Alianza de <span className="text-azul">{activo.nombre}</span> con:
           </span>
           <div className="flex flex-wrap gap-2">
@@ -108,7 +108,7 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
           {alianzasBotinRonda.map((alianza, idx) => (
             <span
               key={idx}
-              className="flex items-center gap-2 rounded-full border border-oro bg-slate-50 py-1 pl-3 pr-1 text-base font-bold text-azul"
+              className="flex items-center gap-2 rounded-full border border-oro bg-slate-50 py-1 pl-3 pr-1 text-base font-semibold text-azul"
             >
               {alianza.nombreA} 🤝 {alianza.nombreB}
               <button

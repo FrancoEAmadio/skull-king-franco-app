@@ -17,9 +17,9 @@ export function ModalHistorialJugador() {
             {(jugadorViendoHistorial.historial as EntradaHistorialRonda[]).map((ronda) => (
               <div key={ronda.ronda} className="rounded-xl border border-slate-200 bg-white p-3.5 text-sm shadow-sm">
                 <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-base font-black text-azul">Ronda {ronda.ronda}</span>
+                  <span className="text-base font-bold text-azul">Ronda {ronda.ronda}</span>
                   <span
-                    className={`rounded-full border px-2.5 py-0.5 text-[11px] font-black ${
+                    className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${
                       ronda.acierto ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'
                     }`}
                   >
@@ -48,12 +48,12 @@ export function ModalHistorialJugador() {
 
                 <div className="fila-puntaje !items-end mt-2 border-t border-slate-100 pt-2">
                   <div>
-                    <span className="block text-[10px] font-bold uppercase text-slate-400">Total ronda</span>
-                    <span className={`text-xl font-black ${ronda.totalRonda >= 0 ? 'text-azul' : 'text-rojo-osc'}`}>{signo(ronda.totalRonda)}</span>
+                    <span className="block text-[10px] font-semibold uppercase text-slate-400">Total ronda</span>
+                    <span className={`text-xl font-bold ${ronda.totalRonda >= 0 ? 'text-azul' : 'text-rojo-osc'}`}>{signo(ronda.totalRonda)}</span>
                   </div>
                   <div className="text-right">
-                    <span className="block text-[10px] font-bold uppercase text-slate-400">Acumulado</span>
-                    <span className="text-2xl font-black text-tinta">{ronda.acumuladoNuevo}</span>
+                    <span className="block text-[10px] font-semibold uppercase text-slate-400">Acumulado</span>
+                    <span className="text-2xl font-bold text-tinta">{ronda.acumuladoNuevo}</span>
                   </div>
                 </div>
               </div>

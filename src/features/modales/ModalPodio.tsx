@@ -63,15 +63,15 @@ export function ModalPodio() {
               className={`flex items-center justify-between p-3 text-left ${index === 0 ? 'opcion opcion-sel' : 'opcion'}`}
             >
               <span className="flex min-w-0 items-center gap-3">
-                <span className="w-7 shrink-0 text-center text-xl font-bold">
+                <span className="w-7 shrink-0 text-center text-xl font-semibold">
                   {index + 1}.º
                 </span>
                 <span className="flex min-w-0 flex-col">
-                  <span className="block truncate font-black text-azul">{jugador.nombre}</span>
-                  <span className="text-xs text-slate-500">Ver detalles de {rondasJugadas === 1 ? 'la ronda' : 'las rondas'}</span>
+                  <span className="block truncate font-bold text-azul">{jugador.nombre}</span>
+                  <span className="text-xs text-slate-500">Ver detalles</span>
                 </span>
               </span>
-              <span className="shrink-0 pl-2 text-xl font-black text-tinta">{jugador.puntos} pts</span>
+              <span className="shrink-0 pl-2 text-xl font-bold text-tinta">{jugador.puntos} pts</span>
             </button>
           ))}
 

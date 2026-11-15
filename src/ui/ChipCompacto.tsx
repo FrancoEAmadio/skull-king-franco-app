@@ -38,15 +38,15 @@ export function ChipCompacto({ titulo, subtitulo, aclaracion, cantidad, maximo, 
         if (cantidad >= maximo) onBorrar();
         else onMas();
       }}
-      className={`relative flex min-h-[4.25rem] w-full flex-col items-center justify-center gap-0.5 rounded-xl border-2 px-1.5 py-2 text-center disabled:opacity-35 ${
+      className={`relative flex min-h-[3.75rem] w-full flex-col items-center justify-center gap-0.5 rounded-xl border-2 px-1.5 py-2 text-center disabled:opacity-35 ${
         activo ? clases.activo : clases.reposo
       }`}
     >
-      <span className={`${grande ? 'text-2xl' : 'text-[13px]'} font-black leading-tight`}>{titulo}</span>
+      <span className={`${grande ? 'text-xl' : 'text-[13px]'} font-bold leading-tight`}>{titulo}</span>
       {aclaracion && <span className="text-[10px] font-semibold leading-tight opacity-75">{aclaracion}</span>}
-      {subtitulo && <span className="text-[11px] font-bold leading-tight opacity-80">{subtitulo}</span>}
+      {subtitulo && <span className="text-[11px] font-semibold leading-tight opacity-80">{subtitulo}</span>}
       {activo && maximo > 1 && (
-        <span className="absolute -right-1.5 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-oro px-1.5 text-xs font-black text-tinta-oro shadow">
+        <span className="absolute -right-1.5 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-oro px-1.5 text-xs font-bold text-tinta-oro shadow">
           ×{cantidad}
         </span>
       )}

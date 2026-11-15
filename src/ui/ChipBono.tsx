@@ -28,11 +28,11 @@ export function ChipBono({ nombre, detalle, cantidad, maximo, onMas, onBorrar, m
         className={`flex min-h-12 w-full items-center justify-between gap-2 px-3 py-2 text-left disabled:opacity-40 ${activo ? 'opcion opcion-sel' : 'opcion'}`}
       >
         <span className="min-w-0">
-          <span className="block text-sm font-extrabold leading-tight text-tinta">{nombre}</span>
+          <span className="block text-sm font-semibold leading-tight text-tinta">{nombre}</span>
           <span className="block text-xs font-semibold text-slate-500">{detalle}</span>
         </span>
         {activo && maximo > 1 && (
-          <span className="flex h-8 min-w-8 shrink-0 items-center justify-center rounded-full bg-oro px-2 text-sm font-black text-tinta-oro">
+          <span className="flex h-8 min-w-8 shrink-0 items-center justify-center rounded-full bg-oro px-2 text-sm font-bold text-tinta-oro">
             ×{cantidad}
           </span>
         )}

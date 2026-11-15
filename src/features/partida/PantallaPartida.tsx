@@ -53,7 +53,7 @@ export function PantallaPartida() {
           <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma px-3 py-2 text-sm">
             ← Menú
           </button>
-          <span className="text-[10px] font-black uppercase tracking-widest text-amber-100">Partida en curso</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-amber-100">Partida en curso</span>
         </div>
 
         <div className="flex items-center justify-between gap-2">
@@ -69,10 +69,10 @@ export function PantallaPartida() {
               </svg>
             </button>
             <div>
-              <span className="block text-xs font-black uppercase tracking-widest text-amber-100">
+              <span className="block text-xs font-bold uppercase tracking-widest text-amber-100">
                 Ronda {rondaVisible} de {totalRondas}
               </span>
-              <h2 className="font-display text-lg font-black leading-tight text-white">
+              <h2 className="font-display text-lg font-bold leading-tight text-white">
                 {cartasPorJugadorVisibles} carta{cartasPorJugadorVisibles > 1 ? 's' : ''} en juego
               </h2>
             </div>
@@ -94,7 +94,7 @@ export function PantallaPartida() {
                 onClick={() => tocarRonda(numero)}
                 aria-current={esActual ? 'step' : undefined}
                 aria-label={esActual ? `Ronda ${numero}, en curso` : esPasada ? `Corregir ronda ${numero}` : `Ronda ${numero}`}
-                className={`flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full text-base font-black ${
+                className={`flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full text-base font-bold ${
                   esActual
                     ? 'border-2 border-oro bg-oro text-tinta-oro'
                     : esPasada
@@ -133,7 +133,7 @@ export function PantallaPartida() {
                 className="flex flex-1 flex-col items-center gap-1 rounded-lg px-0.5 py-1 disabled:cursor-default"
               >
                 <span className={`h-1.5 w-full rounded-full ${esActual ? 'bg-white' : puedeVolver ? 'bg-amber-200' : 'bg-white/20'}`} />
-                <span className={`text-[10px] font-black uppercase ${esActual ? 'text-white' : puedeVolver ? 'text-amber-100' : 'text-white/40'}`}>
+                <span className={`text-[10px] font-bold uppercase ${esActual ? 'text-white' : puedeVolver ? 'text-amber-100' : 'text-white/40'}`}>
                   {i + 1}. {etiqueta}
                 </span>
               </button>
@@ -143,7 +143,7 @@ export function PantallaPartida() {
 
         {editandoRondaAnterior && (
           <div className="flex items-center justify-between gap-2 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2">
-            <span className="text-xs font-black text-amber-900">✏️ Corrigiendo la ronda {rondaActual}</span>
+            <span className="text-xs font-bold text-amber-900">✏️ Corrigiendo la ronda {rondaActual}</span>
             <button type="button" onClick={cancelarModificacionRondaAnterior} className="btn-claro px-2.5 py-1 text-[11px]">
               Cancelar corrección
             </button>

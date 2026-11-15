@@ -32,7 +32,7 @@ function Opcion({
       aria-pressed={activa}
       disabled={deshabilitada}
       onClick={onClick}
-      className={`min-h-11 px-3 py-2 text-sm font-bold leading-tight disabled:opacity-35 ${
+      className={`min-h-11 px-3 py-2 text-sm font-semibold leading-tight disabled:opacity-35 ${
         activa ? 'opcion opcion-sel' : 'opcion'
       }`}
     >
@@ -68,7 +68,7 @@ function TogglesBribon({
               vibrar();
               onElegir(pts);
             }}
-            className={`min-h-11 py-3 text-base font-black disabled:opacity-40 ${
+            className={`min-h-11 py-3 text-base font-bold disabled:opacity-40 ${
               activo ? 'opcion opcion-sel' : 'opcion'
             }`}
           >
@@ -169,7 +169,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
           type="button"
           aria-pressed={sel === -1}
           onClick={() => elegir(-1)}
-          className={`min-h-12 rounded-xl border-2 border-red-500 bg-red-50 py-3 text-base font-extrabold text-red-800 ${
+          className={`min-h-12 rounded-xl border-2 border-red-500 bg-red-50 py-3 text-base font-semibold text-red-800 ${
             sel === -1 ? 'ring-4 ring-red-300' : ''
           }`}
         >
@@ -179,7 +179,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
           type="button"
           aria-pressed={sel === 1}
           onClick={() => elegir(1)}
-          className={`min-h-12 rounded-xl border-2 border-emerald-500 bg-emerald-50 py-3 text-base font-extrabold text-emerald-800 ${
+          className={`min-h-12 rounded-xl border-2 border-emerald-500 bg-emerald-50 py-3 text-base font-semibold text-emerald-800 ${
             sel === 1 ? 'ring-4 ring-emerald-300' : ''
           }`}
         >
@@ -203,7 +203,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
         </p>
       ) : (
         <>
-          <span className="text-left text-lg font-black text-tinta">
+          <span className="text-left text-lg font-bold text-tinta">
             Habilidad pirata de <span className="text-azul">{nombre}</span>
           </span>
 
@@ -240,7 +240,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
 
           {habilidadEfectiva === 'bribon_rotan' && (
             <div className="flex flex-col gap-2 text-left">
-              <span className="text-sm font-bold uppercase text-slate-500">
+              <span className="text-sm font-semibold uppercase text-slate-500">
                 Puntos en juego (+ si cumple, − si falla)
               </span>
               <TogglesBribon
@@ -268,7 +268,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
 
           {kongActivo && habilidadEfectiva === 'kong' && (
             <div className="flex flex-col gap-2.5 text-left">
-              <span className="text-sm font-bold uppercase text-slate-500">Kong copia la habilidad de:</span>
+              <span className="text-sm font-semibold uppercase text-slate-500">Kong copia la habilidad de:</span>
               <div className="grid grid-cols-2 gap-2">
                 <Opcion
                   activa={copiadaEfectiva === 'Bribón de Roatán'}
@@ -315,14 +315,14 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
 
       {registroHabilidadesRonda.length > 0 && (
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-bold uppercase text-slate-500">Habilidades en esta ronda</span>
+          <span className="text-sm font-semibold uppercase text-slate-500">Habilidades en esta ronda</span>
           {registroHabilidadesRonda.map((h, idx) => (
             <div
               key={h.id}
               className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-base"
             >
               <div className="flex flex-col text-left">
-                <span className="font-bold text-azul">
+                <span className="font-semibold text-azul">
                   {h.etiqueta} <span className="text-sm text-slate-500">({h.jugadorNombre})</span>
                 </span>
                 <span className="mt-0.5 text-sm text-slate-500">{h.detalle}</span>
@@ -331,7 +331,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
                 type="button"
                 onClick={() => eliminarRegistroHabilidad(idx)}
                 aria-label={`Quitar ${h.etiqueta}`}
-                className="min-h-10 min-w-10 rounded bg-slate-100 px-2 py-1 text-base font-bold text-red-700"
+                className="min-h-10 min-w-10 rounded bg-slate-100 px-2 py-1 text-base font-semibold text-red-700"
               >
                 ✕
               </button>

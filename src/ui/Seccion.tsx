@@ -22,7 +22,7 @@ export function Seccion({ titulo, numero, marcador, abierto = true, onToggle, ch
       </h3>
       <span className="flex items-center gap-2">
         {marcador !== undefined && <span className="marcador">{marcador}</span>}
-        {onToggle && <span className="text-sm font-bold text-azul">{abierto ? '▲' : '▼'}</span>}
+        {onToggle && <span className="text-sm font-semibold text-azul">{abierto ? '▲' : '▼'}</span>}
       </span>
     </>
   );

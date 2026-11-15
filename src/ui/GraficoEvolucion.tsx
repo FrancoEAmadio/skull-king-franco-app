@@ -208,7 +208,7 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
 
       {detalle && indiceActivo !== null && (
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
-          <span className="mb-1.5 block text-sm font-black uppercase tracking-wide text-azul">
+          <span className="mb-1.5 block text-sm font-bold uppercase tracking-wide text-azul">
             {indiceActivo === 0 ? 'Punto de partida' : `Tras la ${etiquetaX(indiceActivo)}`}
           </span>
           <ul className="grid grid-cols-2 gap-x-3 gap-y-1">
@@ -219,7 +219,7 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
                   <span className="inline-block h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: fila.color }} />
                   <span className="truncate">{fila.nombre}</span>
                 </span>
-                <span className={`font-black ${fila.valor >= 0 ? 'text-tinta' : 'text-rojo-osc'}`}>
+                <span className={`font-bold ${fila.valor >= 0 ? 'text-tinta' : 'text-rojo-osc'}`}>
                   {formatear(fila.valor)}
                 </span>
               </li>
@@ -238,7 +238,7 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
               role="switch"
               aria-checked={prendida}
               onClick={() => alternar(serie.nombre)}
-              className={`flex min-h-11 items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-bold ${
+              className={`flex min-h-11 items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-semibold ${
                 prendida
                   ? 'border-oro bg-amber-50 text-tinta'
                   : 'border-slate-200 bg-slate-100 text-slate-400 line-through'

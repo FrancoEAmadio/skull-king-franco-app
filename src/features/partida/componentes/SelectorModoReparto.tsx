@@ -37,7 +37,7 @@ export function SelectorModoReparto({
           aria-haspopup="listbox"
           aria-expanded={abierto}
           onClick={() => setAbierto(!abierto)}
-          className="opcion opcion-sel flex min-h-12 w-full items-center justify-between px-4 text-left text-sm font-extrabold"
+          className="opcion opcion-sel flex min-h-12 w-full items-center justify-between px-4 text-left text-sm font-semibold"
         >
           <span>
             {modoSeleccionado?.icono} {modoSeleccionado?.nombre}
@@ -57,7 +57,7 @@ export function SelectorModoReparto({
                       onCambiarModo(modo.id);
                       setAbierto(false);
                     }}
-                    className={`flex min-h-11 w-full items-center justify-between rounded-lg px-3 text-left text-sm font-bold ${
+                    className={`flex min-h-11 w-full items-center justify-between rounded-lg px-3 text-left text-sm font-semibold ${
                       activo ? 'bg-amber-100 text-tinta' : 'text-tinta hover:bg-slate-200'
                     }`}
                   >
@@ -75,7 +75,7 @@ export function SelectorModoReparto({
 
       <div className="flex items-center justify-between gap-3 rounded-xl bg-slate-50 px-3 py-2 text-xs">
         <span className="font-semibold text-slate-500">Esta partida</span>
-        <span className="text-right font-black text-azul">
+        <span className="text-right font-bold text-azul">
           {vistaPrevia.length} ronda{vistaPrevia.length === 1 ? '' : 's'} ({textoVistaPrevia(vistaPrevia)} carta
           {vistaPrevia.length === 1 && vistaPrevia[0] === 1 ? '' : 's'})
         </span>

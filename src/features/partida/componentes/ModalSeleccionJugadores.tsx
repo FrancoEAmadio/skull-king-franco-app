@@ -131,7 +131,7 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
         <div className="scroll-oculto flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto p-4">
           {jugadoresFiltrados.length > 0 ? (
             <>
-              <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Tocá en el orden en que juegan</span>
+              <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Tocá en el orden en que juegan</span>
               {jugadoresFiltrados.map((jugador) => (
                 <TarjetaSeleccionJugador
                   key={jugador.id}
