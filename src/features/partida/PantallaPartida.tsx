@@ -78,7 +78,7 @@ export function PantallaPartida() {
             </div>
           </div>
           <button type="button" onClick={abrirPodio} aria-label="Ver tabla de puntajes" className="btn-claro px-3.5 py-2.5 text-xs">
-            🏆 Tabla
+            Tabla
           </button>
         </div>
 
@@ -111,10 +111,10 @@ export function PantallaPartida() {
         {pasoPartida !== 'resumen' && jugadorInicial && jugadorReparte && (
           <div className="flex items-center justify-between gap-2 rounded-xl bg-white/10 px-3 py-1.5 text-[11px] text-amber-50">
             <span className="min-w-0 truncate">
-              ⚓ Arranca: <strong className="text-white">{jugadorInicial.nombre}</strong>
+              Arranca: <strong className="text-white">{jugadorInicial.nombre}</strong>
             </span>
             <span className="min-w-0 truncate">
-              🃏 Reparte: <strong className="text-white">{jugadorReparte.nombre}</strong>
+              Reparte: <strong className="text-white">{jugadorReparte.nombre}</strong>
             </span>
           </div>
         )}

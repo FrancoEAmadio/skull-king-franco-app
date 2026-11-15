@@ -1,3 +1,4 @@
+import { VERSION_APP } from './constantes';
 import { AppProvider, useApp } from './estado/AppProvider';
 import { PantallaInicio } from './features/inicio/PantallaInicio';
 import { PantallaNuevaPartida } from './features/partida/PantallaNuevaPartida';
@@ -14,7 +15,7 @@ function ContenidoApp() {
   const { pantallaActual } = useApp();
 
   return (
-    <div className="contenedor-app max-w-md mx-auto min-h-dvh flex flex-col justify-between">
+    <div className="contenedor-app mx-auto flex min-h-dvh w-full max-w-md flex-col justify-between md:max-w-5xl md:px-6">
       {pantallaActual === 'inicio' && <PantallaInicio />}
       {pantallaActual === 'nueva_partida' && <PantallaNuevaPartida />}
       {pantallaActual === 'partida' && <PantallaPartida />}
@@ -22,6 +23,7 @@ function ContenidoApp() {
       {pantallaActual === 'reglas' && <PantallaReglas />}
 
       <footer className="pie-pagina mt-6 w-full pt-3 text-center text-xs font-medium text-amber-100/80">
+        <span className="mb-1 block font-bold text-amber-100">Versión {VERSION_APP}</span>
         <span className="block">Desarrollado por Franco Ezequiel Amadio</span>
         <span className="block">Colaboración de Mateo Álvarez</span>
       </footer>

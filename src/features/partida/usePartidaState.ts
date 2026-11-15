@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { avatarDe } from '../../datos/avatares';
 import type {
   AlianzaBotin,
@@ -22,11 +22,11 @@ import {
 } from '../../constantes';
 import {
   borrarHistorial,
-  borrarPartidaGuardada,
+  borrarPartidaPorId,
   cargarHistorial,
-  cargarPartidaGuardada,
+  cargarPartidasGuardadas,
   guardarHistorial,
-  guardarPartida,
+  guardarPartidaEnLista,
 } from '../../infra/almacenamiento';
 import { obtenerCartasPorRondaDelModo } from '../../datos/modosReparto';
 import {
@@ -161,7 +161,9 @@ export function usePartidaState({
   const [registroHabilidadesRonda, setRegistroHabilidadesRonda] = useState<RegistroHabilidad[]>([]);
   const [resumenRondaActual, setResumenRondaActual] = useState<ResumenRondaJugador[]>([]);
 
-  const [hayPartidaGuardada, setHayPartidaGuardada] = useState(false);
+  const [partidasGuardadas, setPartidasGuardadas] = useState<PartidaGuardada[]>([]);
+  const partidaIdRef = useRef<string>('');
+  const hayPartidaGuardada = partidasGuardadas.length > 0;
   const [partidaFinalizada, setPartidaFinalizada] = useState(false);
   const [partidaPendienteFinalizar, setPartidaPendienteFinalizar] = useState(false);
   const [editandoRondaAnterior, setEditandoRondaAnterior] = useState(false);
@@ -188,8 +190,10 @@ export function usePartidaState({
       /* sin acceso a localStorage: se omite */
     }
 
-    const partida = cargarPartidaGuardada();
-    if (!partida) return;
+    setPartidasGuardadas(cargarPartidasGuardadas());
+  }, []);
+
+  const aplicarPartidaGuardada = (partida: PartidaGuardada) => {
 
     const configuracionCargada = normalizarConfiguracionPorModo({
       ...CONFIG_INICIAL,
@@ -218,7 +222,7 @@ export function usePartidaState({
       }
     );
 
-    setHayPartidaGuardada(true);
+    partidaIdRef.current = partida.id;
     setJugadores(jugadoresCargados);
     setRondaActual(partida.rondaActual);
     setConfiguracionMesa(configuracionCargada);
@@ -246,7 +250,7 @@ export function usePartidaState({
     setBackupRondaActual(partida.backupRondaActual);
     setUltimaRondaEditable(partida.ultimaRondaEditable);
     setPartidaPendienteFinalizar(partida.partidaPendienteFinalizar);
-  }, []);
+  };
 
   const totalRondas = cartasPorRondaActivas.length || 10;
 
@@ -373,7 +377,10 @@ export function usePartidaState({
 
   const persistirPartida = useCallback(
     (parcial: Partial<PartidaGuardada> = {}) => {
+      if (!partidaIdRef.current) partidaIdRef.current = `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
       const partida: PartidaGuardada = {
+        id: partidaIdRef.current,
+        actualizada: new Date().toISOString(),
         jugadores,
         rondaActual,
         configuracionMesa,
@@ -389,8 +396,8 @@ export function usePartidaState({
         partidaPendienteFinalizar,
         ...parcial,
       };
-      guardarPartida(partida);
-      setHayPartidaGuardada(true);
+      guardarPartidaEnLista(partida);
+      setPartidasGuardadas(cargarPartidasGuardadas());
     },
     [
       jugadores,
@@ -442,6 +449,7 @@ export function usePartidaState({
       .filter((jug): jug is JugadorPermanente => Boolean(jug))
       .map(crearJugadorDePartida);
 
+    partidaIdRef.current = `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
     setConfiguracionMesa(configuracionActiva);
     setCartasPorRondaActivas(cartas);
     setJugadores(nuevosJugadores);
@@ -659,8 +667,9 @@ export function usePartidaState({
         jugadores,
         configuracion: configuracionMesa,
         cartasPorJugadorEnRonda,
+        ...contextoExtraBonos,
       }),
-    [jugadorSeleccionadoIdx, jugadores, configuracionMesa, cartasPorJugadorEnRonda]
+    [jugadorSeleccionadoIdx, jugadores, configuracionMesa, cartasPorJugadorEnRonda, contextoExtraBonos]
   );
 
   const motivoTopeBonoCb = useCallback(
@@ -1001,8 +1010,8 @@ export function usePartidaState({
 
       setJugadores(conBlancas.jugadores);
       setResumenRondaActual(conBlancas.resumen);
-      borrarPartidaGuardada();
-      setHayPartidaGuardada(false);
+      borrarPartidaPorId(partidaIdRef.current);
+      setPartidasGuardadas(cargarPartidasGuardadas());
       setPartidaPendienteFinalizar(false);
       setPartidaFinalizada(true);
       setPasoPartida('resumen');
@@ -1170,10 +1179,27 @@ export function usePartidaState({
   }, [editandoRondaAnterior, backupRondaActual, configuracionMesa]);
 
   const descartarPartidaActual = useCallback(() => {
-    borrarPartidaGuardada();
-    setHayPartidaGuardada(false);
+    borrarPartidaPorId(partidaIdRef.current);
+    setPartidasGuardadas(cargarPartidasGuardadas());
     setPantallaActual('inicio');
   }, [setPantallaActual]);
+
+  const continuarPartida = useCallback(
+    (id: string) => {
+      const partida = cargarPartidasGuardadas().find((p) => p.id === id);
+      if (!partida) return;
+      aplicarPartidaGuardada(partida);
+      setPartidaFinalizada(false);
+      setPantallaActual('partida');
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setPantallaActual]
+  );
+
+  const descartarPartidaPorId = useCallback((id: string) => {
+    borrarPartidaPorId(id);
+    setPartidasGuardadas(cargarPartidasGuardadas());
+  }, []);
 
   const eliminarPartidaHistorial = useCallback(
     (indice: number) => {
@@ -1229,6 +1255,7 @@ export function usePartidaState({
     configuracionMesa,
     setConfiguracionMesa,
     idsJugadoresSeleccionados,
+    borrarSeleccionJugadores: () => setIdsJugadoresSeleccionados([]),
     alternarSeleccionJugador,
     posicionSeleccion,
     // estado de partida
@@ -1243,6 +1270,9 @@ export function usePartidaState({
     registroHabilidadesRonda,
     resumenRondaActual,
     hayPartidaGuardada,
+    partidasGuardadas,
+    continuarPartida,
+    descartarPartidaPorId,
     partidaFinalizada,
     partidaPendienteFinalizar,
     editandoRondaAnterior,

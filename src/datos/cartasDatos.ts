@@ -19,11 +19,11 @@ export const CATALOGO_CARTAS_WIKI: CartaWiki[] = [
     modo: 'Expansión',
     cantidad: '1 carta',
     imagen: 'archivos/cartas/primer_oficial_kong.webp',
-    habilidad: 'Gana a piratas normales. Pierde contra Sirena y Skull King. Si gana una baza, copia las habilidades de los piratas capturados.',
+    habilidad: 'Copia la habilidad de un pirata jugado antes que él en la baza. Si no hay ninguno, no hace nada. Capturarlo no da puntos: solo suma +30 al jugador cuyo Skull King o Sirena lo captura.',
     ganaContra: 'Todos los números y Piratas estándar',
     pierdeContra: 'Sirenas y Skull King',
     bonificacion: '+30 pts si es capturado por Skull King o Sirena',
-    descripcion: 'Jerarquía pirata superior. Al ganar la mano imita y copia las habilidades de los piratas derrotados.',
+    descripcion: 'Jerarquía pirata superior. Al jugarse imita la habilidad de un pirata que ya se jugó antes en esa baza, aunque después lo capturen.',
   },
   {
     id: 'sirena',

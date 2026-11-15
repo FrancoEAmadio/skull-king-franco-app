@@ -2,6 +2,7 @@ import {
   CLAVE_LS_HISTORIAL,
   CLAVE_LS_JUGADORES_PERMANENTES,
   CLAVE_LS_PARTIDA_GUARDADA,
+  CLAVE_LS_PARTIDAS,
 } from '../constantes';
 import { MAX_PARTIDAS_EVOLUCION } from '../constantes';
 import { crearEstadisticasVacias, recalcularEstadisticasDesdeHistorial } from '../dominio/estadisticas';
@@ -51,15 +52,11 @@ export function borrarHistorial(): void {
   localStorage.removeItem(CLAVE_LS_HISTORIAL);
 }
 
-export function cargarPartidaGuardada(): PartidaGuardada | null {
-  const partida = leerJson<PartidaGuardada & { configuracionMesa?: { reglasOpcionales?: Record<string, unknown> } }>(
-    CLAVE_LS_PARTIDA_GUARDADA
-  );
-  if (!partida) return null;
+function normalizarPartida(partida: PartidaGuardada): PartidaGuardada {
 
   // Migración defensiva del campo obsoleto reglasOpcionales.cartas7y8
   if (partida.configuracionMesa?.reglasOpcionales) {
-    delete (partida.configuracionMesa.reglasOpcionales as Record<string, unknown>).cartas7y8;
+    delete (partida.configuracionMesa.reglasOpcionales as unknown as Record<string, unknown>).cartas7y8;
   }
 
   partida.ultimaRondaEditable ??= null;
@@ -87,16 +84,39 @@ export function cargarPartidaGuardada(): PartidaGuardada | null {
     backup.resumenRondaActual ??= [];
   }
 
+  partida.id ??= `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+  partida.actualizada ??= new Date().toISOString();
   return partida as PartidaGuardada;
 }
 
-export function guardarPartida(partida: PartidaGuardada): void {
-  escribirJson(CLAVE_LS_PARTIDA_GUARDADA, partida);
+/** Lista de partidas en curso (la más reciente primero). Migra el guardado único anterior. */
+export function cargarPartidasGuardadas(): PartidaGuardada[] {
+  let lista = leerJson<PartidaGuardada[]>(CLAVE_LS_PARTIDAS);
+  if (!Array.isArray(lista)) lista = [];
+  const antigua = leerJson<PartidaGuardada>(CLAVE_LS_PARTIDA_GUARDADA);
+  if (antigua) {
+    lista.push(antigua);
+    localStorage.removeItem(CLAVE_LS_PARTIDA_GUARDADA);
+    escribirJson(CLAVE_LS_PARTIDAS, lista.map(normalizarPartida));
+  }
+  return lista
+    .filter((p) => p && Array.isArray(p.jugadores))
+    .map(normalizarPartida)
+    .sort((x, y) => y.actualizada.localeCompare(x.actualizada));
 }
 
-export function borrarPartidaGuardada(): void {
-  localStorage.removeItem(CLAVE_LS_PARTIDA_GUARDADA);
+export function guardarPartidaEnLista(partida: PartidaGuardada): void {
+  const resto = cargarPartidasGuardadas().filter((p) => p.id !== partida.id);
+  escribirJson(CLAVE_LS_PARTIDAS, [partida, ...resto]);
 }
+
+export function borrarPartidaPorId(id: string): void {
+  escribirJson(
+    CLAVE_LS_PARTIDAS,
+    cargarPartidasGuardadas().filter((p) => p.id !== id)
+  );
+}
+
 
 // ── Copia de seguridad (exportar / importar) ────────────────────────────
 

@@ -1,54 +1,116 @@
+import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { useInstalarPWA } from '../../ui/useInstalarPWA';
+import { Modal } from '../../ui/Modal';
+import { ModalConfirmacion } from '../../ui/ModalConfirmacion';
+
+function formatearFecha(iso: string): string {
+  try {
+    return new Date(iso).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return '';
+  }
+}
 
 export function PantallaInicio() {
   const { setPantallaActual, partida, setAjustesAbiertos } = useApp();
   const { puedeInstalar, instalar, mostrarAyudaIOS } = useInstalarPWA();
+  const [eligiendo, setEligiendo] = useState(false);
+  const [aDescartar, setADescartar] = useState<string | null>(null);
+
+  const continuar = () => {
+    if (partida.partidasGuardadas.length === 1) partida.continuarPartida(partida.partidasGuardadas[0].id);
+    else setEligiendo(true);
+  };
 
   return (
     <main className="entrar my-auto flex w-full flex-col items-center py-4 text-center">
       <img
         src="./archivos/iconos/tapa.png"
         alt="Manual de Skull King"
-        className="h-auto max-h-[24dvh] w-auto max-w-full rounded-3xl border border-oro/40 object-contain shadow-2xl"
+        className="mb-6 h-auto w-full rounded-3xl border border-oro/40 object-cover shadow-2xl"
       />
-      <h1 className="mt-3 font-display text-5xl font-black tracking-wide text-oro-claro drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">Skull King</h1>
-      <p className="mb-8 mt-2 text-xs font-bold uppercase tracking-[0.25em] text-white">Anotador de puntos</p>
 
       <div className="flex w-full flex-col gap-3">
         <button type="button" onClick={partida.irANuevaPartida} className="btn-dorado w-full py-4 text-lg">
-          🏴‍☠️ Nueva Partida
+          Nueva Partida
         </button>
         {partida.hayPartidaGuardada && (
-          <button type="button" onClick={() => setPantallaActual('partida')} className="btn-primario latir w-full py-4 text-lg">
-            ▶ Continuar Partida
+          <button type="button" onClick={continuar} className="btn-oscuro w-full py-4 text-lg">
+            Continuar Partida{partida.partidasGuardadas.length > 1 ? ` (${partida.partidasGuardadas.length})` : ''}
           </button>
         )}
         <button type="button" onClick={() => setPantallaActual('jugadores')} className="btn-claro w-full py-4 text-lg">
           Jugadores, Estadísticas e Historial
         </button>
         <button type="button" onClick={() => setPantallaActual('reglas')} className="btn-claro w-full py-4 text-lg">
-          📖 Manual, Cartas y Reglas
+          Manual, Cartas y Reglas
         </button>
       </div>
 
       <div className="mt-6 flex w-full flex-col items-center gap-2">
         {puedeInstalar && (
           <button type="button" onClick={() => void instalar()} className="btn-fantasma w-full py-3 text-sm">
-            📲 Instalar la app en este dispositivo
+            Instalar la app en este dispositivo
           </button>
         )}
         {mostrarAyudaIOS && (
-          <p className="text-xs text-amber-100">📲 Para instalarla en iPhone: tocá Compartir y elegí «Añadir a pantalla de inicio».</p>
+          <p className="text-xs text-amber-100">Para instalarla en iPhone: tocá Compartir y elegí «Añadir a pantalla de inicio».</p>
         )}
         <button
           type="button"
           onClick={() => setAjustesAbiertos(true)}
-          className="min-h-11 px-3 py-2 text-xs font-bold text-amber-100 underline underline-offset-4"
+          className="min-h-11 px-3 py-2 text-sm font-bold text-amber-100 underline underline-offset-4"
         >
-          ⚙️ Ajustes y copia de seguridad
+          Ajustes y copia de seguridad
         </button>
       </div>
+
+      <Modal abierto={eligiendo} onCerrar={() => setEligiendo(false)} ancho="max-w-md" cerrarAlHacerClickAfuera>
+        <div className="flex max-h-[85dvh] flex-col gap-3 overflow-y-auto p-4 text-left">
+          <h2 className="font-display text-xl font-black text-azul">Elegí qué partida continuar</h2>
+          {partida.partidasGuardadas.map((p) => (
+            <div key={p.id} className="opcion flex items-center gap-2 p-3">
+              <button
+                type="button"
+                className="min-w-0 flex-1 text-left"
+                onClick={() => { setEligiendo(false); partida.continuarPartida(p.id); }}
+              >
+                <span className="block truncate text-sm font-extrabold text-tinta">
+                  {p.jugadores.map((j) => j.nombre).join(', ')}
+                </span>
+                <span className="block text-xs font-semibold text-slate-500">
+                  Ronda {p.rondaActual} de {p.cartasPorRondaActivas.length || 10} · {formatearFecha(p.actualizada)}
+                </span>
+              </button>
+              <button
+                type="button"
+                className="btn-peligro shrink-0 px-3 py-2 text-xs"
+                onClick={() => setADescartar(p.id)}
+              >
+                Borrar
+              </button>
+            </div>
+          ))}
+          <button type="button" onClick={() => setEligiendo(false)} className="btn-claro w-full py-3">
+            Cerrar
+          </button>
+        </div>
+      </Modal>
+
+      <ModalConfirmacion
+        abierto={aDescartar !== null}
+        titulo="¿Borrar esta partida?"
+        descripcion="Se descarta la partida sin guardarla en el historial."
+        textoConfirmar="Borrar"
+        onConfirmar={() => {
+          if (aDescartar) partida.descartarPartidaPorId(aDescartar);
+          setADescartar(null);
+          if (partida.partidasGuardadas.length <= 1) setEligiendo(false);
+        }}
+        onCancelar={() => setADescartar(null)}
+        zIndex="z-[70]"
+      />
     </main>
   );
 }

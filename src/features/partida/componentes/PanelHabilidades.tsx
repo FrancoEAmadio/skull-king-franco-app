@@ -157,21 +157,23 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
       <div className="grid grid-cols-2 gap-2">
         <button
           type="button"
-          onClick={() => elegir(1)}
-          className={`min-h-11 rounded-xl border-2 py-2.5 text-sm font-extrabold ${
-            sel === 1 ? 'border-emerald-500 bg-emerald-50 text-emerald-800' : 'border-slate-300 bg-white text-tinta'
-          }`}
-        >
-          +1 al envite
-        </button>
-        <button
-          type="button"
+          aria-pressed={sel === -1}
           onClick={() => elegir(-1)}
-          className={`min-h-11 rounded-xl border-2 py-2.5 text-sm font-extrabold ${
-            sel === -1 ? 'border-red-500 bg-red-50 text-red-800' : 'border-slate-300 bg-white text-tinta'
+          className={`min-h-12 rounded-xl border-2 border-red-500 bg-red-50 py-3 text-base font-extrabold text-red-800 ${
+            sel === -1 ? 'ring-4 ring-red-300' : ''
           }`}
         >
           −1 al envite
+        </button>
+        <button
+          type="button"
+          aria-pressed={sel === 1}
+          onClick={() => elegir(1)}
+          className={`min-h-12 rounded-xl border-2 border-emerald-500 bg-emerald-50 py-3 text-base font-extrabold text-emerald-800 ${
+            sel === 1 ? 'ring-4 ring-emerald-300' : ''
+          }`}
+        >
+          +1 al envite
         </button>
       </div>
     );

@@ -6,6 +6,7 @@ import type { ModoContenido } from '../../tipos';
 import { useGestosMultiDedo } from '../../ui/useGestosMultiDedo';
 import { FichaCarta } from './FichaCarta';
 import { Jerarquias } from './Jerarquias';
+import { ImagenCarta } from '../../ui/ImagenCarta';
 
 type Vista = 'reglas' | 'jerarquias';
 
@@ -20,23 +21,28 @@ const MODOS: { id: ModoContenido; etiqueta: string; carta: string }[] = [
   { id: 'expansion', etiqueta: 'Expansión', carta: 'Expansión' },
 ];
 
-/** Cartas que ilustran una regla: se deciden por el título de la regla (nada de adivinar por el texto). */
-const IMAGENES_REGLA: [RegExp, string[]][] = [
-  [/Palos y Jerarqu/i, ['palo_negro', 'palo_amarillo', 'palo_violeta', 'palo_verde']],
-  [/Cartas Especiales/i, ['huida', 'pirata_harry', 'sirena', 'sk']],
-  [/Kraken/i, ['kraken']],
-  [/Ballena/i, ['ballena']],
-  [/Aguas Turbulentas/i, ['kraken', 'ballena']],
-  [/Botín/i, ['botin']],
-  [/Monito/i, ['monito15']],
-  [/Nuevos Piratas/i, ['mary_thorne', 'kong']],
-  [/Monstruos Marinos/i, ['raya_moteada', 'davy_jones']],
-  [/Acciones Especiales/i, ['tablon', 'last_volley']],
-  [/Cartas Blancas/i, ['carta_blanca_base']],
+/** Cartas que ilustran cada párrafo de una regla: la foto va justo debajo del párrafo que la nombra. */
+const IMAGENES_PARRAFO: [RegExp, string[]][] = [
+  [/^PALOS DE COLOR/i, ['palo_amarillo', 'palo_violeta', 'palo_verde']],
+  [/^PALO NEGRO/i, ['palo_negro']],
+  [/^🏳️ HUÍDA/i, ['huida']],
+  [/^⚔️ PIRATAS/i, ['pirata_harry', 'sirena', 'sk']],
+  [/^Los piratas no le temen/i, ['kraken']],
+  [/^La Ballena Blanca afecta/i, ['ballena']],
+  [/^Cuando el Kraken y la Ballena/i, ['kraken', 'ballena']],
+  [/^Cuando juegas una carta de Botín/i, ['botin']],
+  [/^El Mono 15/i, ['monito15']],
+  [/^🏴‍☠️ MARY THORNE/i, ['mary_thorne']],
+  [/^🧤 PRIMER OFICIAL KONG/i, ['kong']],
+  [/^🐟 MANTARRAYA/i, ['raya_moteada']],
+  [/^👻 DAVY JONES/i, ['davy_jones']],
+  [/^💣 ÚLTIMA DESCARGA/i, ['last_volley']],
+  [/^🪵 CAMINAR POR LA TABLA/i, ['tablon']],
+  [/^Si al recibir tu mano inicial/i, ['carta_blanca_base']],
 ];
 
-function mencionadas(titulo: string): string[] {
-  return IMAGENES_REGLA.find(([re]) => re.test(titulo))?.[1] ?? [];
+function cartasDelParrafo(parrafo: string): string[] {
+  return IMAGENES_PARRAFO.find(([re]) => re.test(parrafo.trim()))?.[1] ?? [];
 }
 
 export function PantallaReglas() {
@@ -50,14 +56,32 @@ export function PantallaReglas() {
   const abrir = (ids: string[], titulo?: string) =>
     setFicha({ ids, titulo: titulo ?? CATALOGO_CARTAS_WIKI.find((c) => c.id === ids[0])?.nombre ?? 'Carta' });
 
+  const [dirModo, setDirModo] = useState<1 | -1>(1);
+  const [dirVista, setDirVista] = useState<1 | -1>(1);
+  const irAModo = (id: ModoContenido) => {
+    const nuevo = MODOS.findIndex((m) => m.id === id);
+    const actual = MODOS.findIndex((m) => m.id === modo);
+    if (nuevo === actual) return;
+    setDirModo(nuevo > actual ? 1 : -1);
+    setModo(id);
+  };
+  const irAVista = (id: Vista) => {
+    const nuevo = VISTAS.findIndex((v) => v.id === id);
+    const actual = VISTAS.findIndex((v) => v.id === vista);
+    if (nuevo === actual) return;
+    setDirVista(nuevo > actual ? 1 : -1);
+    setVista(id);
+  };
   const cambiarModo = (dir: 1 | -1) => {
     const i = MODOS.findIndex((m) => m.id === modo) + dir;
-    if (i >= 0 && i < MODOS.length) setModo(MODOS[i]!.id);
+    if (i >= 0 && i < MODOS.length) irAModo(MODOS[i]!.id);
   };
   const cambiarVista = (dir: 1 | -1) => {
     const i = VISTAS.findIndex((v) => v.id === vista) + dir;
-    if (i >= 0 && i < VISTAS.length) setVista(VISTAS[i]!.id);
+    if (i >= 0 && i < VISTAS.length) irAVista(VISTAS[i]!.id);
   };
+  const animModo = dirModo > 0 ? 'entra-derecha' : 'entra-izquierda';
+  const animVista = dirVista > 0 ? 'entra-derecha' : 'entra-izquierda';
   // Dos dedos: cambia de modo. Tres dedos: cambia de sección. Un dedo nunca desliza.
   const gestos = useGestosMultiDedo({ dos: cambiarModo, tres: cambiarVista });
 
@@ -68,7 +92,7 @@ export function PantallaReglas() {
           key={m.id}
           type="button"
           aria-pressed={modo === m.id}
-          onClick={() => setModo(m.id)}
+          onClick={() => irAModo(m.id)}
           className={`min-h-12 px-1 py-2 text-xs font-extrabold leading-tight ${modo === m.id ? 'opcion opcion-sel' : 'opcion'}`}
         >
           {m.etiqueta}
@@ -95,7 +119,7 @@ export function PantallaReglas() {
               key={v.id}
               type="button"
               aria-pressed={vista === v.id}
-              onClick={() => setVista(v.id)}
+              onClick={() => irAVista(v.id)}
               className={`min-h-12 px-1 py-2 text-xs leading-tight ${vista === v.id ? 'btn-primario' : 'btn-fantasma'}`}
             >
               {v.etiqueta}
@@ -106,7 +130,7 @@ export function PantallaReglas() {
       </div>
 
       {vista === 'reglas' && (
-        <div className="flex flex-col gap-2.5">
+        <div key="reglas" className={`flex flex-col gap-2.5 ${animVista}`}>
           {CATEGORIAS_REGLAS_WIKI.map((categoria) => {
             const abierta = acordeonAbierto === categoria.id;
             return (
@@ -115,7 +139,7 @@ export function PantallaReglas() {
                   type="button"
                   onClick={() => setAcordeonAbierto(abierta ? null : categoria.id)}
                   aria-expanded={abierta}
-                  className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-black ${abierta ? 'bg-azul text-white' : 'bg-white text-azul'}`}
+                  className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-black ${abierta ? 'bg-[#ead9b4] text-azul' : 'bg-white text-azul'}`}
                 >
                   <span>{categoria.titulo}</span>
                   <span>{abierta ? '▲' : '▼'}</span>
@@ -125,7 +149,6 @@ export function PantallaReglas() {
                     {categoria.items.map((regla, idx) => {
                       const clave = `${categoria.id}-${idx}`;
                       const abiertaRegla = reglasAbiertas[clave] ?? false;
-                      const cartas = mencionadas(regla.titulo);
                       return (
                         <div key={clave} className="border-b border-slate-100 pb-2 last:border-none last:pb-0">
                           <button
@@ -138,19 +161,26 @@ export function PantallaReglas() {
                           </button>
                           {abiertaRegla && (
                             <div className="mt-1 flex flex-col gap-2 rounded-lg bg-slate-50 p-3">
-                              <p className="whitespace-pre-line text-xs leading-relaxed">{regla.texto}</p>
-                              {cartas.length > 0 && (
-                                <div className="flex flex-wrap gap-2">
-                                  {cartas.map((id) => {
-                                    const c = CATALOGO_CARTAS_WIKI.find((x) => x.id === id);
-                                    return c ? (
-                                      <button key={id} type="button" onClick={() => abrir([id])} aria-label={`Ver ${c.nombre}`}>
-                                        <img src={`./${c.imagen}`} alt={c.nombre} className="h-20 rounded-md border border-slate-200 bg-white object-contain shadow" />
-                                      </button>
-                                    ) : null;
-                                  })}
-                                </div>
-                              )}
+                              {regla.texto.split('\n\n').map((parrafo, pIdx) => {
+                                const cartas = cartasDelParrafo(parrafo);
+                                return (
+                                  <div key={pIdx} className="flex flex-col gap-2">
+                                    <p className="whitespace-pre-line text-xs leading-relaxed">{parrafo}</p>
+                                    {cartas.length > 0 && (
+                                      <div className="flex flex-wrap gap-2">
+                                        {cartas.map((id) => {
+                                          const c = CATALOGO_CARTAS_WIKI.find((x) => x.id === id);
+                                          return c ? (
+                                            <button key={id} type="button" onClick={() => abrir([id])} aria-label={`Ver ${c.nombre}`}>
+                                              <ImagenCarta src={`./${c.imagen}`} alt={c.nombre} className="h-24 rounded-md border border-slate-200 bg-white object-contain shadow" />
+                                            </button>
+                                          ) : null;
+                                        })}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
@@ -168,9 +198,9 @@ export function PantallaReglas() {
               type="button"
               onClick={() => setAcordeonAbierto(acordeonAbierto === 'catalogo' ? null : 'catalogo')}
               aria-expanded={acordeonAbierto === 'catalogo'}
-              className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-black ${acordeonAbierto === 'catalogo' ? 'bg-azul text-white' : 'bg-white text-azul'}`}
+              className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-black ${acordeonAbierto === 'catalogo' ? 'bg-[#ead9b4] text-azul' : 'bg-white text-azul'}`}
             >
-              <span>🃏 Catálogo de cartas</span>
+              <span>Catálogo de cartas</span>
               <span>{acordeonAbierto === 'catalogo' ? '▲' : '▼'}</span>
             </button>
             {acordeonAbierto === 'catalogo' && (
@@ -179,10 +209,10 @@ export function PantallaReglas() {
                 <p className="text-xs text-slate-500">
                   {modo === 'base' ? 'Cartas del juego base.' : modo === 'avanzado' ? 'Solo lo que suman las reglas avanzadas.' : 'Solo lo que suma la expansión.'} Tocá una carta para ver su detalle.
                 </p>
-                <div className="grid grid-cols-3 gap-2.5">
+                <div key={modo} className={`grid grid-cols-3 gap-2.5 ${animModo}`}>
                   {cartasDelModo.map((c) => (
                     <button key={c.id} type="button" onClick={() => abrir([c.id])} className="flex flex-col items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-2">
-                      <img src={`./${c.imagen}`} alt={c.nombre} className="h-24 rounded-md border border-slate-200 bg-white object-contain" />
+                      <ImagenCarta src={`./${c.imagen}`} alt={c.nombre} className="h-24 rounded-md border border-slate-200 bg-white object-contain" />
                       <span className="text-center text-[11px] font-bold leading-tight text-tinta">{c.nombre}</span>
                     </button>
                   ))}
@@ -194,7 +224,11 @@ export function PantallaReglas() {
         </div>
       )}
 
-      {vista === 'jerarquias' && <Jerarquias modo={modo} />}
+      {vista === 'jerarquias' && (
+        <div key={`j-${modo}`} className={animModo}>
+          <Jerarquias modo={modo} />
+        </div>
+      )}
 
       <FichaCarta ids={ficha?.ids ?? null} titulo={ficha?.titulo ?? ''} onCerrar={() => setFicha(null)} />
     </main>

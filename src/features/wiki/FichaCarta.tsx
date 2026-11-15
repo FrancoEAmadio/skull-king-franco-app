@@ -1,4 +1,5 @@
 import { CATALOGO_CARTAS_WIKI } from '../../datos/cartasDatos';
+import { ImagenCarta } from '../../ui/ImagenCarta';
 import { EncabezadoModal, Modal } from '../../ui/Modal';
 
 function Campo({ etiqueta, texto }: { etiqueta: string; texto: string }) {
@@ -26,11 +27,11 @@ export function FichaCarta({ ids, titulo, onCerrar }: Props) {
         {cartas.map((c) => (
           <article key={c.id} className="tarjeta flex flex-col gap-3 p-4">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="font-display text-lg font-black text-azul">{c.nombre}</h3>
+              {cartas.length > 1 && <h3 className="font-display text-lg font-black text-azul">{c.nombre}</h3>}
               <span className="shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-black text-azul">{c.cantidad}</span>
             </div>
             <div className="flex justify-center rounded-xl bg-gradient-to-b from-amber-50 to-stone-100 p-3">
-              <img src={`./${c.imagen}`} alt={c.nombre} className="h-64 rounded-lg border border-slate-200 bg-white object-contain shadow" />
+              <ImagenCarta src={`./${c.imagen}`} alt={c.nombre} className="h-64 rounded-lg border border-slate-200 bg-white object-contain shadow" />
             </div>
             <dl className="flex flex-col gap-2">
               <p className="text-sm text-slate-700">{c.descripcion}</p>

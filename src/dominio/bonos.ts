@@ -25,6 +25,8 @@ export const EVENTOS_ESPECIALES = [
   'monstruo_davy',
 ] as const;
 
+const PALOS = ['siete_expansion', 'ocho_expansion', 'catorce_color', 'catorce_negro'] as const;
+
 const LIMITES_FIJOS: Record<string, number> = {
   catorce_negro: 1,
   catorce_color: 3,
@@ -81,7 +83,7 @@ export function esPosibleAsignacionEspeciales(asignaciones: Eventos[], ctx: Cont
   return detectarMotivoImposible(asignaciones, ctx) === null;
 }
 
-type Motivo = 'baza' | 'sk_unico' | 'sk_excluyente' | 'sirenas' | 'piratas' | 'kong' | 'monstruos' | 'mesa';
+type Motivo = 'davy_total' | 'baza' | 'sk_unico' | 'sk_excluyente' | 'sirenas' | 'piratas' | 'kong' | 'monstruos' | 'mesa';
 
 function detectarMotivoImposible(asignaciones: Eventos[], ctx: ContextoLimite): Motivo | null {
   const t = totalizar(asignaciones);
@@ -89,6 +91,13 @@ function detectarMotivoImposible(asignaciones: Eventos[], ctx: ContextoLimite): 
   const porBaza = maximoPorBaza(ctx);
 
   if (t.pirataSk > porBaza) return 'baza';
+
+  // Con los 3 monstruos destruidos, Davy Jones ocupa la baza: no queda lugar para otras capturas (solo comodines).
+  if (t.monstruos >= 3) {
+    const otros = t.pirataSk + t.skSirena + t.sirenaPirata + t.kong + habilidades + (ctx.alianzasBotin ?? 0);
+    const palos = asignaciones.reduce((acc, e) => acc + PALOS.reduce((a, id) => a + (Number(e[id]) || 0), 0), 0);
+    if (otros > 0 || palos > 0) return 'davy_total';
+  }
 
   if (t.jugadoresConPirataSk > 1 || t.skSirena > 1) return 'sk_unico';
   if (t.pirataSk > 0 && t.skSirena > 0) return 'sk_excluyente';
@@ -103,7 +112,9 @@ function detectarMotivoImposible(asignaciones: Eventos[], ctx: ContextoLimite): 
   const kongCartas = t.kong > 0 || ctx.kongEnHabilidad ? 1 : 0;
   const davyCartas = t.monstruos > 0 ? 1 : 0;
   const botinCartas = Math.min(2, ctx.alianzasBotin ?? 0);
-  const fisicas = skCartas + sirenas + piratas + kongCartas + davyCartas + t.monstruos + botinCartas;
+  // El Kong capturado necesita además la carta que lo captura (Skull King o Sirena).
+  const capturadorKong = t.kong > 0 && skCartas + sirenas === 0 ? 1 : 0;
+  const fisicas = skCartas + sirenas + piratas + kongCartas + capturadorKong + davyCartas + t.monstruos + botinCartas;
   if (fisicas > totalCartasEnMesa(ctx)) return 'mesa';
   return null;
 }
@@ -114,12 +125,32 @@ function asignacionesCon(ctx: ContextoLimite, idEvento: string, valor: number): 
   );
 }
 
+/** Cartas de palo capturables: solo las de las bazas ganadas y nunca más que las cartas de la mesa. */
+function maximoCartasPalo(idEvento: string, ctx: ContextoLimite): number {
+  const actual = ctx.jugadores[ctx.jugadorSeleccionadoIdx];
+  if (!actual) return 0;
+  if (ctx.jugadores.some((j) => (Number(j.eventosBono?.monstruo_davy) || 0) >= 3)) return 0;
+  const capturables = Math.min(totalCartasEnMesa(ctx), actual.ganadas * (ctx.jugadores.length || 2));
+  const otrasDelJugador = PALOS.filter((id) => id !== idEvento).reduce(
+    (acc, id) => acc + (Number(actual.eventosBono?.[id]) || 0),
+    0
+  );
+  const deTodos = ctx.jugadores.reduce(
+    (acc, j, idx) =>
+      idx === ctx.jugadorSeleccionadoIdx ? acc : acc + PALOS.reduce((a, id) => a + (Number(j.eventosBono?.[id]) || 0), 0),
+    0
+  );
+  const libres = Math.max(0, totalCartasEnMesa(ctx) - deTodos - otrasDelJugador);
+  return Math.max(0, Math.min(LIMITES_FIJOS[idEvento] ?? 99, capturables - otrasDelJugador, libres));
+}
+
 /**
  * Mayor valor `v` tal que la ronda completa (con lo de los demás jugadores y `v` para el jugador actual)
  * siga siendo posible. Las cartas especiales son únicas: ver `esPosibleAsignacionEspeciales`.
  */
 export function calcularMaximoDisponible(idEvento: string, ctx: ContextoLimite): number {
   if (!estaDisponibleEventoBono(idEvento, ctx.configuracion)) return 0;
+  if ((PALOS as readonly string[]).includes(idEvento)) return maximoCartasPalo(idEvento, ctx);
   if (!(EVENTOS_ESPECIALES as readonly string[]).includes(idEvento)) return LIMITES_FIJOS[idEvento] ?? 99;
 
   let maximo = 0;
@@ -135,6 +166,8 @@ export function motivoTopeBono(idEvento: string, ctx: ContextoLimite): string {
   const actual = Number(ctx.jugadores[ctx.jugadorSeleccionadoIdx]?.eventosBono?.[idEvento]) || 0;
   const motivo = detectarMotivoImposible(asignacionesCon(ctx, idEvento, actual + 1), ctx);
   switch (motivo) {
+    case 'davy_total':
+      return 'Con los 3 monstruos, Davy Jones ocupa toda la baza: solo se admiten comodines.';
     case 'baza':
       return `En una baza entran ${(ctx.jugadores.length || 2)} cartas: el Skull King captura hasta ${maximoPorBaza(ctx)}.`;
     case 'sk_unico':

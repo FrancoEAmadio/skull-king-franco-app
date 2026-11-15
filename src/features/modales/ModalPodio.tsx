@@ -97,7 +97,7 @@ export function ModalPodio() {
             </div>
           )}
           <button type="button" onClick={cerrarPodio} className="btn-dorado w-full py-3.5 text-base">
-            {partidaFinalizada ? '🏁 Finalizar y guardar' : '← Volver a la partida'}
+            {partidaFinalizada ? 'Finalizar y guardar' : '← Volver a la partida'}
           </button>
         </div>
       </Modal>

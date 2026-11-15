@@ -6,6 +6,7 @@ import {
   interpretarCopiaSeguridad,
 } from '../../infra/almacenamiento';
 import { copiarLink, descargarArchivo } from '../../infra/compartir';
+import { VERSION_APP } from '../../constantes';
 import { Toggle } from '../../ui/Toggle';
 import { ModalFeedback } from './ModalFeedback';
 import { EncabezadoModal, Modal } from '../../ui/Modal';
@@ -158,6 +159,14 @@ export function ModalAjustes() {
               className="hidden"
               onChange={(evento) => void importar(evento.target.files?.[0])}
             />
+          </section>
+
+          <section className="tarjeta p-4">
+            <h4 className="tarjeta-titulo">Información de la app</h4>
+            <ul className="mt-2 flex flex-col gap-1 text-sm text-slate-600">
+              <li>Versión: <strong className="text-tinta">{VERSION_APP}</strong></li>
+              <li>Pantalla: <strong className="text-tinta">{window.innerWidth} px de ancho</strong> · densidad {window.devicePixelRatio}×</li>
+            </ul>
           </section>
 
           <section className="tarjeta p-4">

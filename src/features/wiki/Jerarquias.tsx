@@ -209,7 +209,7 @@ function Preguntas({ modo }: { modo: ModoContenido }) {
       {abierto && (
         <div className="flex flex-col gap-2 border-t border-slate-100 px-4 py-3">
           <p className="text-sm text-slate-600">¿Querés hacer una pregunta que no está respondida acá? Escribinos tu pregunta y la agregamos.</p>
-          <button type="button" onClick={() => setPreguntando(true)} className="btn-claro w-full py-3 text-sm">
+          <button type="button" onClick={() => setPreguntando(true)} className="btn-primario w-full py-3 text-sm !text-white">
             Hacer una pregunta
           </button>
         </div>

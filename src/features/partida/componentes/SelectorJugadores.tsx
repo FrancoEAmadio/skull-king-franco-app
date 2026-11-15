@@ -5,7 +5,7 @@ import { ModalSeleccionJugadores } from './ModalSeleccionJugadores';
 
 export function SelectorJugadores() {
   const {
-    partida: { idsJugadoresSeleccionados },
+    partida: { idsJugadoresSeleccionados, borrarSeleccionJugadores },
   } = useApp();
   const [selectorAbierto, setSelectorAbierto] = useState(false);
   const faltan = idsJugadoresSeleccionados.length < MIN_JUGADORES;
@@ -23,6 +23,11 @@ export function SelectorJugadores() {
           {idsJugadoresSeleccionados.length}
         </span>
       </button>
+      {idsJugadoresSeleccionados.length > 0 && (
+        <button type="button" onClick={borrarSeleccionJugadores} className="btn-claro mx-auto px-5 py-2.5 text-sm">
+          Borrar selección
+        </button>
+      )}
       <ModalSeleccionJugadores abierto={selectorAbierto} onCerrar={() => setSelectorAbierto(false)} />
     </section>
   );

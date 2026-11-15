@@ -1,8 +1,6 @@
 import { useApp } from '../../../estado/AppProvider';
-import { ChipBono } from '../../../ui/ChipBono';
-import { estaReglaActiva } from '../../../dominio/disponibilidadContenido';
+import { ChipCompacto, type TonoChip } from '../../../ui/ChipCompacto';
 import { Seccion } from '../../../ui/Seccion';
-import { vibrar } from '../../../infra/vibracion';
 import type { EventoBono } from '../../../tipos';
 
 interface Props {
@@ -11,16 +9,20 @@ interface Props {
   eventosExpansion: EventoBono[];
 }
 
-const REEMPLAZADOS = new Set(['catorce_negro', 'catorce_color', 'ocho_expansion', 'siete_expansion', 'puntos_cartas']);
+const PALOS: { id: string; titulo: string; tono: TonoChip }[] = [
+  { id: 'siete_expansion', titulo: '−5', tono: 'rojo' },
+  { id: 'ocho_expansion', titulo: '+5', tono: 'verde' },
+  { id: 'catorce_color', titulo: '+10', tono: 'dorado' },
+  { id: 'catorce_negro', titulo: '+20', tono: 'negro' },
+];
 
-function nombreCorto(etiqueta: string): string {
-  return etiqueta.replace(/\s*\(.*?\)\s*$/, '').trim();
-}
-
-function detalleBono(evento: EventoBono, maximo: number): string {
-  const signo = evento.puntos > 0 ? '+' : '';
-  return `${signo}${evento.puntos} pts · máx ${maximo}`;
-}
+const ESPECIALES: Record<string, { titulo: string }> = {
+  pirata_por_sk: { titulo: 'Pirata capturado por SK' },
+  sk_por_sirena: { titulo: 'SK capturado por Sirena' },
+  sirena_por_pirata: { titulo: 'Sirena capturada por Pirata' },
+  kong_por_sk_sirena: { titulo: 'Kong capturado por SK o Sirena' },
+  monstruo_davy: { titulo: 'Monstruo destruido por Davy Jones' },
+};
 
 export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Props) {
   const { partida } = useApp();
@@ -28,104 +30,82 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
     jugadorActual,
     obtenerCantidadBono,
     obtenerMaximoBono,
-    ajustarPuntosCartas,
-    limitePuntosCartas,
     cambiarCantidadBono,
     limpiarTodosLosEventos,
     motivoTopeBono,
     borrarBonoInmediato,
-    configuracionMesa,
   } = partida;
 
   if (!jugadorActual) return null;
 
   const tieneEventos = Object.values(jugadorActual.eventosBono).some((v) => Number(v) !== 0);
-  const unidadesCartas = Number(jugadorActual.eventosBono.puntos_cartas) || 0;
-  // Sin las cartas 7 y 8 (Base, Avanzadas o Expansión sin ellas) solo hay 14 de bono: se suma de a 10.
-  const paso10 = !estaReglaActiva(configuracionMesa, 'carta7') && !estaReglaActiva(configuracionMesa, 'carta8');
-  const pasoUnidades = paso10 ? 2 : 1;
-  const puntosCartas = unidadesCartas * 5;
-  const enMaximo = unidadesCartas + pasoUnidades > limitePuntosCartas.maximoUnidades;
-  const enMinimo = unidadesCartas - pasoUnidades < limitePuntosCartas.minimoUnidades;
-  const base = eventosBase.filter((e) => !REEMPLAZADOS.has(e.id));
-  const expansion = eventosExpansion.filter((e) => !REEMPLAZADOS.has(e.id));
+  const disponibles = new Set([...eventosBase, ...eventosExpansion].map((e) => e.id));
+  const palos = PALOS.filter((p) => disponibles.has(p.id));
+  const especialesBase = eventosBase.filter((e) => ESPECIALES[e.id]);
+  const especialesExp = eventosExpansion.filter((e) => ESPECIALES[e.id]);
 
-  const grupo = (titulo: string, eventos: EventoBono[]) =>
-    eventos.length > 0 && (
-      <div className="flex flex-col gap-2">
-        <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">{titulo}</span>
-        {eventos.map((evento) => {
-          const maximo = obtenerMaximoBono(evento.id);
-          return (
-            <ChipBono
-              key={evento.id}
-              nombre={nombreCorto(evento.etiqueta)}
-              detalle={detalleBono(evento, maximo)}
-              cantidad={obtenerCantidadBono(evento.id)}
-              maximo={maximo}
-              motivoTope={motivoTopeBono(evento.id)}
-              onMas={() => cambiarCantidadBono(evento.id, 1)}
-              onBorrar={() => borrarBonoInmediato(evento.id)}
-            />
-          );
-        })}
-      </div>
-    );
+  const chip = (evento: { id: string; puntos: number }, titulo: string, tono?: TonoChip, grande?: boolean) => (
+    <ChipCompacto
+      key={evento.id}
+      titulo={titulo}
+      subtitulo={grande ? undefined : `${evento.puntos > 0 ? '+' : ''}${evento.puntos} pts`}
+      tono={tono}
+      grande={grande}
+      cantidad={obtenerCantidadBono(evento.id)}
+      maximo={obtenerMaximoBono(evento.id)}
+      onMas={() => cambiarCantidadBono(evento.id, 1)}
+      onBorrar={() => borrarBonoInmediato(evento.id)}
+    />
+  );
+
+  const motivos = [...especialesBase, ...especialesExp, ...palos.map((p) => ({ id: p.id }))]
+    .filter((e) => obtenerMaximoBono(e.id) <= 0 && obtenerCantidadBono(e.id) === 0)
+    .map((e) => motivoTopeBono(e.id))
+    .filter((m, i, arr) => m && arr.indexOf(m) === i);
 
   return (
     <Seccion numero={numero} titulo="Bonos de la ronda">
-      {tieneEventos && (
-        <button type="button" onClick={limpiarTodosLosEventos} className="btn-claro self-end px-3 py-2 text-xs">
-          🧹 Limpiar bonos
-        </button>
-      )}
-
       <div className="flex flex-col gap-2">
-        <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Cartas de palo</span>
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
-          <div className="flex items-center justify-between gap-2">
-            <div className="min-w-0">
-              <span className="block text-sm font-extrabold leading-tight text-tinta">{paso10 ? '14 capturados (+10)' : 'Puntos por cartas capturadas'}</span>
-              <span className="block text-xs font-semibold text-slate-500">
-                {enMaximo ? `Máximo: ${limitePuntosCartas.maximoUnidades * 5} pts` : (paso10 ? 'De a 10 pts' : '14, 8 y 7 · de a 5 pts')}
-              </span>
-            </div>
-            <div className="stepper" role="group" aria-label="Puntos por cartas capturadas">
-              <button
-                type="button"
-                className="stepper-btn"
-                disabled={enMinimo}
-                aria-label="Restar puntos"
-                onClick={() => {
-                  vibrar();
-                  ajustarPuntosCartas(-pasoUnidades);
-                }}
-              >
-                −
-              </button>
-              <span className="stepper-valor !min-w-[3.2rem] !text-lg" aria-live="polite">
-                {puntosCartas > 0 ? '+' : ''}
-                {puntosCartas}
-              </span>
-              <button
-                type="button"
-                className="stepper-btn"
-                disabled={enMaximo}
-                aria-label="Sumar puntos"
-                onClick={() => {
-                  vibrar();
-                  ajustarPuntosCartas(pasoUnidades);
-                }}
-              >
-                +
-              </button>
-            </div>
-          </div>
+        <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Cartas de palo capturadas</span>
+        <div className={`grid gap-2 ${palos.length > 2 ? 'grid-cols-4' : 'grid-cols-2'}`}>
+          {palos.map((p) => chip({ id: p.id, puntos: 0 }, p.titulo, p.tono, true))}
         </div>
+        <p className="text-xs font-semibold text-slate-500">
+          {palos.length > 2 ? 'Tocá cada valor tantas veces como cartas capturaste.' : 'Los 14 capturados: +10 de color y +20 negro.'}
+        </p>
       </div>
 
-      {grupo('Capturas especiales', base)}
-      {grupo('Expansión', expansion)}
+      {especialesBase.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Capturas especiales</span>
+          <div className="grid grid-cols-3 gap-2">
+            {especialesBase.map((e) => chip(e, ESPECIALES[e.id]!.titulo))}
+          </div>
+        </div>
+      )}
+
+      {especialesExp.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Expansión</span>
+          <div className="grid grid-cols-2 gap-2">
+            {especialesExp.map((e) => chip(e, ESPECIALES[e.id]!.titulo))}
+          </div>
+        </div>
+      )}
+
+      {motivos.length > 0 && (
+        <ul className="flex flex-col gap-0.5">
+          {motivos.map((m) => (
+            <li key={m} className="text-xs font-semibold text-amber-700">{m}</li>
+          ))}
+        </ul>
+      )}
+
+      {tieneEventos && (
+        <button type="button" onClick={limpiarTodosLosEventos} className="btn-claro mx-auto px-5 py-2.5 text-sm">
+          Limpiar bonos
+        </button>
+      )}
     </Seccion>
   );
 }
