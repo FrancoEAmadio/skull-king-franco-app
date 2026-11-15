@@ -34,9 +34,13 @@ export function ChipCompacto({ titulo, subtitulo, aclaracion, cantidad, maximo, 
       aria-pressed={activo}
       disabled={bloqueado}
       onClick={() => {
-        vibrar();
-        if (cantidad >= maximo) onBorrar();
-        else onMas();
+        if (cantidad >= maximo) {
+          vibrar([25, 45, 25]); // doble toque: se borró
+          onBorrar();
+        } else {
+          vibrar();
+          onMas();
+        }
       }}
       className={`relative flex min-h-[3.75rem] w-full flex-col items-center justify-center gap-0.5 rounded-xl border-2 px-1.5 py-2 text-center disabled:opacity-35 ${
         activo ? clases.activo : clases.reposo
