@@ -85,6 +85,35 @@ export function esPosibleAsignacionEspeciales(asignaciones: Eventos[], ctx: Cont
 
 type Motivo = 'davy_total' | 'baza' | 'sk_unico' | 'sk_excluyente' | 'sirenas' | 'piratas' | 'kong' | 'monstruos' | 'mesa';
 
+/** Cartas de la mesa que ya quedaron identificadas (capturas especiales, palos, habilidades y Botín). */
+export function contarCartasFisicas(asignaciones: Eventos[], ctx: ContextoLimite, sinPalos = false): number {
+  const t = totalizar(asignaciones);
+  const habilidades = ctx.piratasEnHabilidades ?? 0;
+  const sirenas = t.skSirena + t.sirenaPirata;
+  const piratas = t.pirataSk + t.sirenaPirata + habilidades;
+  const skCartas = t.pirataSk > 0 || t.skSirena > 0 ? 1 : 0;
+  const kongCartas = t.kong > 0 || ctx.kongEnHabilidad ? 1 : 0;
+  const davyCartas = t.monstruos > 0 ? 1 : 0;
+  const botinCartas = Math.min(2, ctx.alianzasBotin ?? 0);
+  // El Kong capturado necesita además la carta que lo captura (Skull King o Sirena).
+  const capturadorKong = t.kong > 0 && skCartas + sirenas === 0 ? 1 : 0;
+  const palos = sinPalos
+    ? 0
+    : asignaciones.reduce((acc, e) => acc + PALOS.reduce((a, id) => a + (Number(e[id]) || 0), 0), 0);
+  return skCartas + sirenas + piratas + kongCartas + capturadorKong + davyCartas + t.monstruos + botinCartas + palos;
+}
+
+/** ¿Entra una carta más (habilidad pirata, Kong o alianza de Botín) en la mesa de esta ronda? */
+export function hayCartaLibre(ctx: ContextoLimite, extra: { habilidad?: boolean; kong?: boolean; alianza?: boolean }): boolean {
+  const ctx2: ContextoLimite = {
+    ...ctx,
+    piratasEnHabilidades: (ctx.piratasEnHabilidades ?? 0) + (extra.habilidad ? 1 : 0),
+    kongEnHabilidad: ctx.kongEnHabilidad || !!extra.kong,
+    alianzasBotin: (ctx.alianzasBotin ?? 0) + (extra.alianza ? 1 : 0),
+  };
+  return detectarMotivoImposible(ctx.jugadores.map((j) => j.eventosBono ?? {}), ctx2) === null;
+}
+
 function detectarMotivoImposible(asignaciones: Eventos[], ctx: ContextoLimite): Motivo | null {
   const t = totalizar(asignaciones);
   const habilidades = ctx.piratasEnHabilidades ?? 0;
@@ -108,13 +137,7 @@ function detectarMotivoImposible(asignaciones: Eventos[], ctx: ContextoLimite): 
   if (t.kong > 1) return 'kong';
   if (t.monstruos > Math.min(monstruosEnMazo(ctx.configuracion), porBaza)) return 'monstruos';
 
-  const skCartas = t.pirataSk > 0 || t.skSirena > 0 ? 1 : 0;
-  const kongCartas = t.kong > 0 || ctx.kongEnHabilidad ? 1 : 0;
-  const davyCartas = t.monstruos > 0 ? 1 : 0;
-  const botinCartas = Math.min(2, ctx.alianzasBotin ?? 0);
-  // El Kong capturado necesita además la carta que lo captura (Skull King o Sirena).
-  const capturadorKong = t.kong > 0 && skCartas + sirenas === 0 ? 1 : 0;
-  const fisicas = skCartas + sirenas + piratas + kongCartas + capturadorKong + davyCartas + t.monstruos + botinCartas;
+  const fisicas = contarCartasFisicas(asignaciones, ctx);
   if (fisicas > totalCartasEnMesa(ctx)) return 'mesa';
   return null;
 }
@@ -140,7 +163,8 @@ function maximoCartasPalo(idEvento: string, ctx: ContextoLimite): number {
       idx === ctx.jugadorSeleccionadoIdx ? acc : acc + PALOS.reduce((a, id) => a + (Number(j.eventosBono?.[id]) || 0), 0),
     0
   );
-  const libres = Math.max(0, totalCartasEnMesa(ctx) - deTodos - otrasDelJugador);
+  const especiales = contarCartasFisicas(ctx.jugadores.map((j) => j.eventosBono ?? {}), ctx, true);
+  const libres = Math.max(0, totalCartasEnMesa(ctx) - especiales - deTodos - otrasDelJugador);
   return Math.max(0, Math.min(LIMITES_FIJOS[idEvento] ?? 99, capturables - otrasDelJugador, libres));
 }
 
@@ -166,7 +190,7 @@ export function calcularMaximoDisponible(idEvento: string, ctx: ContextoLimite):
 export function motivoTopeBono(idEvento: string, ctx: ContextoLimite): string {
   const actual = Number(ctx.jugadores[ctx.jugadorSeleccionadoIdx]?.eventosBono?.[idEvento]) || 0;
   if (idEvento === 'monstruo_davy' && (ctx.jugadores[ctx.jugadorSeleccionadoIdx]?.ganadas ?? 0) >= ctx.cartasPorJugadorEnRonda) {
-    return 'Davy Jones no gana bazas: este jugador usó una carta para él y no puede haber ganado todas.';
+    return 'Davy Jones no gana bazas: si este jugador ganó todas las suyas, no pudo jugarlo.';
   }
   const motivo = detectarMotivoImposible(asignacionesCon(ctx, idEvento, actual + 1), ctx);
   switch (motivo) {

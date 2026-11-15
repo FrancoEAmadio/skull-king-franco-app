@@ -11,11 +11,11 @@ interface Props {
   sinBazas?: boolean;
 }
 
-const PALOS: { id: string; titulo: string; tono: TonoChip }[] = [
-  { id: 'siete_expansion', titulo: '−5', tono: 'rojo' },
-  { id: 'ocho_expansion', titulo: '+5', tono: 'verde' },
-  { id: 'catorce_color', titulo: '+10', tono: 'dorado' },
-  { id: 'catorce_negro', titulo: '+20', tono: 'negro' },
+const PALOS: { id: string; titulo: string; tono: TonoChip; aclaracion: string }[] = [
+  { id: 'siete_expansion', titulo: '−5', tono: 'rojo', aclaracion: 'capturó un 7' },
+  { id: 'ocho_expansion', titulo: '+5', tono: 'verde', aclaracion: 'capturó un 8' },
+  { id: 'catorce_color', titulo: '+10', tono: 'dorado', aclaracion: 'capturó un 14 de color' },
+  { id: 'catorce_negro', titulo: '+20', tono: 'negro', aclaracion: 'capturó el 14 negro' },
 ];
 
 const ESPECIALES: Record<string, { titulo: string }> = {
@@ -48,10 +48,11 @@ export function PanelEventosBono({ numero, eventosBase: baseTodos, eventosExpans
   const especialesBase = eventosBase.filter((e) => ESPECIALES[e.id]);
   const especialesExp = eventosExpansion.filter((e) => ESPECIALES[e.id]);
 
-  const chip = (evento: { id: string; puntos: number }, titulo: string, tono?: TonoChip, grande?: boolean) => (
+  const chip = (evento: { id: string; puntos: number }, titulo: string, tono?: TonoChip, grande?: boolean, aclaracion?: string) => (
     <ChipCompacto
       key={evento.id}
       titulo={titulo}
+      aclaracion={aclaracion}
       subtitulo={grande ? undefined : `${evento.puntos > 0 ? '+' : ''}${evento.puntos} pts`}
       tono={tono}
       grande={grande}
@@ -73,10 +74,10 @@ export function PanelEventosBono({ numero, eventosBase: baseTodos, eventosExpans
       {!sinBazas && <div className="flex flex-col gap-2">
         <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Cartas de palo capturadas</span>
         <div className={`grid gap-2 ${palos.length > 2 ? 'grid-cols-4' : 'grid-cols-2'}`}>
-          {palos.map((p) => chip({ id: p.id, puntos: 0 }, p.titulo, p.tono, true))}
+          {palos.map((p) => chip({ id: p.id, puntos: 0 }, p.titulo, p.tono, true, p.aclaracion))}
         </div>
         <p className="text-xs font-semibold text-slate-500">
-          {palos.length > 2 ? 'Tocá cada valor tantas veces como cartas capturaste.' : 'Los 14 capturados: +10 de color y +20 negro.'}
+          Tocá cada valor tantas veces como cartas capturaste.
         </p>
       </div>}
 

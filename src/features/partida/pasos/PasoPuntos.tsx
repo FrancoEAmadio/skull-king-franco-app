@@ -128,7 +128,7 @@ export function PasoPuntos() {
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
               {indiceVisualActual + 1} de {total}
             </span>
-            <h3 className="truncate font-display text-xl font-black text-azul">{jugadorActual.nombre}</h3>
+            <h3 className="truncate text-xl font-black text-azul">{jugadorActual.nombre}</h3>
             <span className="block text-xs font-semibold text-slate-500">
               Total: <strong className="text-tinta">{jugadorActual.puntos}</strong> pts
             </span>

@@ -35,7 +35,7 @@ import {
 } from '../../dominio/cierreRonda';
 import { calcularBonoCartasBlancas, calcularPuntajeRonda } from '../../dominio/puntuacion';
 import { calcularBonosAlianzasBotin } from '../../dominio/alianzas';
-import { calcularMaximoDisponible, limitesPuntosCartas, motivoTopeBono, sanearEventosEspeciales } from '../../dominio/bonos';
+import { calcularMaximoDisponible, hayCartaLibre, limitesPuntosCartas, motivoTopeBono, sanearEventosEspeciales } from '../../dominio/bonos';
 import { aplicarFinDePartida, recalcularEstadisticasDesdeHistorial } from '../../dominio/estadisticas';
 import {
   estaDisponibleEventoBono,
@@ -288,6 +288,20 @@ export function usePartidaState({
     }),
     [registroHabilidadesRonda, alianzasBotinRonda]
   );
+
+  const ctxCartas = useMemo(
+    () => ({
+      jugadorSeleccionadoIdx,
+      jugadores,
+      configuracion: configuracionMesa,
+      cartasPorJugadorEnRonda,
+      ...contextoExtraBonos,
+    }),
+    [jugadorSeleccionadoIdx, jugadores, configuracionMesa, cartasPorJugadorEnRonda, contextoExtraBonos]
+  );
+  const hayCartaLibreHabilidad = useMemo(() => hayCartaLibre(ctxCartas, { habilidad: true }), [ctxCartas]);
+  const hayCartaLibreKong = useMemo(() => hayCartaLibre(ctxCartas, { kong: true }), [ctxCartas]);
+  const hayCartaLibreBotin = useMemo(() => hayCartaLibre(ctxCartas, { alianza: true }), [ctxCartas]);
 
   const rondaVisible =
     pasoPartida === 'resumen' && ultimaRondaEditable ? ultimaRondaEditable.ronda : rondaActual;
@@ -710,6 +724,7 @@ export function usePartidaState({
       if (alianzasBotinRonda.length >= MAX_ALIANZAS_POR_RONDA) {
         return 'limite_alcanzado' as const;
       }
+      if (!hayCartaLibre(ctxCartas, { alianza: true })) return 'limite_alcanzado' as const;
 
       setAlianzasBotinRonda((previas) => [
         ...previas,
@@ -717,7 +732,7 @@ export function usePartidaState({
       ]);
       return 'alianza_agregada' as const;
     },
-    [jugadores, alianzasBotinRonda.length, configuracionMesa]
+    [jugadores, alianzasBotinRonda.length, configuracionMesa, ctxCartas]
   );
 
   const eliminarAlianzaBotin = useCallback((indice: number) => {
@@ -1294,6 +1309,9 @@ export function usePartidaState({
     maxHabilidadesRonda,
     textoBotonAvanzar,
     habilidadesBloqueadasPorLimite,
+    hayCartaLibreHabilidad,
+    hayCartaLibreKong,
+    hayCartaLibreBotin,
     indiceJugadorInicial,
     // acciones setup
     irANuevaPartida,

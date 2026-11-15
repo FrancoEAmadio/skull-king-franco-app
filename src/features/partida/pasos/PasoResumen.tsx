@@ -78,7 +78,7 @@ export function PasoResumen() {
         return (
           <article key={res.nombre} className="tarjeta flex flex-col gap-3 p-4">
             <header className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
-              <h3 className="min-w-0 flex-1 truncate font-display text-lg font-black text-azul">{res.nombre}</h3>
+              <h3 className="min-w-0 flex-1 truncate text-lg font-black text-azul">{res.nombre}</h3>
               <span
                 className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-black ${
                   res.acierto ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'

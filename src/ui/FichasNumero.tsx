@@ -18,10 +18,10 @@ interface Props {
 }
 
 function medidaFicha(max: number): string {
-  if (max <= 4) return '4.6rem';
-  if (max <= 6) return '4.1rem';
-  if (max <= 8) return '3.6rem';
-  return '3.3rem';
+  if (max <= 4) return '4rem';
+  if (max <= 6) return '3.5rem';
+  if (max <= 8) return '3.1rem';
+  return '2.85rem';
 }
 
 export function FichasNumero({ valor, max, min = 0, onElegir, deshabilitada, meta = null, resultado = null, etiqueta }: Props) {
@@ -29,7 +29,7 @@ export function FichasNumero({ valor, max, min = 0, onElegir, deshabilitada, met
   const numeros = Array.from({ length: max - min + 1 }, (_, i) => i + min);
 
   return (
-    <div className="flex flex-wrap gap-x-3 gap-y-4 px-1 py-1" role="radiogroup" aria-label={etiqueta}>
+    <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 px-1 py-1" role="radiogroup" aria-label={etiqueta}>
       {numeros.map((numero) => {
         const elegida = valor === numero;
         const bloqueada = !elegida && (deshabilitada?.(numero) ?? false);

@@ -9,6 +9,8 @@ interface Props {
   maximo: number;
   tono?: TonoChip;
   grande?: boolean;
+  /** Línea chica que aclara qué carta se capturó. */
+  aclaracion?: string;
   onMas: () => void;
   onBorrar: () => void;
 }
@@ -22,7 +24,7 @@ const TONOS: Record<TonoChip, { reposo: string; activo: string }> = {
 };
 
 /** Botón-chip vertical: cada toque suma hasta el máximo y el siguiente lo borra. */
-export function ChipCompacto({ titulo, subtitulo, cantidad, maximo, tono = 'neutro', grande = false, onMas, onBorrar }: Props) {
+export function ChipCompacto({ titulo, subtitulo, aclaracion, cantidad, maximo, tono = 'neutro', grande = false, onMas, onBorrar }: Props) {
   const activo = cantidad > 0;
   const bloqueado = maximo <= 0 && cantidad === 0;
   const clases = TONOS[tono];
@@ -40,7 +42,8 @@ export function ChipCompacto({ titulo, subtitulo, cantidad, maximo, tono = 'neut
         activo ? clases.activo : clases.reposo
       }`}
     >
-      <span className={`${grande ? 'font-display text-2xl' : 'text-[13px]'} font-black leading-tight`}>{titulo}</span>
+      <span className={`${grande ? 'text-2xl' : 'text-[13px]'} font-black leading-tight`}>{titulo}</span>
+      {aclaracion && <span className="text-[10px] font-semibold leading-tight opacity-75">{aclaracion}</span>}
       {subtitulo && <span className="text-[11px] font-bold leading-tight opacity-80">{subtitulo}</span>}
       {activo && maximo > 1 && (
         <span className="absolute -right-1.5 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-oro px-1.5 text-xs font-black text-tinta-oro shadow">

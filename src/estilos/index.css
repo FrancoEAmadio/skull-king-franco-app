@@ -69,7 +69,7 @@ body::before {
 
 #root { position: relative; z-index: 1; }
 
-h1, h2, h3, .font-display {
+h1, h2, .tarjeta-titulo, .font-display {
   font-family: var(--font-display);
   letter-spacing: 0.01em;
   font-variant-numeric: lining-nums tabular-nums;
@@ -160,7 +160,7 @@ main :where(h1, h2, h3, p, span) { overflow-wrap: anywhere; }
   color: #251a05;
   background: linear-gradient(180deg, #f7da72 0%, #e9bf42 55%, #c9951c 100%);
   border-color: #b98a1c;
-  box-shadow: 0 6px 16px -4px rgba(233, 191, 66, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  box-shadow: 0 4px 10px -4px rgba(233, 191, 66, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 .btn-peligro {
   color: #fff;
@@ -299,6 +299,7 @@ select.campo {
 
 /* ── Fichas (envites y bazas) ────────────────────────────────────────── */
 .ficha {
+  font-family: var(--font-sans);
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -306,7 +307,6 @@ select.campo {
   width: 4.1rem;
   height: 4.1rem;
   border-radius: 9999px;
-  font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.85rem;
   line-height: 1;
@@ -321,8 +321,8 @@ select.campo {
   color: #2a1700;
   background: radial-gradient(circle at 35% 30%, #fff3b0 0%, #f7d44c 45%, #e0a812 100%);
   border-color: #e0a812;
-  box-shadow: 0 0 0 3px rgba(233, 191, 66, 0.4), inset 0 2px 3px rgba(255, 255, 255, 0.75);
-  transform: scale(1.05);
+  box-shadow: 0 0 0 2px rgba(233, 191, 66, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.6);
+  transform: scale(1.03);
 }
 .ficha:disabled { opacity: 0.3; filter: grayscale(1); }
 .ficha-meta::after {
@@ -375,7 +375,6 @@ select.campo {
 .stepper-valor {
   min-width: 2.5rem;
   text-align: center;
-  font-family: var(--font-display);
   font-size: 1.4rem;
   font-weight: 800;
   color: var(--azul);
@@ -405,9 +404,10 @@ select.campo {
 .entra-izquierda { animation: entrar-desde-izquierda 0.22s ease-out backwards; }
 .entra-subiendo, .entrar { animation: entrar-subiendo 0.14s ease-out backwards; }
 
+/* Sin menú contextual al mantener apretado */
 @keyframes latir {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(233, 191, 66, 0.55); }
-  50% { box-shadow: 0 0 0 8px rgba(233, 191, 66, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(233, 191, 66, 0.3); }
+  50% { box-shadow: 0 0 0 5px rgba(233, 191, 66, 0); }
 }
 .latir { animation: latir 1.8s ease-in-out infinite; }
 

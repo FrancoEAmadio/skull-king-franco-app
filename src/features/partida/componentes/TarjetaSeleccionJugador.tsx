@@ -22,7 +22,7 @@ export function TarjetaSeleccionJugador({ jugador, posicionSeleccion, onSeleccio
     >
       <AvatarPirata emoji={avatarDe(jugador.id, jugador.avatar)} tamano="md" activo={seleccionado} />
       <div className="min-w-0 flex-1">
-        <span className="block truncate font-display text-lg font-black text-azul">{jugador.nombre}</span>
+        <span className="block truncate text-lg font-black text-azul">{jugador.nombre}</span>
         <span className="mt-0.5 block text-xs font-bold text-slate-500">
           {partidasJugadas} {partidasJugadas === 1 ? 'partida' : 'partidas'} · 🏆 {victorias} {victorias === 1 ? 'victoria' : 'victorias'}
         </span>

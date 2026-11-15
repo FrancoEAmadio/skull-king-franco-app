@@ -27,6 +27,7 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
     crearJugadorPermanente,
     partida: {
       alternarSeleccionJugador,
+      borrarSeleccionJugadores,
       configuracionMesa,
       idsJugadoresSeleccionados,
       posicionSeleccion,
@@ -147,7 +148,12 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
           )}
         </div>
 
-        <div className="border-t border-slate-200 p-4">
+        <div className="flex flex-col gap-2 border-t border-slate-200 p-4">
+          {idsJugadoresSeleccionados.length > 0 && (
+            <button type="button" onClick={borrarSeleccionJugadores} className="btn-peligro mx-auto px-5 py-2.5 text-sm">
+              Borrar selección
+            </button>
+          )}
           <button type="button" onClick={cerrar} className="btn-dorado w-full py-3.5 text-base">
             Listo ({idsJugadoresSeleccionados.length})
           </button>

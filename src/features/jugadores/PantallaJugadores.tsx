@@ -171,7 +171,7 @@ export function PantallaJugadores() {
                         <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} tamano="lg" />
                       </button>
                       <button type="button" onClick={() => verEstadisticasJugador(jug)} className="min-w-0 flex-1 text-left">
-                        <span className="block truncate font-display text-lg font-black text-azul">{jug.nombre}</span>
+                        <span className="block truncate text-lg font-black text-azul">{jug.nombre}</span>
                         <span className="text-xs font-semibold text-slate-500">
                           {jug.estadisticas.partidasJugadas} partida{jug.estadisticas.partidasJugadas === 1 ? '' : 's'} · 🏆{' '}
                           {jug.estadisticas.victorias} · {jug.estadisticas.partidasJugadas ? `${calcularPorcentajeVictorias(jug)}% victorias` : 'sin partidas'}
@@ -185,9 +185,9 @@ export function PantallaJugadores() {
                           type="button"
                           onClick={() => setJugadorPendienteEliminar(jug)}
                           aria-label={`Eliminar a ${jug.nombre}`}
-                          className="btn-peligro h-10 w-10 text-lg"
+                          className="btn-peligro h-10 w-10 text-lg !text-white"
                         >
-                          🗑️
+                          ✕
                         </button>
                       </div>
                     </>
@@ -226,14 +226,14 @@ export function PantallaJugadores() {
                 <span className="w-6 shrink-0 text-center text-sm font-black text-slate-400">{posicion + 1}</span>
                 <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} tamano="md" />
                 <div className="min-w-0 flex-1">
-                  <span className="block truncate font-display text-base font-black text-azul">{jug.nombre}</span>
+                  <span className="block truncate text-base font-black text-azul">{jug.nombre}</span>
                   <span className="text-xs font-semibold text-slate-500">
                     {jug.estadisticas.partidasJugadas} jugadas · 🏆 {jug.estadisticas.victorias}
                     {jug.estadisticas.mejorPartida !== null ? ` · récord ${jug.estadisticas.mejorPartida}` : ''}
                   </span>
                 </div>
                 <span className="shrink-0 text-right">
-                  <span className="block font-display text-2xl font-black text-azul">
+                  <span className="block text-2xl font-black text-azul">
                     {jug.estadisticas.partidasJugadas ? `${calcularPorcentajeVictorias(jug)}%` : '—'}
                   </span>
                   <span className="block text-[10px] font-bold uppercase text-slate-400">victorias</span>

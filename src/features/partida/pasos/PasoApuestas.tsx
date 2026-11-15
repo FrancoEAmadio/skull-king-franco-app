@@ -27,7 +27,7 @@ export function PasoApuestas() {
       <div className="tarjeta flex items-center justify-between gap-3 p-4">
         <div>
           <span className="tarjeta-titulo block">Envites</span>
-          <span className="block font-display text-lg font-black leading-tight text-azul">¿Cuántas bazas ganás?</span>
+          <span className="block text-lg font-black leading-tight text-azul">¿Cuántas bazas ganás?</span>
         </div>
         <div className="text-right">
           <span className="block text-3xl font-black leading-none text-azul">{sumaApuestas}</span>
@@ -39,7 +39,7 @@ export function PasoApuestas() {
         <div key={originalIndex} className="tarjeta flex flex-col gap-3 p-4">
           <div className="flex items-center gap-3">
             <AvatarPirata emoji={avatarDe(jugador.permanenteId, jugador.avatar)} tamano="md" />
-            <span className="min-w-0 flex-1 truncate font-display text-lg font-black text-azul">{jugador.nombre}</span>
+            <span className="min-w-0 flex-1 truncate text-lg font-black text-azul">{jugador.nombre}</span>
             <span
               className={`rounded-full px-3 py-1 text-base font-black ${
                 jugador.apuestaElegida ? 'bg-oro text-tinta-oro' : 'border border-dashed border-slate-300 text-slate-400'

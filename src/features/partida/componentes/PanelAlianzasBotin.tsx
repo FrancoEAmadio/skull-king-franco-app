@@ -7,7 +7,16 @@ import { Seccion } from '../../../ui/Seccion';
 /** Alianzas de Botín del jugador que se está anotando: solo hay que elegir con quién se alió. */
 export function PanelAlianzasBotin({ numero }: { numero?: number }) {
   const { partida } = useApp();
-  const { jugadores, jugadorSeleccionadoIdx, alianzasBotinRonda, agregarAlianzaBotin, eliminarAlianzaBotin } = partida;
+  const {
+    jugadores,
+    jugadorSeleccionadoIdx,
+    alianzasBotinRonda,
+    agregarAlianzaBotin,
+    eliminarAlianzaBotin,
+    hayCartaLibreBotin,
+    registroHabilidadesRonda,
+    cartasPorJugadorEnRonda,
+  } = partida;
 
   const activo = jugadores[jugadorSeleccionadoIdx];
   const [idxOtro, setIdxOtro] = useState<number | null>(null);
@@ -20,9 +29,26 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
 
   if (!activo) return null;
 
-  const limiteAlcanzado = alianzasBotinRonda.length >= MAX_ALIANZAS_POR_RONDA;
+  const limiteAlcanzado = alianzasBotinRonda.length >= MAX_ALIANZAS_POR_RONDA || !hayCartaLibreBotin;
   const sinBazas = activo.ganadas === 0;
   const otros = jugadores.map((jug, idx) => ({ jug, idx })).filter(({ idx }) => idx !== jugadorSeleccionadoIdx);
+
+  // Con una carta por jugador, quien jugó el Botín no ganó la baza y su carta no puede ser otra cosa.
+  const cartaYaIdentificada = (idx: number): boolean => {
+    if (cartasPorJugadorEnRonda > 1) return false;
+    const j = jugadores[idx];
+    if (!j) return true;
+    const ev = j.eventosBono ?? {};
+    const hayEspecial = ['pirata_por_sk', 'sk_por_sirena', 'sirena_por_pirata', 'kong_por_sk_sirena', 'monstruo_davy'].some(
+      (id) => (Number(ev[id]) || 0) > 0
+    );
+    return (
+      (Number(j.ganadas) || 0) > 0 ||
+      hayEspecial ||
+      registroHabilidadesRonda.some((h) => h.jugadorIdx === idx) ||
+      alianzasBotinRonda.some((a) => a.idxB === idx)
+    );
+  };
 
   const registrar = () => {
     if (idxOtro === null) {
@@ -57,8 +83,9 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
                 key={idx}
                 type="button"
                 aria-pressed={idxOtro === idx}
+                disabled={cartaYaIdentificada(idx)}
                 onClick={() => setIdxOtro(idx)}
-                className={`px-4 py-2.5 text-sm ${
+                className={`px-4 py-2.5 text-sm disabled:opacity-35 ${
                   idxOtro === idx ? 'btn-dorado' : 'btn-claro'
                 }`}
               >
