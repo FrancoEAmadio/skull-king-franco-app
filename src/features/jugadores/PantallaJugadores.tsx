@@ -9,6 +9,7 @@ import { AvatarPirata } from '../../ui/AvatarPirata';
 import { SelectorAvatar } from '../../ui/SelectorAvatar';
 import type { JugadorPermanente } from '../../tipos';
 import { ModalConfirmarEliminacionJugador } from './ModalConfirmarEliminacionJugador';
+import { ModalConfirmacion } from '../../ui/ModalConfirmacion';
 
 type Vista = 'gestor' | 'historial' | 'estadisticas';
 
@@ -331,9 +332,73 @@ function GraficoPartidaHistorial({
   return <GraficoEvolucion series={evolucion.series} etiquetas={evolucion.etiquetas} />;
 }
 
+function fechaCorta(iso: string): string {
+  const fecha = new Date(iso);
+  if (Number.isNaN(fecha.getTime())) return '';
+  return fecha.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+/** Partidas que quedaron sin terminar: aparecen arriba del historial para retomarlas o descartarlas. */
+function PartidasEnCursoHistorial() {
+  const { partida } = useApp();
+  const { partidasGuardadas, continuarPartida, descartarPartidaPorId } = partida;
+  const [aDescartar, setADescartar] = useState<string | null>(null);
+  if (partidasGuardadas.length === 0) return null;
+
+  return (
+    <>
+      {partidasGuardadas.map((guardada) => {
+        const ranking = [...guardada.jugadores].sort((a, b) => b.puntos - a.puntos);
+        const totalRondas = guardada.cartasPorRondaActivas.length || 10;
+        return (
+          <div key={guardada.id} className="tarjeta flex flex-col gap-3 p-4">
+            <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
+              <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800">En curso</span>
+              <span className="text-xs font-bold text-slate-500">{fechaCorta(guardada.actualizada)}</span>
+            </div>
+            <span className="text-xs font-semibold text-slate-500">
+              Ronda {guardada.rondaActual} de {totalRondas}
+            </span>
+            <div className="flex flex-col gap-1.5">
+              {ranking.map((jug, indice) => (
+                <div key={jug.permanenteId || jug.nombre} className="opcion flex items-center justify-between px-3 py-2">
+                  <span className="truncate text-sm font-semibold text-tinta">
+                    {indice + 1}.º {jug.nombre}
+                  </span>
+                  <span className="shrink-0 pl-2 font-bold text-tinta">{jug.puntos} pts</span>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => continuarPartida(guardada.id)} className="btn-primario py-2.5 text-sm">
+                Reanudar
+              </button>
+              <button type="button" onClick={() => setADescartar(guardada.id)} className="btn-peligro py-2.5 text-sm">
+                Descartar
+              </button>
+            </div>
+          </div>
+        );
+      })}
+      <ModalConfirmacion
+        abierto={aDescartar !== null}
+        titulo="¿Descartar esta partida?"
+        descripcion="La partida en curso se borra y no se guarda en el historial."
+        textoConfirmar="Descartar"
+        onConfirmar={() => {
+          if (aDescartar) descartarPartidaPorId(aDescartar);
+          setADescartar(null);
+        }}
+        onCancelar={() => setADescartar(null)}
+        zIndex="z-[70]"
+      />
+    </>
+  );
+}
+
 function VistaHistorial() {
   const { partida, verHistorialJugador } = useApp();
-  const { historialPartidas, eliminarPartidaHistorial, borrarTodoElHistorial } = partida;
+  const { historialPartidas, eliminarPartidaHistorial, borrarTodoElHistorial, partidasGuardadas } = partida;
   const [graficosAbiertos, setGraficosAbiertos] = useState<Set<number>>(new Set());
 
   const alternarGrafico = (indice: number) =>
@@ -346,7 +411,9 @@ function VistaHistorial() {
 
   return (
     <div className="flex flex-col gap-3">
+      <PartidasEnCursoHistorial />
       {historialPartidas.length === 0 ? (
+        partidasGuardadas.length > 0 ? null :
         <div className="tarjeta p-8 text-center text-sm text-slate-500">No hay partidas registradas.</div>
       ) : (
         historialPartidas.map((partidaGuardada, hIndex) => (
