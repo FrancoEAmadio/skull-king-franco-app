@@ -8,6 +8,7 @@ import { useGestosMultiDedo } from '../../ui/useGestosMultiDedo';
 import { FichaCarta } from './FichaCarta';
 import { Jerarquias } from './Jerarquias';
 import { ImagenCarta } from '../../ui/ImagenCarta';
+import { TONOS_APP, type NombreTono } from '../../ui/tonos';
 
 type Vista = 'reglas' | 'jerarquias';
 
@@ -16,10 +17,10 @@ const VISTAS: { id: Vista; etiqueta: string }[] = [
   { id: 'jerarquias', etiqueta: '🧭 Orden de jerarquías' },
 ];
 
-const MODOS: { id: ModoContenido; etiqueta: string; carta: string }[] = [
-  { id: 'base', etiqueta: 'Juego base', carta: 'Juego Base' },
-  { id: 'avanzado', etiqueta: 'Reglas avanzadas', carta: 'Reglas Avanzadas' },
-  { id: 'expansion', etiqueta: 'Expansión', carta: 'Expansión' },
+const MODOS: { id: ModoContenido; etiqueta: string; carta: string; tono: NombreTono }[] = [
+  { id: 'base', etiqueta: 'Juego base', carta: 'Juego Base', tono: 'amarillo' },
+  { id: 'avanzado', etiqueta: 'Reglas avanzadas', carta: 'Reglas Avanzadas', tono: 'violeta' },
+  { id: 'expansion', etiqueta: 'Expansión', carta: 'Expansión', tono: 'verde' },
 ];
 
 /** Cartas que ilustran cada párrafo de una regla: la foto va justo debajo del párrafo que la nombra. */
@@ -94,8 +95,11 @@ export function PantallaReglas() {
           type="button"
           aria-pressed={modo === m.id}
           onClick={() => irAModo(m.id)}
-          className={`min-h-12 px-1 py-2 text-xs font-semibold leading-tight ${modo === m.id ? 'opcion opcion-sel' : 'opcion'}`}
+          className={`flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl border-2 px-1 py-2 text-xs font-semibold leading-tight ${
+            modo === m.id ? TONOS_APP[m.tono].activo : 'border-slate-300 bg-white text-tinta'
+          }`}
         >
+          <span aria-hidden="true" className={`h-2 w-2 rounded-full ${TONOS_APP[m.tono].punto}`} />
           {m.etiqueta}
         </button>
       ))}
