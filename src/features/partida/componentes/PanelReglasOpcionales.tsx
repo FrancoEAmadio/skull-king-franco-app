@@ -2,19 +2,20 @@ import { useState } from 'react';
 import { modoPermiteRegla } from '../../../dominio/disponibilidadContenido';
 import { vibrar } from '../../../infra/vibracion';
 import type { ConfiguracionMesa, ReglasOpcionales } from '../../../tipos';
+import { TONOS_APP, type NombreTono } from '../../../ui/tonos';
 
-type Opcion = [keyof ReglasOpcionales, string, string];
+type Opcion = [keyof ReglasOpcionales, string, string, NombreTono];
 
 const OPCIONES_AVANZADAS: Opcion[] = [
-  ['kraken', 'Kraken', 'Nadie gana la baza'],
-  ['botin', 'Botín', 'Alianzas +20 pts'],
+  ['kraken', 'Kraken', 'Nadie gana la baza', 'rosa'],
+  ['botin', 'Botín', 'Alianzas +20 pts', 'amarillo'],
 ];
 
 const OPCIONES_EXPANSION: Opcion[] = [
-  ['primerOficialKong', 'Primer Oficial Kong', 'Copia una habilidad'],
-  ['davyJones', 'Davy Jones', 'Monstruos destruidos'],
-  ['carta7', 'Carta 7', '−5 pts al capturarla'],
-  ['carta8', 'Carta 8', '+5 pts al capturarla'],
+  ['primerOficialKong', 'Primer Oficial Kong', 'Copia una habilidad', 'negro'],
+  ['davyJones', 'Davy Jones', 'Monstruos destruidos', 'agua'],
+  ['carta7', 'Carta 7', '−5 pts al capturarla', 'rojo'],
+  ['carta8', 'Carta 8', '+5 pts al capturarla', 'azul'],
 ];
 
 interface Props {
@@ -61,7 +62,7 @@ function Grupo({ titulo, opciones, configuracion, onCambiar }: GrupoProps) {
         {sinModo && ' · no disponible en este modo'}
       </span>
       <div className="grid grid-cols-2 gap-2.5">
-        {opciones.map(([clave, nombre, detalle]) => {
+        {opciones.map(([clave, nombre, detalle, tono]) => {
           const deshabilitada = !modoPermiteRegla(configuracion.modoContenido, clave);
           const activo = configuracion.reglasOpcionales[clave];
           return (
@@ -75,12 +76,12 @@ function Grupo({ titulo, opciones, configuracion, onCambiar }: GrupoProps) {
                 vibrar();
                 onCambiar(clave, !activo);
               }}
-              className={`flex min-h-[5rem] flex-col items-start justify-between gap-1 p-3 text-left disabled:cursor-not-allowed disabled:opacity-50 ${
-                activo ? 'opcion opcion-sel' : 'opcion'
+              className={`flex min-h-[5rem] flex-col items-start justify-between gap-1 rounded-xl border-2 p-3 text-left disabled:cursor-not-allowed disabled:opacity-50 ${
+                activo ? TONOS_APP[tono].activo : TONOS_APP[tono].reposo
               }`}
             >
               <span className="text-sm font-bold leading-tight">{nombre}</span>
-              <span className="text-xs font-semibold leading-tight text-slate-500">{detalle}</span>
+              <span className="text-xs font-semibold leading-tight opacity-75">{detalle}</span>
             </button>
           );
         })}

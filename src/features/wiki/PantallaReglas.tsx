@@ -222,6 +222,42 @@ export function PantallaReglas() {
               </div>
             )}
           </div>
+
+          {/* Manuales oficiales en PDF: solo en Reglas de juego */}
+          <div className="overflow-hidden rounded-xl border border-white/20">
+            <button
+              type="button"
+              onClick={() => setAcordeonAbierto(acordeonAbierto === 'manuales' ? null : 'manuales')}
+              aria-expanded={acordeonAbierto === 'manuales'}
+              className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-bold ${acordeonAbierto === 'manuales' ? 'bg-[#ead9b4] text-azul' : 'bg-white text-azul'}`}
+            >
+              <span>6. Manuales oficiales en PDF</span>
+              <span>{acordeonAbierto === 'manuales' ? '▲' : '▼'}</span>
+            </button>
+            {acordeonAbierto === 'manuales' && (
+              <div className="flex flex-col gap-2 bg-white p-3">
+                {MANUALES_PDF.map((m) =>
+                  m.archivo ? (
+                    <a
+                      key={m.titulo}
+                      href={`${import.meta.env.BASE_URL}${m.archivo}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-claro flex w-full flex-col items-start px-4 py-3 text-left"
+                    >
+                      <span className="text-sm font-bold">{m.titulo}</span>
+                      <span className="text-xs font-semibold text-slate-500">{m.descripcion}</span>
+                    </a>
+                  ) : (
+                    <div key={m.titulo} className="flex w-full flex-col items-start rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 opacity-70">
+                      <span className="text-sm font-bold text-tinta">{m.titulo}</span>
+                      <span className="text-xs font-semibold text-slate-500">{m.descripcion} · Próximamente</span>
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -230,26 +266,6 @@ export function PantallaReglas() {
           <Jerarquias modo={modo} />
         </div>
       )}
-
-      <section className="tarjeta flex flex-col gap-2.5 p-4">
-        <h3 className="tarjeta-titulo">Manuales oficiales en PDF</h3>
-        {MANUALES_PDF.length === 0 ? (
-          <p className="text-sm font-semibold text-slate-500">Próximamente.</p>
-        ) : (
-          MANUALES_PDF.map((m) => (
-            <a
-              key={m.archivo}
-              href={`${import.meta.env.BASE_URL}${m.archivo}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-claro flex w-full flex-col items-start px-4 py-3 text-left"
-            >
-              <span className="text-sm font-bold">{m.titulo}</span>
-              {m.descripcion && <span className="text-xs font-semibold text-slate-500">{m.descripcion}</span>}
-            </a>
-          ))
-        )}
-      </section>
 
       <FichaCarta ids={ficha?.ids ?? null} titulo={ficha?.titulo ?? ''} onCerrar={() => setFicha(null)} />
     </main>
