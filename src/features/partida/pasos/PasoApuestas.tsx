@@ -32,6 +32,15 @@ export function PasoApuestas() {
         <div className="text-right">
           <span className="block text-3xl font-bold leading-none text-azul">{sumaApuestas}</span>
           <span className="block text-xs font-semibold text-slate-500">de {cartasPorJugadorEnRonda} bazas</span>
+          {completo && (
+            <span className="mt-1 block text-[11px] font-semibold text-amber-700">
+              {sumaApuestas === cartasPorJugadorEnRonda
+                ? 'Coinciden: todos podrían cumplir'
+                : sumaApuestas > cartasPorJugadorEnRonda
+                  ? `Sobran ${sumaApuestas - cartasPorJugadorEnRonda}: alguien va a fallar`
+                  : `Faltan ${cartasPorJugadorEnRonda - sumaApuestas}: alguien va a fallar`}
+            </span>
+          )}
         </div>
       </div>
 
