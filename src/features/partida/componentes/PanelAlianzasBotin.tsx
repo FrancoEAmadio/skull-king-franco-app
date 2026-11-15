@@ -3,10 +3,12 @@ import { useApp } from '../../../estado/AppProvider';
 import { MAX_ALIANZAS_POR_RONDA } from '../../../constantes';
 import { ModalAviso } from '../../../ui/ModalAviso';
 import { Seccion } from '../../../ui/Seccion';
+import { colorTarjetaDe } from '../../../datos/coloresJugador';
+import { TONOS_APP } from '../../../ui/tonos';
 
 /** Alianzas de Botín del jugador que se está anotando: solo hay que elegir con quién se alió. */
 export function PanelAlianzasBotin({ numero }: { numero?: number }) {
-  const { partida } = useApp();
+  const { partida, jugadoresPermanentes } = useApp();
   const {
     jugadores,
     jugadorSeleccionadoIdx,
@@ -17,6 +19,13 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
     registroHabilidadesRonda,
     cartasPorJugadorEnRonda,
   } = partida;
+
+  /** Colores de la tarjeta del jugador en la posición `idx` de la partida. */
+  const coloresDe = (idx: number) => {
+    const jug = jugadores[idx];
+    const perm = jug && jugadoresPermanentes.find((p) => p.id === jug.permanenteId);
+    return TONOS_APP[colorTarjetaDe(jug?.permanenteId ?? String(idx), perm?.colorTarjeta)];
+  };
 
   const activo = jugadores[jugadorSeleccionadoIdx];
   const [idxOtro, setIdxOtro] = useState<number | null>(null);
@@ -75,7 +84,7 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
       {!limiteAlcanzado && !sinBazas && (
         <>
           <span className="text-sm font-semibold text-tinta">
-            Alianza de <span className="text-azul">{activo.nombre}</span> con:
+            Alianza de <span className={`rounded-lg border-2 px-2 py-0.5 ${coloresDe(jugadorSeleccionadoIdx).activo}`}>{activo.nombre}</span> con:
           </span>
           <div className="flex flex-wrap gap-2">
             {otros.map(({ jug, idx }) => (
@@ -85,8 +94,8 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
                 aria-pressed={idxOtro === idx}
                 disabled={cartaYaIdentificada(idx)}
                 onClick={() => setIdxOtro(idx)}
-                className={`px-4 py-2.5 text-sm disabled:opacity-35 ${
-                  idxOtro === idx ? 'btn-dorado' : 'btn-claro'
+                className={`rounded-xl border-2 px-4 py-2.5 text-sm font-bold disabled:opacity-35 ${
+                  idxOtro === idx ? coloresDe(idx).activo : coloresDe(idx).reposo
                 }`}
               >
                 {jug.nombre}
@@ -108,9 +117,11 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
           {alianzasBotinRonda.map((alianza, idx) => (
             <span
               key={idx}
-              className="flex items-center gap-2 rounded-full border border-oro bg-slate-50 py-1 pl-3 pr-1 text-base font-semibold text-azul"
+              className="flex items-center gap-1.5 rounded-full border border-oro bg-slate-50 py-1 pl-1 pr-1 text-base font-semibold text-azul"
             >
-              {alianza.nombreA} 🤝 {alianza.nombreB}
+              <span className={`rounded-full border-2 px-2.5 py-0.5 ${coloresDe(alianza.idxA).activo}`}>{alianza.nombreA}</span>
+              🤝
+              <span className={`rounded-full border-2 px-2.5 py-0.5 ${coloresDe(alianza.idxB).activo}`}>{alianza.nombreB}</span>
               <button
                 type="button"
                 onClick={() => eliminarAlianzaBotin(idx)}
