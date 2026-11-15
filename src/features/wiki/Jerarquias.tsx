@@ -54,7 +54,7 @@ function EspecialesTriangulo({ onFicha }: { onFicha: OnFicha }) {
 function EspecialesCuadrado({ onFicha }: { onFicha: OnFicha }) {
   const nodos: NodoDiagrama[] = [
     { id: 'sk', x: 22, y: 22, imgs: [img('sk')], nombre: 'Skull King', color: COLOR.sk },
-    { id: 'kong', x: 78, y: 22, imgs: [img('kong')], nombre: 'Primer Oficial Kong', color: COLOR.kong },
+    { id: 'kong', x: 78, y: 22, imgs: [img('kong')], nombre: 'Kong', color: COLOR.kong },
     { id: 'si', x: 22, y: 78, imgs: [img('sirena'), img('sirena')], nombre: 'Sirenas ×2', color: COLOR.sirena },
     { id: 'pi', x: 78, y: 78, imgs: [...PIRATAS_BASE, 'mary_thorne'].map(img), nombre: 'Piratas ×7', color: COLOR.pirata },
   ];
@@ -113,11 +113,21 @@ function Palos({ modo, onFicha }: { modo: ModoContenido; onFicha: OnFicha }) {
             {flecha('gana a los 14')}
           </>
         )}
-        {fila([
-          { carta: 'palo_amarillo', id: 'a', nombre: 'Amarillo', archivo: archivo('palo_amarillo'), color: '#ca8a04' },
-          { carta: 'palo_violeta', id: 'v', nombre: 'Violeta', archivo: archivo('palo_violeta'), color: '#7c3aed' },
-          { carta: 'palo_verde', id: 'g', nombre: 'Verde', archivo: archivo('palo_verde'), color: '#16a34a' },
-        ])}
+        <DiagramaJerarquia
+          alto={96}
+          nodos={[
+            { id: 'a', x: 50, y: 20, imgs: [archivo('palo_amarillo')], nombre: 'Amarillo', color: '#ca8a04' },
+            { id: 'v', x: 20, y: 74, imgs: [archivo('palo_violeta')], nombre: 'Violeta', color: '#7c3aed' },
+            { id: 'g', x: 80, y: 74, imgs: [archivo('palo_verde')], nombre: 'Verde', color: '#16a34a' },
+          ]}
+          flechas={[
+            { de: 'a', a: 'v', doble: true, punteada: true },
+            { de: 'a', a: 'g', doble: true, punteada: true },
+            { de: 'v', a: 'g', doble: true, punteada: true },
+          ]}
+          onTocar={(id) => onFicha([id === 'a' ? 'palo_amarillo' : id === 'v' ? 'palo_violeta' : 'palo_verde'], id === 'a' ? 'Amarillo' : id === 'v' ? 'Violeta' : 'Verde')}
+        />
+        <p className="text-center text-xs font-semibold text-slate-500">Entre sí no hay uno mejor: gana el palo declarado, el de la primera carta de la baza.</p>
       </div>
     </Caja>
   );

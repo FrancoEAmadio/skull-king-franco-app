@@ -19,7 +19,7 @@ export function BarraJugadores({ items, indice, onIr }: Props) {
   const desde = Math.max(0, Math.min(indice - 1, cantidad - 3));
 
   return (
-    <div className="sticky top-0 z-20 -mx-4 px-4 pb-1 pt-[max(0.5rem,env(safe-area-inset-top))]">
+    <div className="sticky top-0 z-20 sangrado pb-1 pt-[max(0.5rem,env(safe-area-inset-top))]">
       <div
         className="rounded-2xl bg-noche-2/90 p-1 shadow-lg shadow-black/30 ring-1 ring-white/15 backdrop-blur"
       >

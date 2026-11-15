@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { modoPermiteRegla } from '../../../dominio/disponibilidadContenido';
 import { vibrar } from '../../../infra/vibracion';
 import type { ConfiguracionMesa, ReglasOpcionales } from '../../../tipos';
@@ -22,11 +23,24 @@ interface Props {
 }
 
 export function PanelReglasOpcionales({ configuracion, onCambiar }: Props) {
+  const [abierto, setAbierto] = useState(false);
   return (
-    <section className="tarjeta flex flex-col gap-4 p-4">
-      <h3 className="tarjeta-titulo">5. Reglas y cartas opcionales</h3>
-      <Grupo titulo="Reglas avanzadas" opciones={OPCIONES_AVANZADAS} configuracion={configuracion} onCambiar={onCambiar} />
-      <Grupo titulo="Expansión" opciones={OPCIONES_EXPANSION} configuracion={configuracion} onCambiar={onCambiar} />
+    <section className="tarjeta overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setAbierto(!abierto)}
+        aria-expanded={abierto}
+        className="flex w-full items-center justify-between gap-2 px-4 py-3.5 text-left"
+      >
+        <h3 className="tarjeta-titulo">5. Reglas y cartas opcionales</h3>
+        <span className="text-sm font-bold text-azul">{abierto ? '▲' : '▼'}</span>
+      </button>
+      {abierto && (
+        <div className="flex flex-col gap-4 px-4 pb-4">
+          <Grupo titulo="Reglas avanzadas" opciones={OPCIONES_AVANZADAS} configuracion={configuracion} onCambiar={onCambiar} />
+          <Grupo titulo="Expansión" opciones={OPCIONES_EXPANSION} configuracion={configuracion} onCambiar={onCambiar} />
+        </div>
+      )}
     </section>
   );
 }

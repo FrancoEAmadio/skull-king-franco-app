@@ -15,7 +15,7 @@ function ContenidoApp() {
   const { pantallaActual } = useApp();
 
   return (
-    <div className="contenedor-app mx-auto flex min-h-dvh w-full max-w-md flex-col justify-between md:max-w-5xl md:px-6">
+    <div className="contenedor-app mx-auto flex min-h-dvh w-full max-w-md flex-col justify-between md:max-w-none">
       {pantallaActual === 'inicio' && <PantallaInicio />}
       {pantallaActual === 'nueva_partida' && <PantallaNuevaPartida />}
       {pantallaActual === 'partida' && <PantallaPartida />}

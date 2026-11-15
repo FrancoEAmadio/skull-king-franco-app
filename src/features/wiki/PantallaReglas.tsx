@@ -106,7 +106,7 @@ export function PantallaReglas() {
   return (
     <main className="entrar flex w-full flex-1 flex-col gap-4 pb-4" {...gestos}>
       {/* Menú fijo: queda a la vista al scrollear */}
-      <div className="sticky top-0 z-20 -mx-4 flex flex-col gap-2 bg-noche-2/95 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] shadow-lg shadow-black/20 backdrop-blur">
+      <div className="sticky top-0 z-20 sangrado flex flex-col gap-2 bg-noche-2/95 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] shadow-lg shadow-black/20 backdrop-blur">
         <div className="flex items-center justify-between gap-2">
           <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma px-3 py-2 text-sm">
             ← Menú
@@ -167,7 +167,7 @@ export function PantallaReglas() {
                                   <div key={pIdx} className="flex flex-col gap-2">
                                     <p className="whitespace-pre-line text-xs leading-relaxed">{parrafo}</p>
                                     {cartas.length > 0 && (
-                                      <div className="flex flex-wrap gap-2">
+                                      <div className="flex flex-wrap justify-center gap-3">
                                         {cartas.map((id) => {
                                           const c = CATALOGO_CARTAS_WIKI.find((x) => x.id === id);
                                           return c ? (
@@ -200,7 +200,7 @@ export function PantallaReglas() {
               aria-expanded={acordeonAbierto === 'catalogo'}
               className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-black ${acordeonAbierto === 'catalogo' ? 'bg-[#ead9b4] text-azul' : 'bg-white text-azul'}`}
             >
-              <span>Catálogo de cartas</span>
+              <span>5. Catálogo de cartas</span>
               <span>{acordeonAbierto === 'catalogo' ? '▲' : '▼'}</span>
             </button>
             {acordeonAbierto === 'catalogo' && (

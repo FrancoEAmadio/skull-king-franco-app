@@ -42,7 +42,9 @@ export function calcularMaxGanadasPara(
     if (idx === indiceJugador) return acc;
     return acc + (Number(jugador.ganadas) || 0);
   }, 0);
-  return Math.max(0, cartasPorJugadorEnRonda - sumaOtras);
+  // Davy Jones no gana bazas: quien lo jugó no puede haber ganado con esa carta.
+  const conDavy = (Number(jugadores[indiceJugador]?.eventosBono?.monstruo_davy) || 0) > 0 ? 1 : 0;
+  return Math.max(0, Math.min(cartasPorJugadorEnRonda - conDavy, cartasPorJugadorEnRonda - sumaOtras));
 }
 
 export interface LimiteComodines {

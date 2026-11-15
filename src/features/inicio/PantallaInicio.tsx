@@ -24,19 +24,22 @@ export function PantallaInicio() {
   };
 
   return (
-    <main className="entrar my-auto flex w-full flex-col items-center py-4 text-center">
+    <main className="entrar mx-auto my-auto flex w-full max-w-xl flex-col items-center py-4 text-center">
       <img
-        src="./archivos/iconos/tapa.png"
-        alt="Manual de Skull King"
-        className="mb-6 h-auto w-full rounded-3xl border border-oro/40 object-cover shadow-2xl"
+        src="./archivos/iconos/icon-512.png"
+        alt="Skull King"
+        className="h-auto w-48 max-w-[55%] drop-shadow-[0_10px_24px_rgba(0,0,0,0.55)]"
       />
+      <h1 className="mb-7 mt-3 font-display text-5xl font-black tracking-wide text-oro-claro drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+        Skull King
+      </h1>
 
       <div className="flex w-full flex-col gap-3">
         <button type="button" onClick={partida.irANuevaPartida} className="btn-dorado w-full py-4 text-lg">
           Nueva Partida
         </button>
         {partida.hayPartidaGuardada && (
-          <button type="button" onClick={continuar} className="btn-oscuro w-full py-4 text-lg">
+          <button type="button" onClick={continuar} className="btn-oscuro latir w-full py-4 text-lg">
             Continuar Partida{partida.partidasGuardadas.length > 1 ? ` (${partida.partidasGuardadas.length})` : ''}
           </button>
         )}

@@ -372,7 +372,7 @@ export function usePartidaState({
     if (indiceVisualActual < jugadoresOrdenados.length - 1) return 'Siguiente Jugador ➔';
     if (editandoRondaAnterior) return '✓ Guardar Corrección de Ronda ➔';
     if (rondaActual < totalRondas) return 'Ver Resumen de la Ronda ➔';
-    return '🏁 Ver Resumen Final ➔';
+    return 'Ver Resumen Final ➔';
   }, [indiceVisualActual, jugadoresOrdenados.length, editandoRondaAnterior, rondaActual, totalRondas]);
 
   const persistirPartida = useCallback(
