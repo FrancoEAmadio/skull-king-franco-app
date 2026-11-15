@@ -97,8 +97,8 @@ export function PantallaNuevaPartida() {
   const maxPiratasHabilidad = configuracionMesa.modoContenido === 'expansion' ? 'Bribón, Harry y Kong' : 'Bribón y Harry';
 
   return (
-    <main className="entrar flex w-full flex-col gap-4 py-4">
-      <div className="flex items-start justify-between gap-3">
+    <main className="entrar flex w-full flex-col gap-4 py-4 lg:grid lg:grid-cols-2 lg:items-start">
+      <div className="flex items-start justify-between gap-3 lg:col-span-2">
         <div>
           <span className="text-xs font-black uppercase tracking-widest text-amber-100">Nueva partida</span>
           <h2 className="font-display text-2xl font-black text-white">Configurar mesa</h2>
@@ -170,7 +170,7 @@ export function PantallaNuevaPartida() {
 
       <PanelReglasOpcionales configuracion={configuracionMesa} onCambiar={cambiarReglaOpcional} />
 
-      <button type="button" onClick={intentarComenzarPartida} className="btn-dorado mt-1 w-full py-4 text-lg">
+      <button type="button" onClick={intentarComenzarPartida} className="btn-dorado mt-1 w-full py-4 text-lg lg:col-span-2">
         Empezar partida ➔
       </button>
 

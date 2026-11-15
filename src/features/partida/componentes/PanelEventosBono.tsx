@@ -7,6 +7,8 @@ interface Props {
   numero?: number;
   eventosBase: EventoBono[];
   eventosExpansion: EventoBono[];
+  /** Sin bazas ganadas no hay capturas: solo queda Davy Jones (no gana bazas). */
+  sinBazas?: boolean;
 }
 
 const PALOS: { id: string; titulo: string; tono: TonoChip }[] = [
@@ -24,7 +26,7 @@ const ESPECIALES: Record<string, { titulo: string }> = {
   monstruo_davy: { titulo: 'Monstruo destruido por Davy Jones' },
 };
 
-export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Props) {
+export function PanelEventosBono({ numero, eventosBase: baseTodos, eventosExpansion: expTodos, sinBazas = false }: Props) {
   const { partida } = useApp();
   const {
     jugadorActual,
@@ -37,6 +39,8 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
   } = partida;
 
   if (!jugadorActual) return null;
+  const eventosBase = sinBazas ? [] : baseTodos;
+  const eventosExpansion = sinBazas ? expTodos.filter((e) => e.id === 'monstruo_davy') : expTodos;
 
   const tieneEventos = Object.values(jugadorActual.eventosBono).some((v) => Number(v) !== 0);
   const disponibles = new Set([...eventosBase, ...eventosExpansion].map((e) => e.id));
@@ -65,7 +69,8 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
 
   return (
     <Seccion numero={numero} titulo="Bonos de la ronda">
-      <div className="flex flex-col gap-2">
+      {sinBazas && <p className="text-sm text-slate-600">Sin bazas ganadas no hay capturas{eventosExpansion.length > 0 ? ', salvo los monstruos que destruyó Davy Jones' : ''}.</p>}
+      {!sinBazas && <div className="flex flex-col gap-2">
         <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Cartas de palo capturadas</span>
         <div className={`grid gap-2 ${palos.length > 2 ? 'grid-cols-4' : 'grid-cols-2'}`}>
           {palos.map((p) => chip({ id: p.id, puntos: 0 }, p.titulo, p.tono, true))}
@@ -73,7 +78,7 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
         <p className="text-xs font-semibold text-slate-500">
           {palos.length > 2 ? 'Tocá cada valor tantas veces como cartas capturaste.' : 'Los 14 capturados: +10 de color y +20 negro.'}
         </p>
-      </div>
+      </div>}
 
       {especialesBase.length > 0 && (
         <div className="flex flex-col gap-2">

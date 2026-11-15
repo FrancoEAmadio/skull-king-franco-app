@@ -150,6 +150,7 @@ function maximoCartasPalo(idEvento: string, ctx: ContextoLimite): number {
  */
 export function calcularMaximoDisponible(idEvento: string, ctx: ContextoLimite): number {
   if (!estaDisponibleEventoBono(idEvento, ctx.configuracion)) return 0;
+  if (idEvento === 'monstruo_davy' && (ctx.jugadores[ctx.jugadorSeleccionadoIdx]?.ganadas ?? 0) >= ctx.cartasPorJugadorEnRonda) return 0;
   if ((PALOS as readonly string[]).includes(idEvento)) return maximoCartasPalo(idEvento, ctx);
   if (!(EVENTOS_ESPECIALES as readonly string[]).includes(idEvento)) return LIMITES_FIJOS[idEvento] ?? 99;
 
@@ -164,6 +165,9 @@ export function calcularMaximoDisponible(idEvento: string, ctx: ContextoLimite):
 /** Línea corta con el motivo por el cual el + de un bono ya no se puede usar. */
 export function motivoTopeBono(idEvento: string, ctx: ContextoLimite): string {
   const actual = Number(ctx.jugadores[ctx.jugadorSeleccionadoIdx]?.eventosBono?.[idEvento]) || 0;
+  if (idEvento === 'monstruo_davy' && (ctx.jugadores[ctx.jugadorSeleccionadoIdx]?.ganadas ?? 0) >= ctx.cartasPorJugadorEnRonda) {
+    return 'Davy Jones no gana bazas: este jugador usó una carta para él y no puede haber ganado todas.';
+  }
   const motivo = detectarMotivoImposible(asignacionesCon(ctx, idEvento, actual + 1), ctx);
   switch (motivo) {
     case 'davy_total':

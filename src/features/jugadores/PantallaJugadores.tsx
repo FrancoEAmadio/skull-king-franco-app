@@ -85,9 +85,9 @@ export function PantallaJugadores() {
       <div className="grid grid-cols-3 gap-2">
         {(
           [
-            ['gestor', '👤 Jugadores'],
-            ['estadisticas', '📊 Estadísticas'],
-            ['historial', '📜 Historial'],
+            ['gestor', 'Jugadores'],
+            ['estadisticas', 'Estadísticas'],
+            ['historial', 'Historial'],
           ] as const
         ).map(([id, etiqueta]) => (
           <button
@@ -185,7 +185,7 @@ export function PantallaJugadores() {
                           type="button"
                           onClick={() => setJugadorPendienteEliminar(jug)}
                           aria-label={`Eliminar a ${jug.nombre}`}
-                          className="btn-claro h-10 w-10 text-lg !text-rojo-osc"
+                          className="btn-peligro h-10 w-10 text-lg"
                         >
                           🗑️
                         </button>
@@ -353,8 +353,8 @@ function VistaHistorial() {
           <div key={hIndex} className="tarjeta flex flex-col gap-3 p-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <span className="text-xs font-black uppercase tracking-wider text-azul">{partidaGuardada.fecha}</span>
-              <button type="button" onClick={() => eliminarPartidaHistorial(hIndex)} className="min-h-11 px-2 text-xs font-bold text-rojo-osc">
-                ✕ Eliminar
+              <button type="button" onClick={() => eliminarPartidaHistorial(hIndex)} className="btn-peligro px-3 py-2 text-xs">
+                Eliminar
               </button>
             </div>
             <div className="flex flex-col gap-1.5">
@@ -369,7 +369,7 @@ function VistaHistorial() {
                     <span className="truncate text-sm font-bold text-tinta">
                       {jIndex + 1}.º {jug.nombre}
                     </span>
-                    <span className="text-[11px] text-slate-500">Ver desglose por ronda</span>
+                    <span className="text-[11px] text-slate-500">Ver detalles</span>
                   </span>
                   <span className="shrink-0 pl-2 font-black text-tinta">{jug.puntos} pts</span>
                 </button>

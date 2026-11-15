@@ -81,7 +81,7 @@ export function PasoPuntos() {
 
   // Si el envite no se cumplió, los bonos no se cobran (salvo que la mesa tenga activada esa regla).
   const sinBazas = jugadorActual.ganadas === 0;
-  const bonosBloqueados = sinBazas || (!acerto && !configuracionMesa.cobrarBonosSinAcierto);
+  const bonosBloqueados = (!acerto && !configuracionMesa.cobrarBonosSinAcierto);
 
   const eventosDisponibles = LISTA_EVENTOS_BONO.filter(
     (evento) => evento.id !== 'alianza_botin' && estaDisponibleEventoBono(evento.id, configuracionMesa)
@@ -122,8 +122,8 @@ export function PasoPuntos() {
         }))}
       />
 
-      <div key={jugadorSeleccionadoIdx} className={`flex flex-col gap-4 ${animacion}`}>
-        <div className="tarjeta flex items-end justify-between gap-3 p-4">
+      <div key={jugadorSeleccionadoIdx} className={`flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start ${animacion}`}>
+        <div className="tarjeta lg:col-span-2 flex items-end justify-between gap-3 p-4">
           <div className="min-w-0">
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
               {indiceVisualActual + 1} de {total}
@@ -181,11 +181,11 @@ export function PasoPuntos() {
 
         {bonosBloqueados ? (
           <Seccion numero={numeroBonos} titulo="Bonos de la ronda" marcador="Bloqueado">
-            <p className="text-sm text-slate-600">{sinBazas ? 'Sin bazas ganadas no hay capturas.' : 'Se habilitan al acertar el envite.'}</p>
+            <p className="text-sm text-slate-600">Se habilitan al acertar el envite.</p>
           </Seccion>
         ) : (
           <div className="entra-subiendo">
-            <PanelEventosBono numero={numeroBonos} eventosBase={eventosBase} eventosExpansion={eventosExpansion} />
+            <PanelEventosBono numero={numeroBonos} eventosBase={eventosBase} eventosExpansion={eventosExpansion} sinBazas={sinBazas} />
           </div>
         )}
 

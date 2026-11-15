@@ -18,7 +18,7 @@ const TONOS: Record<TonoChip, { reposo: string; activo: string }> = {
   rojo: { reposo: 'bg-red-50 border-red-200 text-red-700', activo: 'bg-red-100 border-red-500 text-red-800 ring-2 ring-red-300' },
   verde: { reposo: 'bg-emerald-50 border-emerald-200 text-emerald-700', activo: 'bg-emerald-100 border-emerald-500 text-emerald-800 ring-2 ring-emerald-300' },
   dorado: { reposo: 'bg-amber-50 border-amber-300 text-amber-800', activo: 'bg-amber-200 border-oro-osc text-amber-900 ring-2 ring-oro/50' },
-  negro: { reposo: 'bg-slate-100 border-slate-300 text-slate-700', activo: 'bg-slate-300 border-slate-700 text-slate-900 ring-2 ring-slate-400' },
+  negro: { reposo: 'bg-slate-100 border-slate-800 text-slate-900', activo: 'bg-slate-300 border-black text-black ring-2 ring-slate-500' },
 };
 
 /** Botón-chip vertical: cada toque suma hasta el máximo y el siguiente lo borra. */
