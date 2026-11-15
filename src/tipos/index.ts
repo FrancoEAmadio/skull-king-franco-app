@@ -180,6 +180,10 @@ export interface JugadorPermanente {
   id: string;
   nombre: string;
   avatar?: string;
+  /** Color de la tarjeta (borde y tinte) al estar seleccionado. */
+  colorTarjeta?: string;
+  /** Color de fondo del emoji. */
+  colorAvatar?: string;
   estadisticas: EstadisticasJugador;
   evolucion: EntradaEvolucion[];
 }

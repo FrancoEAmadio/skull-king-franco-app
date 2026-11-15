@@ -7,6 +7,9 @@ import { GraficoEvolucion } from '../../ui/GraficoEvolucion';
 import { AVATARES, avatarDe } from '../../datos/avatares';
 import { AvatarPirata } from '../../ui/AvatarPirata';
 import { SelectorAvatar } from '../../ui/SelectorAvatar';
+import { SelectorColor } from '../../ui/SelectorColor';
+import { colorAvatarDe, colorTarjetaDe, coloresParaNuevo } from '../../datos/coloresJugador';
+import type { NombreTono } from '../../ui/tonos';
 import type { JugadorPermanente } from '../../tipos';
 import { ModalConfirmarEliminacionJugador } from './ModalConfirmarEliminacionJugador';
 import { ModalConfirmacion } from '../../ui/ModalConfirmacion';
@@ -20,6 +23,7 @@ export function PantallaJugadores() {
     crearJugadorPermanente,
     renombrarJugadorPermanente,
     cambiarAvatarJugadorPermanente,
+    cambiarColoresJugadorPermanente,
     eliminarJugadorPermanente,
     verEstadisticasJugador,
     partida,
@@ -29,14 +33,17 @@ export function PantallaJugadores() {
   const [nombreNuevo, setNombreNuevo] = useState('');
   const [avatarNuevo, setAvatarNuevo] = useState(AVATARES[0]!);
   const [avatarAbierto, setAvatarAbierto] = useState<string | null>(null);
+  const [coloresElegidos, setColoresNuevo] = useState<{ colorTarjeta: NombreTono; colorAvatar: NombreTono } | null>(null);
+  const coloresNuevo = coloresElegidos ?? coloresParaNuevo(jugadoresPermanentes);
   const [edicion, setEdicion] = useState<{ id: string; nombre: string } | null>(null);
   const [jugadorPendienteEliminar, setJugadorPendienteEliminar] =
     useState<JugadorPermanente | null>(null);
 
   const crear = () => {
-    const nuevo = crearJugadorPermanente(nombreNuevo, avatarNuevo);
+    const nuevo = crearJugadorPermanente(nombreNuevo, avatarNuevo, coloresNuevo);
     if (nuevo) {
       setNombreNuevo('');
+      setColoresNuevo(null);
       setAvatarNuevo(AVATARES[(AVATARES.indexOf(avatarNuevo) + 1) % AVATARES.length]!);
     }
   };
@@ -114,7 +121,7 @@ export function PantallaJugadores() {
                 aria-label="Elegir icono del nuevo pirata"
                 className="btn-claro shrink-0 px-2"
               >
-                <AvatarPirata emoji={avatarNuevo} tamano="md" />
+                <AvatarPirata emoji={avatarNuevo} fondo={coloresNuevo.colorAvatar} tamano="md" />
               </button>
               <input
                 value={nombreNuevo}
@@ -129,13 +136,24 @@ export function PantallaJugadores() {
               </button>
             </div>
             {avatarAbierto === 'nuevo' && (
-              <SelectorAvatar
-                valor={avatarNuevo}
-                onCambiar={(emoji) => {
-                  setAvatarNuevo(emoji);
-                  setAvatarAbierto(null);
-                }}
-              />
+              <div className="flex flex-col gap-3">
+                <SelectorAvatar valor={avatarNuevo} onCambiar={setAvatarNuevo} />
+                <SelectorColor
+                  titulo="Color de la tarjeta"
+                  valor={coloresNuevo.colorTarjeta}
+                  bloqueado={coloresNuevo.colorAvatar}
+                  onCambiar={(tono) => setColoresNuevo({ ...coloresNuevo, colorTarjeta: tono })}
+                />
+                <SelectorColor
+                  titulo="Fondo del emoji"
+                  valor={coloresNuevo.colorAvatar}
+                  bloqueado={coloresNuevo.colorTarjeta}
+                  onCambiar={(tono) => setColoresNuevo({ ...coloresNuevo, colorAvatar: tono })}
+                />
+                <button type="button" onClick={() => setAvatarAbierto(null)} className="btn-claro px-4 py-2.5 text-sm font-bold">
+                  Listo
+                </button>
+              </div>
             )}
           </section>
 
@@ -169,7 +187,7 @@ export function PantallaJugadores() {
                         aria-label={`Cambiar icono de ${jug.nombre}`}
                         className="shrink-0"
                       >
-                        <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} tamano="lg" />
+                        <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} fondo={colorAvatarDe(jug.id, jug.colorAvatar, jug.colorTarjeta)} tamano="lg" />
                       </button>
                       <button type="button" onClick={() => verEstadisticasJugador(jug)} className="min-w-0 flex-1 text-left">
                         <span className="block truncate text-lg font-bold text-azul">{jug.nombre}</span>
@@ -195,13 +213,27 @@ export function PantallaJugadores() {
                   )}
                 </div>
                 {avatarAbierto === jug.id && (
-                  <SelectorAvatar
-                    valor={avatarDe(jug.id, jug.avatar)}
-                    onCambiar={(emoji) => {
-                      cambiarAvatarJugadorPermanente(jug.id, emoji);
-                      setAvatarAbierto(null);
-                    }}
-                  />
+                  <div className="mt-2 flex flex-col gap-3">
+                    <SelectorAvatar
+                      valor={avatarDe(jug.id, jug.avatar)}
+                      onCambiar={(emoji) => cambiarAvatarJugadorPermanente(jug.id, emoji)}
+                    />
+                    <SelectorColor
+                      titulo="Color de la tarjeta"
+                      valor={colorTarjetaDe(jug.id, jug.colorTarjeta)}
+                      bloqueado={colorAvatarDe(jug.id, jug.colorAvatar, jug.colorTarjeta)}
+                      onCambiar={(tono) => cambiarColoresJugadorPermanente(jug.id, { colorTarjeta: tono, colorAvatar: colorAvatarDe(jug.id, jug.colorAvatar, jug.colorTarjeta) })}
+                    />
+                    <SelectorColor
+                      titulo="Fondo del emoji"
+                      valor={colorAvatarDe(jug.id, jug.colorAvatar, jug.colorTarjeta)}
+                      bloqueado={colorTarjetaDe(jug.id, jug.colorTarjeta)}
+                      onCambiar={(tono) => cambiarColoresJugadorPermanente(jug.id, { colorTarjeta: colorTarjetaDe(jug.id, jug.colorTarjeta), colorAvatar: tono })}
+                    />
+                    <button type="button" onClick={() => setAvatarAbierto(null)} className="btn-claro px-4 py-2.5 text-sm font-bold">
+                      Listo
+                    </button>
+                  </div>
                 )}
               </div>
             ))
@@ -225,7 +257,7 @@ export function PantallaJugadores() {
                 className="tarjeta flex items-center gap-3 p-3 text-left"
               >
                 <span className="w-6 shrink-0 text-center text-sm font-bold text-slate-400">{posicion + 1}</span>
-                <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} tamano="md" />
+                <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} fondo={colorAvatarDe(jug.id, jug.colorAvatar, jug.colorTarjeta)} tamano="md" />
                 <div className="min-w-0 flex-1">
                   <span className="block truncate text-base font-bold text-azul">{jug.nombre}</span>
                   <span className="text-xs font-semibold text-slate-500">

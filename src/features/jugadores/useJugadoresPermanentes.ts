@@ -5,12 +5,16 @@ import {
 } from '../../infra/almacenamiento';
 import type { JugadorPermanente } from '../../tipos';
 import { crearJugadorPermanente } from '../../dominio/estadisticas';
+import { completarColores, coloresParaNuevo } from '../../datos/coloresJugador';
 
 export function useJugadoresPermanentes() {
   const [jugadores, setJugadores] = useState<JugadorPermanente[]>([]);
 
   useEffect(() => {
-    setJugadores(cargarJugadoresPermanentes());
+    const cargados = cargarJugadoresPermanentes();
+    const { lista, cambio } = completarColores(cargados);
+    setJugadores(lista);
+    if (cambio) guardarJugadoresPermanentes(lista);
   }, []);
 
   const persistir = useCallback((nuevos: JugadorPermanente[]) => {
@@ -19,10 +23,10 @@ export function useJugadoresPermanentes() {
   }, []);
 
   const crear = useCallback(
-    (nombre: string, avatar?: string): JugadorPermanente | null => {
+    (nombre: string, avatar?: string, colores?: { colorTarjeta: string; colorAvatar: string }): JugadorPermanente | null => {
       const nombreLimpio = nombre.trim();
       if (!nombreLimpio) return null;
-      const nuevo = crearJugadorPermanente(nombreLimpio, avatar);
+      const nuevo = { ...crearJugadorPermanente(nombreLimpio, avatar), ...(colores ?? coloresParaNuevo(jugadores)) };
       persistir([...jugadores, nuevo]);
       return nuevo;
     },
@@ -47,6 +51,13 @@ export function useJugadoresPermanentes() {
     [jugadores, persistir]
   );
 
+  const cambiarColores = useCallback(
+    (id: string, colores: { colorTarjeta?: string; colorAvatar?: string }) => {
+      persistir(jugadores.map((jug) => (jug.id === id ? { ...jug, ...colores } : jug)));
+    },
+    [jugadores, persistir]
+  );
+
   const eliminar = useCallback(
     (id: string) => {
       persistir(jugadores.filter((jug) => jug.id !== id));
@@ -61,5 +72,5 @@ export function useJugadoresPermanentes() {
     [persistir]
   );
 
-  return { jugadores, crear, renombrar, cambiarAvatar, eliminar, reemplazarLista };
+  return { jugadores, crear, renombrar, cambiarAvatar, cambiarColores, eliminar, reemplazarLista };
 }

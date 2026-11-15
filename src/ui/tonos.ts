@@ -33,3 +33,12 @@ export const TONOS_APP: Record<NombreTono, Tono> = {
 
 /** Base de las opciones neutras en reposo (el color aparece al elegirlas). */
 export const REPOSO_NEUTRO = 'bg-white border-slate-300 text-tinta';
+
+/** Degradado del fondo del emoji (claro → oscuro) por tono. */
+export const FONDO_AVATAR: Record<NombreTono, [string, string]> = {
+  amarillo: ['#fcd34d', '#d97706'], violeta: ['#a78bfa', '#6d28d9'], verde: ['#34d399', '#047857'],
+  rojo: ['#f87171', '#b91c1c'], azul: ['#60a5fa', '#1d4ed8'], rosa: ['#f472b6', '#be185d'],
+  negro: ['#475569', '#0f172a'], agua: ['#2dd4bf', '#0f766e'], naranja: ['#fb923c', '#c2410c'],
+  fucsia: ['#e879f9', '#a21caf'], lima: ['#a3e635', '#4d7c0f'], indigo: ['#818cf8', '#4338ca'],
+  cian: ['#22d3ee', '#0e7490'], pizarra: ['#94a3b8', '#475569'],
+};
