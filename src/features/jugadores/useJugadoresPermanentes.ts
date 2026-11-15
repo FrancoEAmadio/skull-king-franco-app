@@ -24,8 +24,14 @@ export function useJugadoresPermanentes() {
 
   const crear = useCallback(
     (nombre: string, avatar?: string, colores?: { colorTarjeta: string; colorAvatar: string }): JugadorPermanente | null => {
-      const nombreLimpio = nombre.trim();
-      if (!nombreLimpio) return null;
+      // Sin nombre: se crea un perfil automático "Jugador N" (el primer número que no esté en uso).
+      let nombreLimpio = nombre.trim();
+      if (!nombreLimpio) {
+        const usados = new Set(jugadores.map((jug) => jug.nombre.trim().toLowerCase()));
+        let numero = 1;
+        while (usados.has(`jugador ${numero}`)) numero += 1;
+        nombreLimpio = `Jugador ${numero}`;
+      }
       const nuevo = { ...crearJugadorPermanente(nombreLimpio, avatar), ...(colores ?? coloresParaNuevo(jugadores)) };
       persistir([...jugadores, nuevo]);
       return nuevo;
