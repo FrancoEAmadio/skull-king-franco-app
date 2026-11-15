@@ -3,6 +3,7 @@ import { MAX_JUGADORES_BASE, MAX_JUGADORES_EXPANSION } from '../../../constantes
 import { useApp } from '../../../estado/AppProvider';
 import { EncabezadoModal, Modal } from '../../../ui/Modal';
 import { AVATARES } from '../../../datos/avatares';
+import { vibrar } from '../../../infra/vibracion';
 import { AvatarPirata } from '../../../ui/AvatarPirata';
 import { coloresParaNuevo } from '../../../datos/coloresJugador';
 import { SelectorAvatar } from '../../../ui/SelectorAvatar';
@@ -29,6 +30,7 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
     partida: {
       alternarSeleccionJugador,
       borrarSeleccionJugadores,
+      aleatorizarSeleccionJugadores,
       configuracionMesa,
       idsJugadoresSeleccionados,
       posicionSeleccion,
@@ -153,9 +155,23 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
 
         <div className="flex flex-col gap-2 border-t border-slate-200 p-4">
           {idsJugadoresSeleccionados.length > 0 && (
-            <button type="button" onClick={borrarSeleccionJugadores} className="btn-peligro mx-auto px-5 py-2.5 text-sm">
-              Borrar selección
-            </button>
+            <div className="flex justify-center gap-2">
+              {idsJugadoresSeleccionados.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    aleatorizarSeleccionJugadores();
+                    vibrar();
+                  }}
+                  className="btn-claro px-5 py-2.5 text-sm font-bold"
+                >
+                  🎲 Aleatorio
+                </button>
+              )}
+              <button type="button" onClick={borrarSeleccionJugadores} className="btn-peligro px-5 py-2.5 text-sm">
+                Borrar selección
+              </button>
+            </div>
           )}
           <button type="button" onClick={cerrar} className="btn-dorado w-full py-3.5 text-base">
             Listo ({idsJugadoresSeleccionados.length})
