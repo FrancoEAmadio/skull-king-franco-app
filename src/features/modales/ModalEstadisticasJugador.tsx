@@ -36,8 +36,8 @@ export function ModalEstadisticasJugador() {
                 etiqueta="Victorias"
                 color="text-emerald-700"
               />
-              <Dato valor={`🥈 ${jugador.estadisticas.segundoPuesto}`} etiqueta="2º puesto" />
-              <Dato valor={`🥉 ${jugador.estadisticas.tercerPuesto}`} etiqueta="3º puesto" />
+              <Dato valor={`${jugador.estadisticas.segundoPuesto}`} etiqueta="2º puesto" />
+              <Dato valor={`${jugador.estadisticas.tercerPuesto}`} etiqueta="3º puesto" />
               <Dato valor={`${calcularPorcentajeAciertos(jugador)}%`} etiqueta="Envites acertados" />
               <Dato valor={jugador.estadisticas.mejorPartida ?? '—'} etiqueta="Mejor partida" color="text-emerald-700" />
               <Dato valor={jugador.estadisticas.peorPartida ?? '—'} etiqueta="Peor partida" color="text-rojo-osc" />
@@ -54,7 +54,7 @@ export function ModalEstadisticasJugador() {
                       <li key={`${entrada.fecha}-${indice}`} className="fila-puntaje py-1.5 text-sm">
                         <span className="text-slate-500">{entrada.fecha}</span>
                         <span className="shrink-0 font-bold text-tinta">
-                          {['🥇', '🥈', '🥉'][entrada.posicion - 1] ?? `${entrada.posicion}º`} · {entrada.puntos} pts
+                          {entrada.posicion}.º · {entrada.puntos} pts
                         </span>
                       </li>
                     ))}

@@ -1,9 +1,9 @@
-import { useSwipeHorizontal } from '../../../ui/useSwipeHorizontal';
-
 export interface ItemBarra {
   id: string;
   nombre: string;
   detalle: string;
+  /** Puntos que sumaría la ronda con lo cargado hasta ahora. */
+  proyeccion?: number;
 }
 
 interface Props {
@@ -18,16 +18,9 @@ export function BarraJugadores({ items, indice, onIr }: Props) {
   const ventana = Math.min(3, cantidad);
   const desde = Math.max(0, Math.min(indice - 1, cantidad - 3));
 
-  const { iniciarTouch, finalizarTouch } = useSwipeHorizontal({
-    onSwipeIzquierda: () => indice < cantidad - 1 && onIr(indice + 1),
-    onSwipeDerecha: () => indice > 0 && onIr(indice - 1),
-  });
-
   return (
     <div className="sticky top-0 z-20 -mx-4 px-4 pb-1 pt-[max(0.5rem,env(safe-area-inset-top))]">
       <div
-        onTouchStart={iniciarTouch}
-        onTouchEnd={finalizarTouch}
         className="rounded-2xl bg-noche-2/90 p-1 shadow-lg shadow-black/30 ring-1 ring-white/15 backdrop-blur"
       >
         <div className="selector-ventana">
@@ -59,6 +52,16 @@ export function BarraJugadores({ items, indice, onIr }: Props) {
                   <span className="selector-jugador-nombre text-xs font-black">{item.nombre}</span>
                   <span className={`selector-jugador-total text-[11px] font-bold ${activo ? 'text-azul-vivo' : 'opacity-75'}`}>
                     {item.detalle}
+                    {item.proyeccion !== undefined && (
+                      <span
+                        className={`ml-1 text-[10px] font-black ${
+                          item.proyeccion < 0 ? (activo ? 'text-rojo' : 'text-red-300') : activo ? 'text-emerald-600' : 'text-emerald-300'
+                        }`}
+                      >
+                        {item.proyeccion > 0 ? '+' : ''}
+                        {item.proyeccion}
+                      </span>
+                    )}
                   </span>
                 </button>
               );

@@ -1,5 +1,6 @@
 import { useApp } from '../../../estado/AppProvider';
-import { StepperBono } from '../../../ui/StepperBono';
+import { ChipBono } from '../../../ui/ChipBono';
+import { estaReglaActiva } from '../../../dominio/disponibilidadContenido';
 import { Seccion } from '../../../ui/Seccion';
 import { vibrar } from '../../../infra/vibracion';
 import type { EventoBono } from '../../../tipos';
@@ -32,15 +33,20 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
     cambiarCantidadBono,
     limpiarTodosLosEventos,
     motivoTopeBono,
+    borrarBonoInmediato,
+    configuracionMesa,
   } = partida;
 
   if (!jugadorActual) return null;
 
   const tieneEventos = Object.values(jugadorActual.eventosBono).some((v) => Number(v) !== 0);
   const unidadesCartas = Number(jugadorActual.eventosBono.puntos_cartas) || 0;
+  // Sin las cartas 7 y 8 (Base, Avanzadas o Expansión sin ellas) solo hay 14 de bono: se suma de a 10.
+  const paso10 = !estaReglaActiva(configuracionMesa, 'carta7') && !estaReglaActiva(configuracionMesa, 'carta8');
+  const pasoUnidades = paso10 ? 2 : 1;
   const puntosCartas = unidadesCartas * 5;
-  const enMaximo = unidadesCartas >= limitePuntosCartas.maximoUnidades;
-  const enMinimo = unidadesCartas <= limitePuntosCartas.minimoUnidades;
+  const enMaximo = unidadesCartas + pasoUnidades > limitePuntosCartas.maximoUnidades;
+  const enMinimo = unidadesCartas - pasoUnidades < limitePuntosCartas.minimoUnidades;
   const base = eventosBase.filter((e) => !REEMPLAZADOS.has(e.id));
   const expansion = eventosExpansion.filter((e) => !REEMPLAZADOS.has(e.id));
 
@@ -51,7 +57,7 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
         {eventos.map((evento) => {
           const maximo = obtenerMaximoBono(evento.id);
           return (
-            <StepperBono
+            <ChipBono
               key={evento.id}
               nombre={nombreCorto(evento.etiqueta)}
               detalle={detalleBono(evento, maximo)}
@@ -59,7 +65,7 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
               maximo={maximo}
               motivoTope={motivoTopeBono(evento.id)}
               onMas={() => cambiarCantidadBono(evento.id, 1)}
-              onMenos={() => cambiarCantidadBono(evento.id, -1)}
+              onBorrar={() => borrarBonoInmediato(evento.id)}
             />
           );
         })}
@@ -79,9 +85,9 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-2.5">
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0">
-              <span className="block text-sm font-extrabold leading-tight text-tinta">Puntos por cartas capturadas</span>
+              <span className="block text-sm font-extrabold leading-tight text-tinta">{paso10 ? '14 capturados (+10)' : 'Puntos por cartas capturadas'}</span>
               <span className="block text-xs font-semibold text-slate-500">
-                {enMaximo ? `Máximo: ${limitePuntosCartas.maximoUnidades * 5} pts` : '14, 8 y 7 · de a 5 pts'}
+                {enMaximo ? `Máximo: ${limitePuntosCartas.maximoUnidades * 5} pts` : (paso10 ? 'De a 10 pts' : '14, 8 y 7 · de a 5 pts')}
               </span>
             </div>
             <div className="stepper" role="group" aria-label="Puntos por cartas capturadas">
@@ -89,10 +95,10 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
                 type="button"
                 className="stepper-btn"
                 disabled={enMinimo}
-                aria-label="Restar 5 puntos"
+                aria-label="Restar puntos"
                 onClick={() => {
                   vibrar();
-                  ajustarPuntosCartas(-1);
+                  ajustarPuntosCartas(-pasoUnidades);
                 }}
               >
                 −
@@ -105,10 +111,10 @@ export function PanelEventosBono({ numero, eventosBase, eventosExpansion }: Prop
                 type="button"
                 className="stepper-btn"
                 disabled={enMaximo}
-                aria-label="Sumar 5 puntos"
+                aria-label="Sumar puntos"
                 onClick={() => {
                   vibrar();
-                  ajustarPuntosCartas(1);
+                  ajustarPuntosCartas(pasoUnidades);
                 }}
               >
                 +

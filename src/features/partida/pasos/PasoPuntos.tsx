@@ -7,6 +7,7 @@ import {
   estaReglaActiva,
 } from '../../../dominio/disponibilidadContenido';
 import { BarraJugadores } from '../componentes/BarraJugadores';
+import { useGestosMultiDedo } from '../../../ui/useGestosMultiDedo';
 import { vibrar } from '../../../infra/vibracion';
 import { FichasNumero } from '../../../ui/FichasNumero';
 import { ModalConfirmacion } from '../../../ui/ModalConfirmacion';
@@ -37,6 +38,7 @@ export function PasoPuntos() {
     limiteComodines,
     fijarCartasBlancas,
     puntajeProyectadoActual,
+    puntajeProyectadoDe,
     textoBotonAvanzar,
     guardarJugadorYContinuar,
   } = partida;
@@ -59,6 +61,9 @@ export function PasoPuntos() {
 
   const total = jugadoresOrdenados.length;
   const inicioPanelRef = useRef<HTMLDivElement | null>(null);
+  const gestos = useGestosMultiDedo({
+    dos: (dir) => irA(Math.max(0, Math.min(total - 1, indiceVisualActual + dir))),
+  });
   const irA = (posicion: number) => {
     const destino = jugadoresOrdenados[posicion];
     if (!destino) return;
@@ -75,7 +80,8 @@ export function PasoPuntos() {
   const bazasSinAsignar = cartasPorJugadorEnRonda - totalGanadasAsignadas;
 
   // Si el envite no se cumplió, los bonos no se cobran (salvo que la mesa tenga activada esa regla).
-  const bonosBloqueados = !acerto && !configuracionMesa.cobrarBonosSinAcierto;
+  const sinBazas = jugadorActual.ganadas === 0;
+  const bonosBloqueados = sinBazas || (!acerto && !configuracionMesa.cobrarBonosSinAcierto);
 
   const eventosDisponibles = LISTA_EVENTOS_BONO.filter(
     (evento) => evento.id !== 'alianza_botin' && estaDisponibleEventoBono(evento.id, configuracionMesa)
@@ -103,15 +109,16 @@ export function PasoPuntos() {
   const numeroComodines = configuracionMesa.usarComodinesBonificacion ? n++ : undefined;
 
   return (
-    <section className="flex flex-1 flex-col gap-4">
+    <section className="flex flex-1 flex-col gap-4" {...gestos}>
       <div ref={inicioPanelRef} aria-hidden="true" className="-mb-4 h-0" />
       <BarraJugadores
         indice={indiceVisualActual}
         onIr={irA}
-        items={jugadoresOrdenados.map(({ jugador }) => ({
+        items={jugadoresOrdenados.map(({ jugador, originalIndex }) => ({
           id: jugador.permanenteId,
           nombre: jugador.nombre,
           detalle: `${jugador.ganadas}/${jugador.apuesta}`,
+          proyeccion: puntajeProyectadoDe(originalIndex),
         }))}
       />
 
@@ -174,7 +181,7 @@ export function PasoPuntos() {
 
         {bonosBloqueados ? (
           <Seccion numero={numeroBonos} titulo="Bonos de la ronda" marcador="🔒">
-            <p className="text-sm text-slate-600">Se habilitan al acertar el envite.</p>
+            <p className="text-sm text-slate-600">{sinBazas ? 'Sin bazas ganadas no hay capturas.' : 'Se habilitan al acertar el envite.'}</p>
           </Seccion>
         ) : (
           <div className="entra-subiendo">
@@ -190,8 +197,8 @@ export function PasoPuntos() {
               nombre="Comodín"
               detalle={`En mesa: ${limiteComodines.comodinesDisponibles} / ${limiteComodines.maxComodinesPermitidos}`}
               cantidad={jugadorActual.cartasBlancas || 0}
-              maximo={limiteComodines.comodinesBloqueados ? 0 : 1}
-              motivoTope="No quedan comodines en la mesa."
+              maximo={limiteComodines.comodinesDisponibles}
+              motivoTope="Ya están todos los comodines del mazo repartidos."
               onMas={() => fijarCartasBlancas(jugadorSeleccionadoIdx, (jugadorActual.cartasBlancas || 0) + 1)}
               onMenos={() => fijarCartasBlancas(jugadorSeleccionadoIdx, Math.max(0, (jugadorActual.cartasBlancas || 0) - 1))}
             />

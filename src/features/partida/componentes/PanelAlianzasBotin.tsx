@@ -21,6 +21,7 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
   if (!activo) return null;
 
   const limiteAlcanzado = alianzasBotinRonda.length >= MAX_ALIANZAS_POR_RONDA;
+  const sinBazas = activo.ganadas === 0;
   const otros = jugadores.map((jug, idx) => ({ jug, idx })).filter(({ idx }) => idx !== jugadorSeleccionadoIdx);
 
   const registrar = () => {
@@ -41,7 +42,11 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
   return (
     <Seccion numero={numero} titulo="Alianzas de botín" marcador={`${alianzasBotinRonda.length}/${MAX_ALIANZAS_POR_RONDA}`}>
 
-      {!limiteAlcanzado && (
+      {sinBazas && (
+        <p className="text-sm text-slate-600">Sin bazas ganadas no podés registrar el Botín: lo carga quien lo capturó.</p>
+      )}
+
+      {!limiteAlcanzado && !sinBazas && (
         <>
           <span className="text-sm font-bold text-tinta">
             Alianza de <span className="text-azul">{activo.nombre}</span> con:

@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-  --color-noche: #0b1437;
-  --color-noche-2: #111c4a;
-  --color-azul: #1e3a8a;
-  --color-azul-vivo: #1d4ed8;
+  --color-noche: #2f241a;
+  --color-noche-2: #3f2d1c;
+  --color-azul: #5a3d1e;
+  --color-azul-vivo: #8a6a2f;
   --color-rojo: #dc2626;
   --color-rojo-osc: #b91c1c;
-  --color-tinta: #0f172a;
+  --color-tinta: #2b2118;
   --color-oro: #e9bf42;
   --color-oro-claro: #f1d36b;
   --color-oro-osc: #c9951c;
@@ -17,11 +17,11 @@
 }
 
 :root {
-  --azul: #1e3a8a;
-  --azul-vivo: #1d4ed8;
+  --azul: #5a3d1e;
+  --azul-vivo: #8a6a2f;
   --rojo: #dc2626;
   --rojo-osc: #b91c1c;
-  --tinta: #0f172a;
+  --tinta: #2b2118;
   --borde: #cbd5e1;
   --oro: #e9bf42;
   --oro-claro: #f1d36b;
@@ -44,9 +44,9 @@ body {
   font-variant-numeric: tabular-nums;
   -webkit-tap-highlight-color: transparent;
   background:
-    radial-gradient(ellipse at 50% -10%, rgba(37, 99, 235, 0.45) 0%, transparent 55%),
-    linear-gradient(180deg, #11205c 0%, #0b1437 70%);
-  background-color: #0b1437;
+    radial-gradient(ellipse at 50% -10%, rgba(212, 175, 55, 0.2) 0%, transparent 55%),
+    linear-gradient(180deg, #5a3d1e 0%, #2f241a 80%);
+  background-color: #2f241a;
   background-attachment: fixed;
   overflow-x: hidden;
 }
@@ -72,7 +72,6 @@ h1, h2, h3, .font-display {
 }
 
 button {
-  font: inherit;
   cursor: pointer;
   transition: transform 0.1s ease, filter 0.1s ease, background-color 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
   user-select: none;
@@ -89,8 +88,7 @@ input, textarea { -webkit-user-select: text; user-select: text; }
 .scroll-oculto::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
 .contenedor-app {
-  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
-    max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom)) 1rem;
 }
 
 img, svg, canvas { max-width: 100%; }
@@ -123,8 +121,8 @@ main :where(h1, h2, h3, p, span) { overflow-wrap: anywhere; }
   min-width: 2rem;
   padding: 0.1rem 0.6rem;
   border-radius: 9999px;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
+  background: #fbf3e0;
+  border: 1px solid #e7cfa8;
   color: var(--azul);
   font-weight: 900;
   font-size: 0.85rem;
@@ -144,9 +142,9 @@ main :where(h1, h2, h3, p, span) { overflow-wrap: anywhere; }
 }
 .btn-primario {
   color: #fff;
-  background: linear-gradient(180deg, #3b6cf0 0%, var(--azul-vivo) 55%, var(--azul) 100%);
-  border-color: #1e3a8a;
-  box-shadow: 0 6px 16px -4px rgba(29, 78, 216, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  background: linear-gradient(180deg, #a07f3c 0%, var(--azul-vivo) 55%, var(--azul) 100%);
+  border-color: #3f2d1c;
+  box-shadow: 0 6px 16px -4px rgba(90, 61, 30, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 .btn-dorado {
   color: #251a05;
@@ -235,12 +233,12 @@ main :where(h1, h2, h3, p, span) { overflow-wrap: anywhere; }
 .campo:focus {
   outline: none;
   border-color: var(--azul-vivo);
-  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.22);
+  box-shadow: 0 0 0 3px rgba(138, 106, 47, 0.28);
 }
 select.campo {
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231e3a8a'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%235a3d1e'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.85rem center;
   background-size: 1.1rem 1.1rem;
@@ -360,7 +358,7 @@ select.campo {
   font-weight: 900;
   line-height: 1;
   color: #fff;
-  background: linear-gradient(180deg, #3b6cf0 0%, var(--azul) 100%);
+  background: linear-gradient(180deg, #a07f3c 0%, var(--azul) 100%);
 }
 .stepper-btn:active:not(:disabled) { transform: scale(0.93); }
 .stepper-btn:disabled { background: #cbd5e1; color: #94a3b8; }
@@ -386,20 +384,20 @@ select.campo {
   z-index: 20;
   margin-inline: -1rem;
   padding: 1.5rem 1rem max(0.75rem, env(safe-area-inset-bottom));
-  background: linear-gradient(0deg, rgba(11, 20, 55, 0.97) 55%, rgba(11, 20, 55, 0) 100%);
+  background: linear-gradient(0deg, rgba(47, 36, 26, 0.97) 55%, rgba(47, 36, 26, 0) 100%);
 }
 
 /* ── Animaciones (rápidas) ───────────────────────────────────────────── */
-@keyframes entrar-desde-derecha { from { opacity: 0; transform: translateX(6px); } to { opacity: 1; transform: none; } }
-@keyframes entrar-desde-izquierda { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+@keyframes entrar-desde-derecha { from { opacity: 0; transform: translateX(34px); } to { opacity: 1; transform: none; } }
+@keyframes entrar-desde-izquierda { from { opacity: 0; transform: translateX(-34px); } to { opacity: 1; transform: none; } }
 @keyframes entrar-subiendo { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-.entra-derecha { animation: entrar-desde-derecha 0.14s ease-out backwards; }
-.entra-izquierda { animation: entrar-desde-izquierda 0.14s ease-out backwards; }
+.entra-derecha { animation: entrar-desde-derecha 0.22s ease-out backwards; }
+.entra-izquierda { animation: entrar-desde-izquierda 0.22s ease-out backwards; }
 .entra-subiendo, .entrar { animation: entrar-subiendo 0.14s ease-out backwards; }
 
 @keyframes latir {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(147, 197, 253, 0.55); }
-  50% { box-shadow: 0 0 0 8px rgba(147, 197, 253, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(233, 191, 66, 0.55); }
+  50% { box-shadow: 0 0 0 8px rgba(233, 191, 66, 0); }
 }
 .latir { animation: latir 1.8s ease-in-out infinite; }
 

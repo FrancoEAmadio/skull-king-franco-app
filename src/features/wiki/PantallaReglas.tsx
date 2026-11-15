@@ -1,56 +1,65 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { CATALOGO_CARTAS_WIKI } from '../../datos/cartasDatos';
 import { CATEGORIAS_REGLAS_WIKI } from '../../datos/reglasDatos';
 import type { ModoContenido } from '../../tipos';
-import { useSwipeHorizontal } from '../../ui/useSwipeHorizontal';
+import { useGestosMultiDedo } from '../../ui/useGestosMultiDedo';
+import { FichaCarta } from './FichaCarta';
 import { Jerarquias } from './Jerarquias';
 
-type Vista = 'manual' | 'cartas' | 'jerarquias';
+type Vista = 'reglas' | 'jerarquias';
 
-const MODOS: { id: ModoContenido; etiqueta: string }[] = [
-  { id: 'base', etiqueta: 'Juego base' },
-  { id: 'avanzado', etiqueta: 'Reglas avanzadas' },
-  { id: 'expansion', etiqueta: 'Expansión' },
+const VISTAS: { id: Vista; etiqueta: string }[] = [
+  { id: 'reglas', etiqueta: '📖 Reglas del juego' },
+  { id: 'jerarquias', etiqueta: '🧭 Orden de jerarquías' },
 ];
 
-function permitida(modoCarta: string, modo: ModoContenido): boolean {
-  if (modoCarta === 'Juego Base') return true;
-  if (modoCarta === 'Reglas Avanzadas') return modo !== 'base';
-  return modo === 'expansion';
-}
+const MODOS: { id: ModoContenido; etiqueta: string; carta: string }[] = [
+  { id: 'base', etiqueta: 'Juego base', carta: 'Juego Base' },
+  { id: 'avanzado', etiqueta: 'Reglas avanzadas', carta: 'Reglas Avanzadas' },
+  { id: 'expansion', etiqueta: 'Expansión', carta: 'Expansión' },
+];
 
-function Campo({ etiqueta, texto }: { etiqueta: string; texto: string }) {
-  return (
-    <div className="flex flex-col">
-      <dt className="text-[10px] font-black uppercase tracking-widest text-azul">{etiqueta}</dt>
-      <dd className="text-xs leading-snug text-slate-700">{texto}</dd>
-    </div>
-  );
+/** Cartas que ilustran una regla: se deciden por el título de la regla (nada de adivinar por el texto). */
+const IMAGENES_REGLA: [RegExp, string[]][] = [
+  [/Palos y Jerarqu/i, ['palo_negro', 'palo_amarillo', 'palo_violeta', 'palo_verde']],
+  [/Cartas Especiales/i, ['huida', 'pirata_harry', 'sirena', 'sk']],
+  [/Kraken/i, ['kraken']],
+  [/Ballena/i, ['ballena']],
+  [/Aguas Turbulentas/i, ['kraken', 'ballena']],
+  [/Botín/i, ['botin']],
+  [/Monito/i, ['monito15']],
+  [/Nuevos Piratas/i, ['mary_thorne', 'kong']],
+  [/Monstruos Marinos/i, ['raya_moteada', 'davy_jones']],
+  [/Acciones Especiales/i, ['tablon', 'last_volley']],
+  [/Cartas Blancas/i, ['carta_blanca_base']],
+];
+
+function mencionadas(titulo: string): string[] {
+  return IMAGENES_REGLA.find(([re]) => re.test(titulo))?.[1] ?? [];
 }
 
 export function PantallaReglas() {
   const { setPantallaActual, partida } = useApp();
-  const [vista, setVista] = useState<Vista>('manual');
+  const [vista, setVista] = useState<Vista>('reglas');
   const [modo, setModo] = useState<ModoContenido>(partida.hayPartidaGuardada ? partida.configuracionMesa.modoContenido : 'base');
   const [acordeonAbierto, setAcordeonAbierto] = useState<string | null>('general');
   const [reglasAbiertas, setReglasAbiertas] = useState<Record<string, boolean>>({});
-  const [termino, setTermino] = useState('');
+  const [ficha, setFicha] = useState<{ ids: string[]; titulo: string } | null>(null);
 
-  // Deslizar a los costados cambia de modo, solo en Catálogo y Jerarquías.
-  const indiceModo = MODOS.findIndex((m) => m.id === modo);
-  const { iniciarTouch, finalizarTouch } = useSwipeHorizontal({
-    onSwipeIzquierda: () => indiceModo < MODOS.length - 1 && setModo(MODOS[indiceModo + 1]!.id),
-    onSwipeDerecha: () => indiceModo > 0 && setModo(MODOS[indiceModo - 1]!.id),
-  });
-  const gestos = vista === 'manual' ? {} : { onTouchStart: iniciarTouch, onTouchEnd: finalizarTouch };
+  const abrir = (ids: string[], titulo?: string) =>
+    setFicha({ ids, titulo: titulo ?? CATALOGO_CARTAS_WIKI.find((c) => c.id === ids[0])?.nombre ?? 'Carta' });
 
-  const cartas = useMemo(() => {
-    const q = termino.trim().toLowerCase();
-    return CATALOGO_CARTAS_WIKI.filter(
-      (c) => permitida(c.modo, modo) && (!q || c.nombre.toLowerCase().includes(q) || c.descripcion.toLowerCase().includes(q))
-    );
-  }, [termino, modo]);
+  const cambiarModo = (dir: 1 | -1) => {
+    const i = MODOS.findIndex((m) => m.id === modo) + dir;
+    if (i >= 0 && i < MODOS.length) setModo(MODOS[i]!.id);
+  };
+  const cambiarVista = (dir: 1 | -1) => {
+    const i = VISTAS.findIndex((v) => v.id === vista) + dir;
+    if (i >= 0 && i < VISTAS.length) setVista(VISTAS[i]!.id);
+  };
+  // Dos dedos: cambia de modo. Tres dedos: cambia de sección. Un dedo nunca desliza.
+  const gestos = useGestosMultiDedo({ dos: cambiarModo, tres: cambiarVista });
 
   const botonesModo = (
     <div className="grid grid-cols-3 gap-2">
@@ -68,36 +77,35 @@ export function PantallaReglas() {
     </div>
   );
 
-  return (
-    <main className="entrar flex w-full flex-1 flex-col gap-4 py-4" {...gestos}>
-      <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma self-start px-3 py-2 text-sm">
-        ← Volver al menú
-      </button>
-      <h2 className="font-display text-2xl font-black text-white">Manual, Cartas y Reglas</h2>
+  const cartasDelModo = CATALOGO_CARTAS_WIKI.filter((c) => c.modo === MODOS.find((m) => m.id === modo)!.carta);
 
-      <div className="grid grid-cols-3 gap-2">
-        {(
-          [
-            ['manual', '📖 Reglas del juego'],
-            ['cartas', '🃏 Catálogo de cartas'],
-            ['jerarquias', '🧭 Orden de jerarquías'],
-          ] as const
-        ).map(([id, etiqueta]) => (
-          <button
-            key={id}
-            type="button"
-            aria-pressed={vista === id}
-            onClick={() => setVista(id)}
-            className={`min-h-14 px-1 py-2 text-xs leading-tight ${vista === id ? 'btn-primario' : 'btn-fantasma'}`}
-          >
-            {etiqueta}
+  return (
+    <main className="entrar flex w-full flex-1 flex-col gap-4 pb-4" {...gestos}>
+      {/* Menú fijo: queda a la vista al scrollear */}
+      <div className="sticky top-0 z-20 -mx-4 flex flex-col gap-2 bg-noche-2/95 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] shadow-lg shadow-black/20 backdrop-blur">
+        <div className="flex items-center justify-between gap-2">
+          <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma px-3 py-2 text-sm">
+            ← Menú
           </button>
-        ))}
+          <h2 className="font-display text-lg font-black text-white">Manual y cartas</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {VISTAS.map((v) => (
+            <button
+              key={v.id}
+              type="button"
+              aria-pressed={vista === v.id}
+              onClick={() => setVista(v.id)}
+              className={`min-h-12 px-1 py-2 text-xs leading-tight ${vista === v.id ? 'btn-primario' : 'btn-fantasma'}`}
+            >
+              {v.etiqueta}
+            </button>
+          ))}
+        </div>
+        {vista === 'jerarquias' && botonesModo}
       </div>
 
-      {vista !== 'manual' && botonesModo}
-
-      {vista === 'manual' && (
+      {vista === 'reglas' && (
         <div className="flex flex-col gap-2.5">
           {CATEGORIAS_REGLAS_WIKI.map((categoria) => {
             const abierta = acordeonAbierto === categoria.id;
@@ -107,9 +115,7 @@ export function PantallaReglas() {
                   type="button"
                   onClick={() => setAcordeonAbierto(abierta ? null : categoria.id)}
                   aria-expanded={abierta}
-                  className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-black ${
-                    abierta ? 'bg-azul text-white' : 'bg-white text-azul'
-                  }`}
+                  className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-black ${abierta ? 'bg-azul text-white' : 'bg-white text-azul'}`}
                 >
                   <span>{categoria.titulo}</span>
                   <span>{abierta ? '▲' : '▼'}</span>
@@ -119,6 +125,7 @@ export function PantallaReglas() {
                     {categoria.items.map((regla, idx) => {
                       const clave = `${categoria.id}-${idx}`;
                       const abiertaRegla = reglasAbiertas[clave] ?? false;
+                      const cartas = mencionadas(regla.titulo);
                       return (
                         <div key={clave} className="border-b border-slate-100 pb-2 last:border-none last:pb-0">
                           <button
@@ -129,7 +136,23 @@ export function PantallaReglas() {
                             <span>{regla.titulo}</span>
                             <span className="px-2 text-azul">{abiertaRegla ? '−' : '+'}</span>
                           </button>
-                          {abiertaRegla && <p className="mt-1 whitespace-pre-line rounded-lg bg-slate-50 p-3 text-xs leading-relaxed">{regla.texto}</p>}
+                          {abiertaRegla && (
+                            <div className="mt-1 flex flex-col gap-2 rounded-lg bg-slate-50 p-3">
+                              <p className="whitespace-pre-line text-xs leading-relaxed">{regla.texto}</p>
+                              {cartas.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                  {cartas.map((id) => {
+                                    const c = CATALOGO_CARTAS_WIKI.find((x) => x.id === id);
+                                    return c ? (
+                                      <button key={id} type="button" onClick={() => abrir([id])} aria-label={`Ver ${c.nombre}`}>
+                                        <img src={`./${c.imagen}`} alt={c.nombre} className="h-20 rounded-md border border-slate-200 bg-white object-contain shadow" />
+                                      </button>
+                                    ) : null;
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -138,61 +161,42 @@ export function PantallaReglas() {
               </div>
             );
           })}
-        </div>
-      )}
 
-      {vista === 'cartas' && (
-        <div className="flex flex-col gap-3">
-          <div className="relative flex items-center">
-            <input
-              value={termino}
-              onChange={(e) => setTermino(e.target.value.trimStart())}
-              type="text"
-              placeholder="🔍 Buscar carta..."
-              aria-label="Buscar carta"
-              className="campo pr-11"
-            />
-            {termino.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setTermino('')}
-                aria-label="Borrar búsqueda"
-                className="absolute right-1.5 flex h-9 w-9 items-center justify-center rounded-full text-slate-500"
-              >
-                ✕
-              </button>
+          {/* Catálogo de cartas: subsección de las reglas, solo con las cartas propias de cada modo */}
+          <div className="overflow-hidden rounded-xl border border-white/20">
+            <button
+              type="button"
+              onClick={() => setAcordeonAbierto(acordeonAbierto === 'catalogo' ? null : 'catalogo')}
+              aria-expanded={acordeonAbierto === 'catalogo'}
+              className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-black ${acordeonAbierto === 'catalogo' ? 'bg-azul text-white' : 'bg-white text-azul'}`}
+            >
+              <span>🃏 Catálogo de cartas</span>
+              <span>{acordeonAbierto === 'catalogo' ? '▲' : '▼'}</span>
+            </button>
+            {acordeonAbierto === 'catalogo' && (
+              <div className="flex flex-col gap-3 bg-white p-3">
+                {botonesModo}
+                <p className="text-xs text-slate-500">
+                  {modo === 'base' ? 'Cartas del juego base.' : modo === 'avanzado' ? 'Solo lo que suman las reglas avanzadas.' : 'Solo lo que suma la expansión.'} Tocá una carta para ver su detalle.
+                </p>
+                <div className="grid grid-cols-3 gap-2.5">
+                  {cartasDelModo.map((c) => (
+                    <button key={c.id} type="button" onClick={() => abrir([c.id])} className="flex flex-col items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-2">
+                      <img src={`./${c.imagen}`} alt={c.nombre} className="h-24 rounded-md border border-slate-200 bg-white object-contain" />
+                      <span className="text-center text-[11px] font-bold leading-tight text-tinta">{c.nombre}</span>
+                    </button>
+                  ))}
+                </div>
+                {modo === 'expansion' && <p className="text-xs font-semibold text-amber-700">Fotos de las cartas 7, 8 y 0/14: próximamente.</p>}
+              </div>
             )}
           </div>
-          {cartas.length === 0 && <div className="tarjeta p-6 text-center text-sm text-slate-500">No hay cartas que coincidan.</div>}
-          {cartas.map((carta) => (
-            <article key={carta.id} className="tarjeta overflow-hidden">
-              <div className="flex items-center justify-between gap-2 px-4 pt-3">
-                <h3 className="font-display text-base font-black text-azul">{carta.nombre}</h3>
-                <span className="shrink-0 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-black text-azul">{carta.cantidad}</span>
-              </div>
-              <div className="mx-4 mt-2 flex justify-center rounded-xl bg-gradient-to-b from-blue-50 to-slate-100 p-3">
-                <img
-                  src={`./${carta.imagen}`}
-                  alt={carta.nombre}
-                  className="h-44 rounded-lg border border-slate-200 bg-white object-contain shadow"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              </div>
-              <dl className="flex flex-col gap-2 p-4">
-                <p className="text-xs text-slate-600">{carta.descripcion}</p>
-                {carta.habilidad && <Campo etiqueta="Habilidad" texto={carta.habilidad} />}
-                <Campo etiqueta="Gana contra" texto={carta.ganaContra} />
-                <Campo etiqueta="Pierde contra" texto={carta.pierdeContra} />
-                {carta.bonificacion && <Campo etiqueta="Bonificación" texto={carta.bonificacion} />}
-              </dl>
-            </article>
-          ))}
         </div>
       )}
 
       {vista === 'jerarquias' && <Jerarquias modo={modo} />}
+
+      <FichaCarta ids={ficha?.ids ?? null} titulo={ficha?.titulo ?? ''} onCerrar={() => setFicha(null)} />
     </main>
   );
 }

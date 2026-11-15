@@ -64,7 +64,7 @@ export function ModalPodio() {
             >
               <span className="flex min-w-0 items-center gap-3">
                 <span className="w-7 shrink-0 text-center text-xl font-bold">
-                  {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`}
+                  {index + 1}.º
                 </span>
                 <span className="flex min-w-0 flex-col">
                   <span className="block truncate font-display font-black text-azul">{jugador.nombre}</span>

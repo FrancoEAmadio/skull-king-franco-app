@@ -27,6 +27,7 @@ interface Props {
   alto: number;
   nodos: NodoDiagrama[];
   flechas: FlechaDiagrama[];
+  onTocar?: (idNodo: string) => void;
 }
 
 const W = 19;
@@ -40,7 +41,7 @@ function bordeRect(dx: number, dy: number, mw: number, mh: number): number {
 }
 
 /** Diagrama con miniaturas de cartas y flechas SVG con punta y recorrido animado. */
-export function DiagramaJerarquia({ alto, nodos, flechas }: Props) {
+export function DiagramaJerarquia({ alto, nodos, flechas, onTocar }: Props) {
   const uid = useId().replace(/:/g, '');
   const porId = Object.fromEntries(nodos.map((n) => [n.id, n]));
   const mw = W / 2 + 2.5;
@@ -51,7 +52,7 @@ export function DiagramaJerarquia({ alto, nodos, flechas }: Props) {
       <svg viewBox={`0 0 100 ${alto}`} className="absolute inset-0 h-full w-full" aria-hidden="true">
         <defs>
           <marker id={`${uid}p`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-            <path d="M0 0L10 5L0 10z" fill="#1e3a8a" />
+            <path d="M0 0L10 5L0 10z" fill="#5a3d1e" />
           </marker>
         </defs>
         {flechas.map((f, i) => {
@@ -81,7 +82,7 @@ export function DiagramaJerarquia({ alto, nodos, flechas }: Props) {
               <path
                 d={`M${sx} ${sy} Q${qx} ${qy} ${ex} ${ey}`}
                 fill="none"
-                stroke="#1e3a8a"
+                stroke="#5a3d1e"
                 strokeWidth={0.9}
                 strokeLinecap="round"
                 strokeDasharray={f.punteada ? '1.6 1.6' : undefined}
@@ -98,7 +99,7 @@ export function DiagramaJerarquia({ alto, nodos, flechas }: Props) {
                   textAnchor="middle"
                   fontSize={3.3}
                   fontWeight={800}
-                  fill="#1e3a8a"
+                  fill="#5a3d1e"
                   stroke="#fff"
                   strokeWidth={1.2}
                   paintOrder="stroke"
@@ -112,8 +113,11 @@ export function DiagramaJerarquia({ alto, nodos, flechas }: Props) {
       </svg>
 
       {nodos.map((n) => (
-        <div
+        <button
+          type="button"
           key={n.id}
+          onClick={() => onTocar?.(n.id)}
+          aria-label={`Ver ${n.nombre}`}
           className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center"
           style={{ left: `${n.x}%`, top: `${(n.y / alto) * 100}%`, width: `${W}%` }}
         >
@@ -132,10 +136,10 @@ export function DiagramaJerarquia({ alto, nodos, flechas }: Props) {
               );
             })}
           </div>
-          <span className="mt-1 text-center text-[10px] font-black leading-tight" style={{ color: n.color }}>
+          <span className="-mx-3 mt-1 text-center text-[10px] font-black leading-tight" style={{ color: n.color }}>
             {n.nombre}
           </span>
-        </div>
+        </button>
       ))}
     </div>
   );
