@@ -4,6 +4,7 @@ import { useApp } from '../../../estado/AppProvider';
 import { EncabezadoModal, Modal } from '../../../ui/Modal';
 import { AVATARES } from '../../../datos/avatares';
 import { AvatarPirata } from '../../../ui/AvatarPirata';
+import { coloresParaNuevo } from '../../../datos/coloresJugador';
 import { SelectorAvatar } from '../../../ui/SelectorAvatar';
 import { ModalAviso } from '../../../ui/ModalAviso';
 import { TarjetaSeleccionJugador } from './TarjetaSeleccionJugador';
@@ -56,8 +57,10 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
     onCerrar();
   };
 
+  const coloresNuevo = coloresParaNuevo(jugadoresPermanentes);
+
   const crearJugador = () => {
-    const nuevo = crearJugadorPermanente(nombreNuevo, avatarNuevo);
+    const nuevo = crearJugadorPermanente(nombreNuevo, avatarNuevo, coloresNuevo);
     if (!nuevo) return;
     setEligiendoAvatar(false);
     setAvatarNuevo(AVATARES[(AVATARES.indexOf(avatarNuevo) + 1) % AVATARES.length]!);
@@ -103,7 +106,7 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
                 aria-label="Elegir icono del nuevo pirata"
                 className="btn-claro shrink-0 px-2"
               >
-                <AvatarPirata emoji={avatarNuevo} tamano="md" />
+                <AvatarPirata emoji={avatarNuevo} fondo={coloresNuevo.colorAvatar} tamano="md" />
               </button>
               <input
                 value={nombreNuevo}
