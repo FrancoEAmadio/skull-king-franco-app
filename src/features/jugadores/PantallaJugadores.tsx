@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
+import { useGestosMultiDedo } from '../../ui/useGestosMultiDedo';
 import { calcularPorcentajeVictorias } from '../../dominio/estadisticas';
 import { calcularRendimientos, construirSeriesEvolucion } from '../../dominio/comparativas';
 import { GraficoEvolucion } from '../../ui/GraficoEvolucion';
@@ -66,8 +67,16 @@ export function PantallaJugadores() {
     [jugadoresPermanentes]
   );
 
+  const ORDEN = ['gestor', 'estadisticas', 'historial'] as const;
+  const gestos = useGestosMultiDedo({
+    dos: (dir) => {
+      const i = ORDEN.indexOf(vista as (typeof ORDEN)[number]) + dir;
+      if (i >= 0 && i < ORDEN.length) setVista(ORDEN[i]!);
+    },
+  });
+
   return (
-    <main className="entrar flex w-full flex-col gap-4 py-4">
+    <main className="entrar flex w-full flex-col gap-4 py-4" {...gestos}>
       <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma self-start px-3 py-2 text-sm">
         ← Volver al menú
       </button>
@@ -337,11 +346,6 @@ function VistaHistorial() {
 
   return (
     <div className="flex flex-col gap-3">
-      {historialPartidas.length > 0 && (
-        <button type="button" onClick={borrarTodoElHistorial} className="btn-peligro self-end px-3 py-2 text-xs">
-          Borrar historial
-        </button>
-      )}
       {historialPartidas.length === 0 ? (
         <div className="tarjeta p-8 text-center text-sm text-slate-500">No hay partidas registradas.</div>
       ) : (
@@ -363,7 +367,7 @@ function VistaHistorial() {
                 >
                   <span className="flex min-w-0 flex-col">
                     <span className="truncate text-sm font-bold text-tinta">
-                      {jIndex === 0 ? '🥇' : jIndex === 1 ? '🥈' : jIndex === 2 ? '🥉' : `${jIndex + 1}.`} {jug.nombre}
+                      {jIndex + 1}.º {jug.nombre}
                     </span>
                     <span className="text-[11px] text-slate-500">Ver desglose por ronda</span>
                   </span>
@@ -386,6 +390,11 @@ function VistaHistorial() {
             )}
           </div>
         ))
+      )}
+      {historialPartidas.length > 0 && (
+        <button type="button" onClick={borrarTodoElHistorial} className="btn-peligro mx-auto mt-2 px-5 py-3 text-sm">
+          Borrar historial
+        </button>
       )}
     </div>
   );

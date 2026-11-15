@@ -2,6 +2,13 @@ import { CATALOGO_CARTAS_WIKI } from '../../datos/cartasDatos';
 import { DiagramaJerarquia } from '../../ui/DiagramaJerarquia';
 import type { FlechaDiagrama, NodoDiagrama } from '../../ui/DiagramaJerarquia';
 import type { ModoContenido } from '../../tipos';
+import { useState } from 'react';
+import { FichaCarta } from './FichaCarta';
+import { ModalFeedback } from '../ajustes/ModalFeedback';
+
+type OnFicha = (ids: string[], titulo: string) => void;
+const PIRATAS6 = ['pirata_brent', 'pirata_rascal', 'pirata_harry', 'pirata_juanita', 'pirata_rosie', 'pirata_tigresa'];
+const PIRATAS7 = [...PIRATAS6, 'mary_thorne'];
 
 const img = (id: string) => CATALOGO_CARTAS_WIKI.find((c) => c.id === id)?.imagen ?? '';
 const cantidad = (id: string) => Number.parseInt(CATALOGO_CARTAS_WIKI.find((c) => c.id === id)?.cantidad ?? '0', 10) || 0;
@@ -20,7 +27,7 @@ function Caja({ titulo, texto, children }: { titulo: string; texto?: string; chi
   );
 }
 
-function EspecialesTriangulo() {
+function EspecialesTriangulo({ onFicha }: { onFicha: OnFicha }) {
   const piratas = cantidad('pirata_brent') ? ['pirata_brent', 'pirata_rascal', 'pirata_harry', 'pirata_juanita', 'pirata_rosie', 'pirata_tigresa'].length : 6;
   const nodos: NodoDiagrama[] = [
     { id: 'sk', x: 50, y: 20, imgs: [img('sk')], nombre: 'Skull King', color: COLOR.sk },
@@ -34,12 +41,17 @@ function EspecialesTriangulo() {
   ];
   return (
     <Caja titulo="Cartas especiales" texto={`1 Skull King · ${piratas} Piratas · ${cantidad('sirena')} Sirenas`}>
-      <DiagramaJerarquia alto={96} nodos={nodos} flechas={flechas} />
+      <DiagramaJerarquia
+        alto={96}
+        nodos={nodos}
+        flechas={flechas}
+        onTocar={(id) => onFicha(id === 'sk' ? ['sk'] : id === 'si' ? ['sirena'] : PIRATAS6, id === 'sk' ? 'Skull King' : id === 'si' ? 'Sirenas' : 'Piratas')}
+      />
     </Caja>
   );
 }
 
-function EspecialesCuadrado() {
+function EspecialesCuadrado({ onFicha }: { onFicha: OnFicha }) {
   const nodos: NodoDiagrama[] = [
     { id: 'sk', x: 22, y: 22, imgs: [img('sk')], nombre: 'Skull King', color: COLOR.sk },
     { id: 'kong', x: 78, y: 22, imgs: [img('kong')], nombre: 'Primer Oficial Kong', color: COLOR.kong },
@@ -56,55 +68,64 @@ function EspecialesCuadrado() {
   ];
   return (
     <Caja titulo="Cartas especiales" texto="1 Skull King · 1 Kong · 7 Piratas · 2 Sirenas">
-      <DiagramaJerarquia alto={100} nodos={nodos} flechas={flechas} />
+      <DiagramaJerarquia
+        alto={100}
+        nodos={nodos}
+        flechas={flechas}
+        onTocar={(id) =>
+          onFicha(id === 'sk' ? ['sk'] : id === 'si' ? ['sirena'] : id === 'kong' ? ['kong'] : PIRATAS7, id === 'sk' ? 'Skull King' : id === 'si' ? 'Sirenas' : id === 'kong' ? 'Primer Oficial Kong' : 'Piratas')
+        }
+      />
     </Caja>
   );
 }
 
-function Palos({ modo }: { modo: ModoContenido }) {
-  const fila = (items: { id: string; nombre: string; archivo: string; color: string }[]) => (
+function Palos({ modo, onFicha }: { modo: ModoContenido; onFicha: OnFicha }) {
+  const fila = (items: { id: string; nombre: string; archivo: string; color: string; carta: string }[]) => (
     <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
       {items.map((it) => (
-        <div key={it.id} className="flex flex-col items-center gap-1">
+        <button type="button" key={it.id} onClick={() => onFicha([it.carta], it.nombre)} className="flex flex-col items-center gap-1">
           <img src={`./${it.archivo}`} alt="" className="w-16 rounded-md bg-white object-cover shadow" style={{ aspectRatio: '0.7', border: `2px solid ${it.color}` }} />
           <span className="text-center text-[10px] font-black leading-tight" style={{ color: it.color }}>{it.nombre}</span>
-        </div>
+        </button>
       ))}
     </div>
   );
   const flecha = (texto: string) => (
     <svg viewBox="0 0 100 14" className="h-7 w-full" aria-hidden="true">
       <defs>
-        <marker id="pp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1e3a8a" /></marker>
+        <marker id="pp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#5a3d1e" /></marker>
       </defs>
-      <line x1="50" y1="0" x2="50" y2="11" stroke="#1e3a8a" strokeWidth="1.2" markerEnd="url(#pp)" />
+      <line x1="50" y1="0" x2="50" y2="11" stroke="#5a3d1e" strokeWidth="1.2" markerEnd="url(#pp)" />
       <line x1="50" y1="0" x2="50" y2="11" stroke="#f1d36b" strokeWidth="0.8" className="flecha-anim" />
-      <text x="56" y="8" fontSize="5" fontWeight="800" fill="#1e3a8a">{texto}</text>
+      <text x="56" y="8" fontSize="5" fontWeight="800" fill="#5a3d1e">{texto}</text>
     </svg>
   );
   const archivo = (id: string) => img(id);
   return (
     <Caja titulo="Palos">
       <div className="flex flex-col items-stretch gap-1">
-        {fila([{ id: 'n', nombre: 'Palo Negro (triunfo)', archivo: archivo('palo_negro'), color: '#111827' }])}
+        {fila([{ carta: 'palo_negro', id: 'n', nombre: 'Palo Negro (triunfo)', archivo: archivo('palo_negro'), color: '#111827' }])}
         {flecha('gana a')}
         {modo === 'expansion' && (
           <>
-            {fila([{ id: 'm', nombre: 'Mono Comodín 15', archivo: archivo('monito15'), color: '#b45309' }])}
+            {fila([{ carta: 'monito15', id: 'm', nombre: 'Mono Comodín 15', archivo: archivo('monito15'), color: '#b45309' }])}
             {flecha('gana a los 14')}
           </>
         )}
         {fila([
-          { id: 'a', nombre: 'Amarillo', archivo: archivo('palo_amarillo'), color: '#ca8a04' },
-          { id: 'v', nombre: 'Violeta', archivo: archivo('palo_violeta'), color: '#7c3aed' },
-          { id: 'g', nombre: 'Verde', archivo: archivo('palo_verde'), color: '#16a34a' },
+          { carta: 'palo_amarillo', id: 'a', nombre: 'Amarillo', archivo: archivo('palo_amarillo'), color: '#ca8a04' },
+          { carta: 'palo_violeta', id: 'v', nombre: 'Violeta', archivo: archivo('palo_violeta'), color: '#7c3aed' },
+          { carta: 'palo_verde', id: 'g', nombre: 'Verde', archivo: archivo('palo_verde'), color: '#16a34a' },
         ])}
       </div>
     </Caja>
   );
 }
 
-function Monstruos({ modo }: { modo: ModoContenido }) {
+function Monstruos({ modo, onFicha }: { modo: ModoContenido; onFicha: OnFicha }) {
+  const ID: Record<string, string> = { kr: 'kraken', ba: 'ballena', ra: 'raya_moteada', dj: 'davy_jones' };
+  const tocar = (id: string) => onFicha([ID[id]!], CATALOGO_CARTAS_WIKI.find((c) => c.id === ID[id])?.nombre ?? '');
   if (modo === 'base') return null;
   if (modo === 'avanzado') {
     const nodos: NodoDiagrama[] = [
@@ -113,7 +134,7 @@ function Monstruos({ modo }: { modo: ModoContenido }) {
     ];
     return (
       <Caja titulo="Monstruos" texto="Entre sí: gana la última que se juega.">
-        <DiagramaJerarquia alto={46} nodos={nodos} flechas={[{ de: 'kr', a: 'ba', doble: true, punteada: true }]} />
+        <DiagramaJerarquia alto={46} nodos={nodos} onTocar={tocar} flechas={[{ de: 'kr', a: 'ba', doble: true, punteada: true }]} />
       </Caja>
     );
   }
@@ -132,40 +153,83 @@ function Monstruos({ modo }: { modo: ModoContenido }) {
   ];
   return (
     <Caja titulo="Monstruos" texto="Davy Jones destruye monstruos (+20 c/u). Entre sí: gana la última que se juega.">
-      <DiagramaJerarquia alto={92} nodos={nodos} flechas={flechas} />
+      <DiagramaJerarquia alto={92} nodos={nodos} flechas={flechas} onTocar={tocar} />
     </Caja>
   );
 }
 
-function SinBazas({ modo }: { modo: ModoContenido }) {
+function SinBazas({ modo, onFicha }: { modo: ModoContenido; onFicha: OnFicha }) {
   const lista = [
     { id: 'huida', nombre: 'Huida', frase: 'Pierde contra todo: te salva de ganar una baza.', ok: true },
+    { id: 'pirata_tigresa', nombre: 'Tigresa', frase: 'Pirata que también puede jugarse como huida: ahí pierde.', ok: true },
     { id: 'botin', nombre: 'Botín', frase: 'Te permite aliarte con otro jugador.', ok: modo !== 'base' },
     { id: 'tablon', nombre: 'Caminar por la Tabla', frase: 'Elimina a un pirata de la baza: ese pirata no gana.', ok: modo === 'expansion' },
     { id: 'last_volley', nombre: 'La Última Descarga', frase: 'Quien la juega tira una segunda carta en la misma baza.', ok: modo === 'expansion' },
   ].filter((c) => c.ok);
   return (
     <Caja titulo="No ganan bazas: tienen habilidades durante la ronda">
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="flex flex-wrap justify-center gap-2.5">
         {lista.map((c) => (
-          <div key={c.id} className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center">
+          <button type="button" key={c.id} onClick={() => onFicha([c.id], c.nombre)} className="flex w-[47%] flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-center">
             <img src={`./${img(c.id)}`} alt="" className="w-14 rounded-md bg-white object-cover shadow" style={{ aspectRatio: '0.7' }} />
             <span className="text-xs font-black text-azul">{c.nombre}</span>
             <span className="text-[11px] leading-tight text-slate-600">{c.frase}</span>
-          </div>
+          </button>
         ))}
       </div>
     </Caja>
   );
 }
 
+function Preguntas({ modo }: { modo: ModoContenido }) {
+  const [abierto, setAbierto] = useState(false);
+  const [preguntando, setPreguntando] = useState(false);
+  const faq = [
+    ['¿Y si se juegan Pirata, Sirena y Skull King en la misma baza?', 'Gana la Sirena, sin importar en qué orden se jugaron.'],
+    ...(modo === 'expansion' ? [['¿Y con el Primer Oficial Kong?', 'Sigue ganando la Sirena.']] : []),
+    ['¿Y si todos juegan Huida?', 'Gana la primera Huida que se jugó.'],
+    ['¿Una carta de otro color le gana al palo declarado?', 'No, aunque sea más alta. Solo ganan el Palo Negro o las cartas especiales.'],
+  ];
+  return (
+    <section className="tarjeta overflow-hidden">
+      <button type="button" onClick={() => setAbierto(!abierto)} aria-expanded={abierto} className="flex min-h-12 w-full items-center justify-between px-4 py-3 text-left">
+        <h3 className="tarjeta-titulo !font-sans">Preguntas frecuentes</h3>
+        <span className="text-sm font-bold text-azul">{abierto ? '▲' : '▼'}</span>
+      </button>
+      {abierto && (
+        <dl className="flex flex-col gap-3 px-4 pb-4">
+          {faq.map(([p, r]) => (
+            <div key={p}>
+              <dt className="text-sm font-bold text-tinta">{p}</dt>
+              <dd className="text-sm text-slate-600">{r}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {abierto && (
+        <div className="flex flex-col gap-2 border-t border-slate-100 px-4 py-3">
+          <p className="text-sm text-slate-600">¿Querés hacer una pregunta que no está respondida acá? Escribinos tu pregunta y la agregamos.</p>
+          <button type="button" onClick={() => setPreguntando(true)} className="btn-claro w-full py-3 text-sm">
+            Hacer una pregunta
+          </button>
+        </div>
+      )}
+      <ModalFeedback abierto={preguntando} onCerrar={() => setPreguntando(false)} />
+    </section>
+  );
+}
+
 export function Jerarquias({ modo }: { modo: ModoContenido }) {
+  const [ficha, setFicha] = useState<{ ids: string[]; titulo: string } | null>(null);
+  const onFicha: OnFicha = (ids, titulo) => setFicha({ ids, titulo });
   return (
     <div className="flex flex-col gap-3">
-      {modo === 'expansion' ? <EspecialesCuadrado /> : <EspecialesTriangulo />}
-      <Palos modo={modo} />
-      <Monstruos modo={modo} />
-      <SinBazas modo={modo} />
+      {modo === 'expansion' ? <EspecialesCuadrado onFicha={onFicha} /> : <EspecialesTriangulo onFicha={onFicha} />}
+      <Palos modo={modo} onFicha={onFicha} />
+      <Monstruos modo={modo} onFicha={onFicha} />
+      <SinBazas modo={modo} onFicha={onFicha} />
+      <Preguntas modo={modo} />
+      <FichaCarta ids={ficha?.ids ?? null} titulo={ficha?.titulo ?? ''} onCerrar={() => setFicha(null)} />
     </div>
   );
 }

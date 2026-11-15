@@ -314,6 +314,27 @@ export function usePartidaState({
     [jugadores, jugadorSeleccionadoIdx, configuracionMesa]
   );
 
+  /** Puntaje que sumaría la ronda para cualquier jugador, con lo cargado hasta ahora. */
+  const puntajeProyectadoDe = useCallback(
+    (idx: number): number => {
+      const jug = jugadores[idx];
+      if (!jug) return 0;
+      const resultado = calcularPuntajeRonda({
+        apuesta: jug.apuesta,
+        ganadas: jug.ganadas,
+        numeroRonda: cartasPorJugadorEnRonda,
+        eventosBono: filtrarEventosBonoDisponibles(jug.eventosBono, configuracionMesa),
+        usarModoBribon: configuracionMesa.usarModoBribon,
+        modoEnvite: jug.modoEnvite,
+        bribonHabilidadPts: jug.bribonHabilidadPts,
+        cobrarBonosSinAcierto: configuracionMesa.cobrarBonosSinAcierto,
+      });
+      const botin = estaReglaActiva(configuracionMesa, 'botin') ? calcularBonosAlianzasBotin(alianzasBotinRonda, jugadores) : {};
+      return resultado.puntajeTotal + (botin[idx] ?? 0);
+    },
+    [jugadores, cartasPorJugadorEnRonda, configuracionMesa, alianzasBotinRonda]
+  );
+
   const puntajeProyectadoActual = useMemo(() => {
     if (!jugadorActual) return 0;
     const eventosBono = filtrarEventosBonoDisponibles(
@@ -707,7 +728,12 @@ export function usePartidaState({
     [registroHabilidadesRonda]
   );
 
-  const habilidadesBloqueadasPorLimite = registroHabilidadesRonda.length >= MAX_HABILIDADES_POR_RONDA;
+  // Habilidades posibles por ronda: Bribón y Harry (2); con Kong activo en Expansión, 3.
+  const maxHabilidadesRonda =
+    configuracionMesa.modoContenido === 'expansion' && estaReglaActiva(configuracionMesa, 'primerOficialKong')
+      ? MAX_HABILIDADES_POR_RONDA
+      : MAX_HABILIDADES_POR_RONDA - 1;
+  const habilidadesBloqueadasPorLimite = registroHabilidadesRonda.length >= maxHabilidadesRonda;
 
   const registrarHabilidad = useCallback(
     (
@@ -856,7 +882,7 @@ export function usePartidaState({
 
       const previo = registroHabilidadesRonda.find(esDeEsteTipo);
       if (previo && previo.jugadorIdx !== indiceJugador) return; // lo usó otro pirata
-      if (!previo && pts !== 0 && registroHabilidadesRonda.length >= MAX_HABILIDADES_POR_RONDA) return;
+      if (!previo && pts !== 0 && registroHabilidadesRonda.length >= maxHabilidadesRonda) return;
 
       setRegistroHabilidadesRonda((previas) => {
         const sin = previas.filter((h) => !esDeEsteTipo(h));
@@ -1234,6 +1260,8 @@ export function usePartidaState({
     puedeModificarRondaAnterior,
     limiteComodines,
     puntajeProyectadoActual,
+    puntajeProyectadoDe,
+    maxHabilidadesRonda,
     textoBotonAvanzar,
     habilidadesBloqueadasPorLimite,
     indiceJugadorInicial,

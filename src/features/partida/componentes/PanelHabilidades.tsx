@@ -91,6 +91,7 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
     esHabilidadYaRegistrada,
     esKongYaRegistradoCon,
     aplicarHarryGigante,
+    maxHabilidadesRonda,
     aplicarKongHarryGigante,
     elegirPuntosBribon,
     eliminarRegistroHabilidad,
@@ -143,38 +144,44 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
         ? 'Bribón de Roatán'
         : habCopiada;
 
-  const botonesHarry = (copia: boolean) => (
-    <div className="grid grid-cols-2 gap-2">
-      <button
-        type="button"
-        onClick={() =>
-          copia
-            ? aplicarKongHarryGigante(jugadorSeleccionadoIdx, 1)
-            : aplicarHarryGigante(jugadorSeleccionadoIdx, 1)
-        }
-        className="min-h-11 rounded-xl bg-emerald-700 py-2.5 text-sm font-extrabold text-tinta active:scale-[0.98]"
-      >
-        +1 al envite
-      </button>
-      <button
-        type="button"
-        onClick={() =>
-          copia
-            ? aplicarKongHarryGigante(jugadorSeleccionadoIdx, -1)
-            : aplicarHarryGigante(jugadorSeleccionadoIdx, -1)
-        }
-        className="min-h-11 rounded-xl bg-rose-700 py-2.5 text-sm font-extrabold text-tinta active:scale-[0.98]"
-      >
-        −1 al envite
-      </button>
-    </div>
-  );
+  const [harrySel, setHarrySel] = useState<Record<number, 1 | -1>>({});
+  const botonesHarry = (copia: boolean) => {
+    const elegir = (delta: 1 | -1) => {
+      vibrar();
+      setHarrySel((a) => ({ ...a, [jugadorSeleccionadoIdx]: delta }));
+      if (copia) aplicarKongHarryGigante(jugadorSeleccionadoIdx, delta);
+      else aplicarHarryGigante(jugadorSeleccionadoIdx, delta);
+    };
+    const sel = harrySel[jugadorSeleccionadoIdx];
+    return (
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => elegir(1)}
+          className={`min-h-11 rounded-xl border-2 py-2.5 text-sm font-extrabold ${
+            sel === 1 ? 'border-emerald-500 bg-emerald-50 text-emerald-800' : 'border-slate-300 bg-white text-tinta'
+          }`}
+        >
+          +1 al envite
+        </button>
+        <button
+          type="button"
+          onClick={() => elegir(-1)}
+          className={`min-h-11 rounded-xl border-2 py-2.5 text-sm font-extrabold ${
+            sel === -1 ? 'border-red-500 bg-red-50 text-red-800' : 'border-slate-300 bg-white text-tinta'
+          }`}
+        >
+          −1 al envite
+        </button>
+      </div>
+    );
+  };
 
   return (
     <Seccion
       numero={numero}
       titulo="Habilidades de piratas"
-      marcador={`${registroHabilidadesRonda.length}/3`}
+      marcador={`${registroHabilidadesRonda.length}/${maxHabilidadesRonda}`}
       abierto={abierto}
       onToggle={onToggle}
     >

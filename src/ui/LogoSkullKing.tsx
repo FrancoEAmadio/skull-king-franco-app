@@ -7,7 +7,7 @@ export function LogoSkullKing({ tamano = 120 }: { tamano?: number }) {
     <svg width={tamano} height={tamano} viewBox="0 0 512 512" role="img" aria-label="Skull King">
       <defs>
         <linearGradient id={id + 'f'} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#1e3a8a" />
+          <stop offset="0" stopColor="#5a3d1e" />
           <stop offset="1" stopColor="#0b1437" />
         </linearGradient>
         <linearGradient id={id + 'o'} x1="0" y1="0" x2="0" y2="1">

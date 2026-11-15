@@ -100,7 +100,7 @@ export function PantallaNuevaPartida() {
     <main className="entrar flex w-full flex-col gap-4 py-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <span className="text-xs font-black uppercase tracking-widest text-blue-200">Nueva partida</span>
+          <span className="text-xs font-black uppercase tracking-widest text-amber-100">Nueva partida</span>
           <h2 className="font-display text-2xl font-black text-white">Configurar mesa</h2>
         </div>
         <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma px-3 py-2 text-sm">

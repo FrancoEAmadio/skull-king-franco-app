@@ -53,7 +53,7 @@ export function PantallaPartida() {
           <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma px-3 py-2 text-sm">
             ← Menú
           </button>
-          <span className="text-[10px] font-black uppercase tracking-widest text-blue-200">Partida en curso</span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-amber-100">Partida en curso</span>
         </div>
 
         <div className="flex items-center justify-between gap-2">
@@ -69,7 +69,7 @@ export function PantallaPartida() {
               </svg>
             </button>
             <div>
-              <span className="block text-xs font-black uppercase tracking-widest text-blue-200">
+              <span className="block text-xs font-black uppercase tracking-widest text-amber-100">
                 Ronda {rondaVisible} de {totalRondas}
               </span>
               <h2 className="font-display text-lg font-black leading-tight text-white">
@@ -98,7 +98,7 @@ export function PantallaPartida() {
                   esActual
                     ? 'border-2 border-oro bg-oro text-tinta-oro'
                     : esPasada
-                      ? 'border border-blue-300/60 bg-blue-300/25 text-blue-100'
+                      ? 'border border-amber-200/60 bg-amber-200/30 text-amber-50'
                       : 'border border-white/15 bg-white/5 text-white/40'
                 }`}
               >
@@ -109,7 +109,7 @@ export function PantallaPartida() {
         </div>
 
         {pasoPartida !== 'resumen' && jugadorInicial && jugadorReparte && (
-          <div className="flex items-center justify-between gap-2 rounded-xl bg-white/10 px-3 py-1.5 text-[11px] text-blue-100">
+          <div className="flex items-center justify-between gap-2 rounded-xl bg-white/10 px-3 py-1.5 text-[11px] text-amber-50">
             <span className="min-w-0 truncate">
               ⚓ Arranca: <strong className="text-white">{jugadorInicial.nombre}</strong>
             </span>
@@ -132,8 +132,8 @@ export function PantallaPartida() {
                 aria-current={esActual ? 'step' : undefined}
                 className="flex flex-1 flex-col items-center gap-1 rounded-lg px-0.5 py-1 disabled:cursor-default"
               >
-                <span className={`h-1.5 w-full rounded-full ${esActual ? 'bg-white' : puedeVolver ? 'bg-blue-300' : 'bg-white/20'}`} />
-                <span className={`text-[10px] font-black uppercase ${esActual ? 'text-white' : puedeVolver ? 'text-blue-200' : 'text-white/40'}`}>
+                <span className={`h-1.5 w-full rounded-full ${esActual ? 'bg-white' : puedeVolver ? 'bg-amber-200' : 'bg-white/20'}`} />
+                <span className={`text-[10px] font-black uppercase ${esActual ? 'text-white' : puedeVolver ? 'text-amber-100' : 'text-white/40'}`}>
                   {i + 1}. {etiqueta}
                 </span>
               </button>

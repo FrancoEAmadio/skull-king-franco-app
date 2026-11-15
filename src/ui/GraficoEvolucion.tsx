@@ -138,7 +138,7 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
               y={ALTO - 8}
               textAnchor="middle"
               fontSize={11}
-              fill={indice === indiceActivo ? '#1d4ed8' : '#64748b'}
+              fill={indice === indiceActivo ? '#8a6a2f' : '#64748b'}
               fontWeight={indice === indiceActivo ? 700 : 400}
             >
               {etiquetaX(indice)}
@@ -152,7 +152,7 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
             x2={x(indiceActivo)}
             y1={MARGEN.arr}
             y2={ALTO - MARGEN.aba}
-            stroke="#1d4ed8"
+            stroke="#8a6a2f"
             strokeWidth={1}
             strokeOpacity={0.6}
           />
