@@ -125,27 +125,27 @@ export function PasoPuntos() {
       <div key={jugadorSeleccionadoIdx} className={`flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start ${animacion}`}>
         <div className="tarjeta lg:col-span-2 flex items-end justify-between gap-3 p-4">
           <div className="min-w-0">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
               {indiceVisualActual + 1} de {total}
             </span>
-            <h3 className="truncate text-xl font-black text-azul">{jugadorActual.nombre}</h3>
+            <h3 className="truncate text-xl font-bold text-azul">{jugadorActual.nombre}</h3>
             <span className="block text-xs font-semibold text-slate-500">
               Total: <strong className="text-tinta">{jugadorActual.puntos}</strong> pts
             </span>
           </div>
           <div className="shrink-0 text-right">
-            <span className={`block text-3xl font-black leading-none ${puntajeProyectadoActual >= 0 ? 'text-emerald-600' : 'text-rojo-osc'}`}>
+            <span className={`block text-3xl font-bold leading-none ${puntajeProyectadoActual >= 0 ? 'text-emerald-600' : 'text-rojo-osc'}`}>
               {puntajeProyectadoActual >= 0 ? '+' : ''}
               {puntajeProyectadoActual}
             </span>
-            <span className="text-[10px] font-bold uppercase text-slate-400">esta ronda</span>
+            <span className="text-[10px] font-semibold uppercase text-slate-400">esta ronda</span>
           </div>
         </div>
 
         <Seccion numero={numeroBazas} titulo="Bazas ganadas" marcador={`Envite ${jugadorActual.apuesta}`}>
           <div className="flex items-center justify-between gap-2">
             <span
-              className={`rounded-full border px-3 py-1 text-xs font-black ${
+              className={`rounded-full border px-3 py-1 text-xs font-bold ${
                 acerto ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'
               }`}
             >

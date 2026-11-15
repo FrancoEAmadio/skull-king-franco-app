@@ -26,7 +26,7 @@ export function ModalConfirmacion({
     <Modal abierto={abierto} onCerrar={onCancelar} ancho="max-w-sm" zIndex={zIndex} cerrarAlHacerClickAfuera>
       <EncabezadoModal titulo={titulo} onCerrar={onCancelar} tono="rojo" />
       <div className="flex flex-col gap-3 p-4">
-        <div className="text-base font-bold text-tinta">{descripcion}</div>
+        <div className="text-base font-semibold text-tinta">{descripcion}</div>
         {advertencia && (
           <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm leading-relaxed text-red-800">{advertencia}</div>
         )}

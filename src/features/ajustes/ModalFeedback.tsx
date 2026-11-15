@@ -56,7 +56,7 @@ export function ModalFeedback({ abierto, onCerrar }: Props) {
         <>
           <div className="flex flex-col items-center gap-3 p-8 text-center" role="status">
             <span className="text-5xl" aria-hidden="true">✅</span>
-            <p className="text-base font-bold text-tinta">¡Gracias! Tu mensaje fue enviado.</p>
+            <p className="text-base font-semibold text-tinta">¡Gracias! Tu mensaje fue enviado.</p>
           </div>
           <div className="border-t border-slate-200 p-4">
             <button type="button" onClick={cerrar} className="btn-dorado w-full py-3.5 text-base">
@@ -84,7 +84,7 @@ export function ModalFeedback({ abierto, onCerrar }: Props) {
                     aria-checked={activo}
                     disabled={enviando}
                     onClick={() => setTipo(opcion.id)}
-                    className={`min-h-11 px-4 py-3 text-sm font-bold ${activo ? 'opcion opcion-sel' : 'opcion'}`}
+                    className={`min-h-11 px-4 py-3 text-sm font-semibold ${activo ? 'opcion opcion-sel' : 'opcion'}`}
                   >
                     {opcion.etiqueta}
                   </button>

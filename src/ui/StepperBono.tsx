@@ -18,7 +18,7 @@ export function StepperBono({ nombre, detalle, cantidad, maximo, onMas, onMenos,
     <div className={`rounded-xl border p-2.5 ${cantidad > 0 ? 'border-oro bg-amber-50' : 'border-slate-200 bg-slate-50'}`}>
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <span className="block text-sm font-extrabold leading-tight text-tinta">{nombre}</span>
+          <span className="block text-sm font-semibold leading-tight text-tinta">{nombre}</span>
           <span className="block text-xs font-semibold text-slate-500">{detalle}</span>
         </div>
         <div className="stepper" role="group" aria-label={nombre}>

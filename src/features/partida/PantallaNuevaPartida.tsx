@@ -100,8 +100,8 @@ export function PantallaNuevaPartida() {
     <main className="entrar flex w-full flex-col gap-4 py-4 lg:grid lg:grid-cols-2 lg:items-start">
       <div className="flex items-start justify-between gap-3 lg:col-span-2">
         <div>
-          <span className="text-xs font-black uppercase tracking-widest text-amber-100">Nueva partida</span>
-          <h2 className="font-display text-2xl font-black text-white">Configurar mesa</h2>
+          <span className="text-xs font-bold uppercase tracking-widest text-amber-100">Nueva partida</span>
+          <h2 className="font-display text-2xl font-bold text-white">Configurar mesa</h2>
         </div>
         <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma px-3 py-2 text-sm">
           ✕ Cancelar
@@ -119,7 +119,7 @@ export function PantallaNuevaPartida() {
                 type="button"
                 onClick={() => cambiarModoContenido(modo.id)}
                 aria-pressed={seleccionado}
-                className={`flex min-h-16 items-center justify-center px-1.5 py-3 text-center text-sm font-extrabold leading-tight ${
+                className={`flex min-h-16 items-center justify-center px-1.5 py-3 text-center text-sm font-semibold leading-tight ${
                   seleccionado ? 'opcion opcion-sel' : 'opcion'
                 }`}
               >
@@ -170,7 +170,7 @@ export function PantallaNuevaPartida() {
 
       <PanelReglasOpcionales configuracion={configuracionMesa} onCambiar={cambiarReglaOpcional} />
 
-      <button type="button" onClick={intentarComenzarPartida} className="btn-dorado mt-1 w-full py-4 text-lg lg:col-span-2">
+      <button type="button" onClick={intentarComenzarPartida} className="btn-dorado mt-1 w-full py-3.5 text-base lg:col-span-2">
         Empezar partida ➔
       </button>
 
@@ -206,7 +206,7 @@ function TarjetaOpcion({ titulo, detalle, activo, onChange }: TarjetaOpcionProps
         activo ? 'opcion opcion-sel' : 'opcion'
       }`}
     >
-      <span className="text-sm font-black leading-tight">{titulo}</span>
+      <span className="text-sm font-bold leading-tight">{titulo}</span>
       <span className="text-xs font-semibold leading-tight text-slate-500">{detalle}</span>
     </button>
   );

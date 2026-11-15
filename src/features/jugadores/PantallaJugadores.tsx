@@ -80,7 +80,7 @@ export function PantallaJugadores() {
       <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma self-start px-3 py-2 text-sm">
         ← Volver al menú
       </button>
-      <h2 className="font-display text-2xl font-black text-white">Jugadores, Estadísticas e Historial</h2>
+      <h2 className="font-display text-2xl font-bold text-white">Jugadores, Estadísticas e Historial</h2>
 
       <div className="grid grid-cols-3 gap-2">
         {(
@@ -171,7 +171,7 @@ export function PantallaJugadores() {
                         <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} tamano="lg" />
                       </button>
                       <button type="button" onClick={() => verEstadisticasJugador(jug)} className="min-w-0 flex-1 text-left">
-                        <span className="block truncate text-lg font-black text-azul">{jug.nombre}</span>
+                        <span className="block truncate text-lg font-bold text-azul">{jug.nombre}</span>
                         <span className="text-xs font-semibold text-slate-500">
                           {jug.estadisticas.partidasJugadas} partida{jug.estadisticas.partidasJugadas === 1 ? '' : 's'} · 🏆{' '}
                           {jug.estadisticas.victorias} · {jug.estadisticas.partidasJugadas ? `${calcularPorcentajeVictorias(jug)}% victorias` : 'sin partidas'}
@@ -223,20 +223,20 @@ export function PantallaJugadores() {
                 onClick={() => verEstadisticasJugador(jug)}
                 className="tarjeta flex items-center gap-3 p-3 text-left"
               >
-                <span className="w-6 shrink-0 text-center text-sm font-black text-slate-400">{posicion + 1}</span>
+                <span className="w-6 shrink-0 text-center text-sm font-bold text-slate-400">{posicion + 1}</span>
                 <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} tamano="md" />
                 <div className="min-w-0 flex-1">
-                  <span className="block truncate text-base font-black text-azul">{jug.nombre}</span>
+                  <span className="block truncate text-base font-bold text-azul">{jug.nombre}</span>
                   <span className="text-xs font-semibold text-slate-500">
                     {jug.estadisticas.partidasJugadas} jugadas · 🏆 {jug.estadisticas.victorias}
                     {jug.estadisticas.mejorPartida !== null ? ` · récord ${jug.estadisticas.mejorPartida}` : ''}
                   </span>
                 </div>
                 <span className="shrink-0 text-right">
-                  <span className="block text-2xl font-black text-azul">
+                  <span className="block text-2xl font-bold text-azul">
                     {jug.estadisticas.partidasJugadas ? `${calcularPorcentajeVictorias(jug)}%` : '—'}
                   </span>
-                  <span className="block text-[10px] font-bold uppercase text-slate-400">victorias</span>
+                  <span className="block text-[10px] font-semibold uppercase text-slate-400">victorias</span>
                 </span>
               </button>
             ))
@@ -279,12 +279,12 @@ function TablaComparativa() {
         <table className="w-full min-w-[19rem] border-collapse text-sm">
           <thead>
             <tr className="text-left text-[11px] uppercase tracking-wide text-slate-400">
-              <th className="px-1 pb-2 font-bold">Pirata</th>
-              <th className="px-1 pb-2 text-right font-bold">PJ</th>
-              <th className="px-1 pb-2 text-right font-bold">Vict.</th>
-              <th className="px-1 pb-2 text-right font-bold">% Vict.</th>
-              <th className="px-1 pb-2 text-right font-bold">Envites</th>
-              <th className="px-1 pb-2 text-right font-bold">Racha</th>
+              <th className="px-1 pb-2 font-semibold">Pirata</th>
+              <th className="px-1 pb-2 text-right font-semibold">PJ</th>
+              <th className="px-1 pb-2 text-right font-semibold">Vict.</th>
+              <th className="px-1 pb-2 text-right font-semibold">% Vict.</th>
+              <th className="px-1 pb-2 text-right font-semibold">Envites</th>
+              <th className="px-1 pb-2 text-right font-semibold">Racha</th>
             </tr>
           </thead>
           <tbody>
@@ -294,7 +294,7 @@ function TablaComparativa() {
               );
               return (
                 <tr key={r.clave} className="border-t border-slate-100">
-                  <td className="max-w-[7rem] px-1 py-2 font-bold text-tinta">
+                  <td className="max-w-[7rem] px-1 py-2 font-semibold text-tinta">
                     {tarjeta ? (
                       <button
                         type="button"
@@ -309,7 +309,7 @@ function TablaComparativa() {
                   </td>
                   <td className="px-1 py-2 text-right text-slate-600">{r.partidas}</td>
                   <td className="px-1 py-2 text-right text-slate-600">{r.victorias}</td>
-                  <td className="px-1 py-2 text-right font-bold text-azul">{r.partidas ? `${r.porcentajeVictorias}%` : '—'}</td>
+                  <td className="px-1 py-2 text-right font-semibold text-azul">{r.partidas ? `${r.porcentajeVictorias}%` : '—'}</td>
                   <td className="px-1 py-2 text-right text-slate-600">{r.precisionEnvites}%</td>
                   <td className="px-1 py-2 text-right text-slate-600">{r.mejorRacha}</td>
                 </tr>
@@ -352,7 +352,7 @@ function VistaHistorial() {
         historialPartidas.map((partidaGuardada, hIndex) => (
           <div key={hIndex} className="tarjeta flex flex-col gap-3 p-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <span className="text-xs font-black uppercase tracking-wider text-azul">{partidaGuardada.fecha}</span>
+              <span className="text-xs font-bold uppercase tracking-wider text-azul">{partidaGuardada.fecha}</span>
               <button type="button" onClick={() => eliminarPartidaHistorial(hIndex)} className="btn-peligro px-3 py-2 text-xs">
                 Eliminar
               </button>
@@ -366,12 +366,12 @@ function VistaHistorial() {
                   className={`flex items-center justify-between px-3 py-2 text-left ${jIndex === 0 ? 'opcion opcion-sel' : 'opcion'}`}
                 >
                   <span className="flex min-w-0 flex-col">
-                    <span className="truncate text-sm font-bold text-tinta">
+                    <span className="truncate text-sm font-semibold text-tinta">
                       {jIndex + 1}.º {jug.nombre}
                     </span>
                     <span className="text-[11px] text-slate-500">Ver detalles</span>
                   </span>
-                  <span className="shrink-0 pl-2 font-black text-tinta">{jug.puntos} pts</span>
+                  <span className="shrink-0 pl-2 font-bold text-tinta">{jug.puntos} pts</span>
                 </button>
               ))}
             </div>

@@ -31,12 +31,12 @@ export function ModalMenuHamburguesa() {
     <div className="fixed inset-0 z-50 flex items-start justify-start bg-black/70 p-4 backdrop-blur-sm" onClick={cerrar}>
       <div className="tarjeta entrar mt-12 flex w-full max-w-sm flex-col gap-3 p-4" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-          <span className="text-lg font-black text-azul">Menú de la partida</span>
+          <span className="text-lg font-bold text-azul">Menú de la partida</span>
           <button
             type="button"
             onClick={cerrar}
             aria-label="Cerrar menú"
-            className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-xl font-bold text-slate-600"
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-xl font-semibold text-slate-600"
           >
             ✕
           </button>

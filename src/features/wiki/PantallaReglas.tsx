@@ -93,7 +93,7 @@ export function PantallaReglas() {
           type="button"
           aria-pressed={modo === m.id}
           onClick={() => irAModo(m.id)}
-          className={`min-h-12 px-1 py-2 text-xs font-extrabold leading-tight ${modo === m.id ? 'opcion opcion-sel' : 'opcion'}`}
+          className={`min-h-12 px-1 py-2 text-xs font-semibold leading-tight ${modo === m.id ? 'opcion opcion-sel' : 'opcion'}`}
         >
           {m.etiqueta}
         </button>
@@ -111,7 +111,7 @@ export function PantallaReglas() {
           <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma px-3 py-2 text-sm">
             ← Menú
           </button>
-          <h2 className="font-display text-lg font-black text-white">Manual y cartas</h2>
+          <h2 className="font-display text-lg font-bold text-white">Manual y cartas</h2>
         </div>
         <div className="grid grid-cols-2 gap-2">
           {VISTAS.map((v) => (
@@ -139,7 +139,7 @@ export function PantallaReglas() {
                   type="button"
                   onClick={() => setAcordeonAbierto(abierta ? null : categoria.id)}
                   aria-expanded={abierta}
-                  className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-black ${abierta ? 'bg-[#ead9b4] text-azul' : 'bg-white text-azul'}`}
+                  className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-bold ${abierta ? 'bg-[#ead9b4] text-azul' : 'bg-white text-azul'}`}
                 >
                   <span>{categoria.titulo}</span>
                   <span>{abierta ? '▲' : '▼'}</span>
@@ -154,7 +154,7 @@ export function PantallaReglas() {
                           <button
                             type="button"
                             onClick={() => setReglasAbiertas((a) => ({ ...a, [clave]: !a[clave] }))}
-                            className="flex min-h-11 w-full items-center justify-between text-left font-bold text-tinta"
+                            className="flex min-h-11 w-full items-center justify-between text-left font-semibold text-tinta"
                           >
                             <span>{regla.titulo}</span>
                             <span className="px-2 text-azul">{abiertaRegla ? '−' : '+'}</span>
@@ -198,7 +198,7 @@ export function PantallaReglas() {
               type="button"
               onClick={() => setAcordeonAbierto(acordeonAbierto === 'catalogo' ? null : 'catalogo')}
               aria-expanded={acordeonAbierto === 'catalogo'}
-              className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-black ${acordeonAbierto === 'catalogo' ? 'bg-[#ead9b4] text-azul' : 'bg-white text-azul'}`}
+              className={`flex min-h-12 w-full items-center justify-between px-4 py-3 text-left text-sm font-bold ${acordeonAbierto === 'catalogo' ? 'bg-[#ead9b4] text-azul' : 'bg-white text-azul'}`}
             >
               <span>5. Catálogo de cartas</span>
               <span>{acordeonAbierto === 'catalogo' ? '▲' : '▼'}</span>
@@ -213,7 +213,7 @@ export function PantallaReglas() {
                   {cartasDelModo.map((c) => (
                     <button key={c.id} type="button" onClick={() => abrir([c.id])} className="flex flex-col items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-2">
                       <ImagenCarta src={`./${c.imagen}`} alt={c.nombre} className="h-24 rounded-md border border-slate-200 bg-white object-contain" />
-                      <span className="text-center text-[11px] font-bold leading-tight text-tinta">{c.nombre}</span>
+                      <span className="text-center text-[11px] font-semibold leading-tight text-tinta">{c.nombre}</span>
                     </button>
                   ))}
                 </div>

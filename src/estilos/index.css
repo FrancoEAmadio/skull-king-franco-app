@@ -93,7 +93,7 @@ img { -webkit-user-drag: none; user-drag: none; }
 .scroll-oculto { scrollbar-width: none; -ms-overflow-style: none; }
 .scroll-oculto::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
-html { font-size: 16px; --gutter: 1rem; }
+html { font-size: 14.5px; --gutter: 1rem; }
 @media (min-width: 768px) { html { font-size: 18px; --gutter: 2rem; } }
 @media (min-width: 1100px) { html { font-size: 19px; --gutter: 3rem; } }
 .contenedor-app {
@@ -117,7 +117,7 @@ main :where(h1, h2, h3, p, span) { overflow-wrap: anywhere; }
 
 .tarjeta-titulo {
   font-size: 0.875rem;
-  font-weight: 900;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--azul);
@@ -134,7 +134,7 @@ main :where(h1, h2, h3, p, span) { overflow-wrap: anywhere; }
   background: #fbf3e0;
   border: 1px solid #e7cfa8;
   color: var(--azul);
-  font-weight: 900;
+  font-weight: 800;
   font-size: 0.85rem;
 }
 
@@ -145,7 +145,7 @@ main :where(h1, h2, h3, p, span) { overflow-wrap: anywhere; }
   justify-content: center;
   gap: 0.45rem;
   min-height: 2.75rem;
-  font-weight: 800;
+  font-weight: 700;
   border-radius: 0.9rem;
   border: 1px solid transparent;
   text-align: center;
@@ -267,7 +267,7 @@ select.campo {
 .fila-puntaje + .fila-puntaje { border-top: 1px solid #f1f5f9; }
 .fila-puntaje-izq { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; }
 .fila-puntaje-nombre { display: block; min-width: 0; overflow-wrap: anywhere; line-height: 1.25; }
-.fila-puntaje-valor { flex-shrink: 0; white-space: nowrap; text-align: right; font-weight: 800; }
+.fila-puntaje-valor { flex-shrink: 0; white-space: nowrap; text-align: right; font-weight: 700; }
 
 /* ── Selector fijo de jugadores (3 pestañas, indicador deslizante) ───── */
 .selector-ventana { overflow: hidden; border-radius: 0.75rem; }
@@ -307,7 +307,7 @@ select.campo {
   width: 4.1rem;
   height: 4.1rem;
   border-radius: 9999px;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 1.85rem;
   line-height: 1;
   color: #334155;
@@ -365,7 +365,7 @@ select.campo {
   justify-content: center;
   border-radius: 0.7rem;
   font-size: 1.5rem;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1;
   color: #fff;
   background: linear-gradient(180deg, #a07f3c 0%, var(--azul) 100%);
@@ -376,7 +376,7 @@ select.campo {
   min-width: 2.5rem;
   text-align: center;
   font-size: 1.4rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--azul);
 }
 
@@ -433,7 +433,7 @@ select.campo {
   border-width: 1.5px;
   box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
-  min-height: 2.75rem; font-weight: 800; border-radius: 0.9rem; text-align: center;
+  min-height: 2.75rem; font-weight: 700; border-radius: 0.9rem; text-align: center;
 }
 .btn-oscuro:active:not(:disabled) { transform: scale(0.97); }
 .btn-oscuro:disabled { opacity: 0.4; }

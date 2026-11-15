@@ -36,29 +36,24 @@ export function PantallaInicio() {
           <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.65 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06A2 2 0 1 1 7.08 4.14l.06.06a1.7 1.7 0 0 0 1.87.34h0A1.7 1.7 0 0 0 10.04 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v0A1.7 1.7 0 0 0 21 10.04H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z" />
         </svg>
       </button>
-      <img
-        src="./archivos/iconos/logo-home.png"
-        alt="Skull King"
-        className="mt-10 h-auto w-44 max-w-[50%] rounded-[1.75rem] border-2 border-oro/70 shadow-2xl"
-      />
-      <h1 className="mt-4 font-display text-5xl font-black tracking-wide text-oro-claro drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+      <h1 className="mt-14 font-display text-4xl font-bold tracking-wide text-oro-claro drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
         Skull King
       </h1>
-      <p className="mb-7 mt-1 text-xs font-bold uppercase tracking-[0.25em] text-white">Anotador de puntos</p>
+      <p className="mb-7 mt-1 text-xs font-semibold uppercase tracking-[0.25em] text-white">Anotador de puntos y manual</p>
 
       <div className="flex w-full flex-col gap-3">
-        <button type="button" onClick={partida.irANuevaPartida} className="btn-dorado w-full py-4 text-lg">
+        <button type="button" onClick={partida.irANuevaPartida} className="btn-dorado w-full py-3.5 text-base">
           Nueva Partida
         </button>
         {partida.hayPartidaGuardada && (
-          <button type="button" onClick={continuar} className="btn-oscuro latir w-full py-4 text-lg">
+          <button type="button" onClick={continuar} className="btn-oscuro latir w-full py-3.5 text-base">
             Continuar Partida{partida.partidasGuardadas.length > 1 ? ` (${partida.partidasGuardadas.length})` : ''}
           </button>
         )}
-        <button type="button" onClick={() => setPantallaActual('jugadores')} className="btn-claro w-full py-4 text-lg">
+        <button type="button" onClick={() => setPantallaActual('jugadores')} className="btn-claro w-full py-3.5 text-base">
           Jugadores, Estadísticas e Historial
         </button>
-        <button type="button" onClick={() => setPantallaActual('reglas')} className="btn-claro w-full py-4 text-lg">
+        <button type="button" onClick={() => setPantallaActual('reglas')} className="btn-claro w-full py-3.5 text-base">
           Manual, Cartas y Reglas
         </button>
       </div>
@@ -76,7 +71,7 @@ export function PantallaInicio() {
 
       <Modal abierto={eligiendo} onCerrar={() => setEligiendo(false)} ancho="max-w-md" cerrarAlHacerClickAfuera>
         <div className="flex max-h-[85dvh] flex-col gap-3 overflow-y-auto p-4 text-left">
-          <h2 className="font-display text-xl font-black text-azul">Elegí qué partida continuar</h2>
+          <h2 className="font-display text-xl font-bold text-azul">Elegí qué partida continuar</h2>
           {partida.partidasGuardadas.map((p) => (
             <div key={p.id} className="opcion flex items-center gap-2 p-3">
               <button
@@ -84,7 +79,7 @@ export function PantallaInicio() {
                 className="min-w-0 flex-1 text-left"
                 onClick={() => { setEligiendo(false); partida.continuarPartida(p.id); }}
               >
-                <span className="block truncate text-sm font-extrabold text-tinta">
+                <span className="block truncate text-sm font-semibold text-tinta">
                   {p.jugadores.map((j) => j.nombre).join(', ')}
                 </span>
                 <span className="block text-xs font-semibold text-slate-500">

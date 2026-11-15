@@ -14,7 +14,7 @@ export function ImagenCarta({ src, alt, className = '' }: Props) {
       <span
         role="img"
         aria-label={`${alt} (foto próximamente)`}
-        className={`flex aspect-[2/3] items-center justify-center rounded-md border-2 border-dashed border-slate-300 bg-slate-100 p-1 text-center text-[10px] font-bold leading-tight text-slate-500 ${className}`}
+        className={`flex aspect-[2/3] items-center justify-center rounded-md border-2 border-dashed border-slate-300 bg-slate-100 p-1 text-center text-[10px] font-semibold leading-tight text-slate-500 ${className}`}
       >
         Próximamente
         <br />

@@ -5,8 +5,8 @@ import { calcularPorcentajeAciertos, calcularPorcentajeVictorias } from '../../d
 function Dato({ valor, etiqueta, color = 'text-azul' }: { valor: string | number; etiqueta: string; color?: string }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-center">
-      <span className={`block text-xl font-black ${color}`}>{valor}</span>
-      <span className="text-[11px] font-bold uppercase leading-tight text-slate-500">{etiqueta}</span>
+      <span className={`block text-xl font-bold ${color}`}>{valor}</span>
+      <span className="text-[11px] font-semibold uppercase leading-tight text-slate-500">{etiqueta}</span>
     </div>
   );
 }
@@ -53,7 +53,7 @@ export function ModalEstadisticasJugador() {
                     .map((entrada, indice) => (
                       <li key={`${entrada.fecha}-${indice}`} className="fila-puntaje py-1.5 text-sm">
                         <span className="text-slate-500">{entrada.fecha}</span>
-                        <span className="shrink-0 font-bold text-tinta">
+                        <span className="shrink-0 font-semibold text-tinta">
                           {entrada.posicion}.º · {entrada.puntos} pts
                         </span>
                       </li>

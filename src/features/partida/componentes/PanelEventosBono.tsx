@@ -12,10 +12,10 @@ interface Props {
 }
 
 const PALOS: { id: string; titulo: string; tono: TonoChip; aclaracion: string }[] = [
-  { id: 'siete_expansion', titulo: '−5', tono: 'rojo', aclaracion: 'capturó un 7' },
-  { id: 'ocho_expansion', titulo: '+5', tono: 'verde', aclaracion: 'capturó un 8' },
-  { id: 'catorce_color', titulo: '+10', tono: 'dorado', aclaracion: 'capturó un 14 de color' },
-  { id: 'catorce_negro', titulo: '+20', tono: 'negro', aclaracion: 'capturó el 14 negro' },
+  { id: 'siete_expansion', titulo: '−5', tono: 'rojo', aclaracion: '(7)' },
+  { id: 'ocho_expansion', titulo: '+5', tono: 'verde', aclaracion: '(8)' },
+  { id: 'catorce_color', titulo: '+10', tono: 'dorado', aclaracion: '(14)' },
+  { id: 'catorce_negro', titulo: '+20', tono: 'negro', aclaracion: '(14 negro)' },
 ];
 
 const ESPECIALES: Record<string, { titulo: string }> = {
@@ -72,18 +72,15 @@ export function PanelEventosBono({ numero, eventosBase: baseTodos, eventosExpans
     <Seccion numero={numero} titulo="Bonos de la ronda">
       {sinBazas && <p className="text-sm text-slate-600">Sin bazas ganadas no hay capturas{eventosExpansion.length > 0 ? ', salvo los monstruos que destruyó Davy Jones' : ''}.</p>}
       {!sinBazas && <div className="flex flex-col gap-2">
-        <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Cartas de palo capturadas</span>
-        <div className={`grid gap-2 ${palos.length > 2 ? 'grid-cols-4' : 'grid-cols-2'}`}>
+        <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Cartas de palo capturadas</span>
+        <div className="grid grid-cols-2 gap-2">
           {palos.map((p) => chip({ id: p.id, puntos: 0 }, p.titulo, p.tono, true, p.aclaracion))}
         </div>
-        <p className="text-xs font-semibold text-slate-500">
-          Tocá cada valor tantas veces como cartas capturaste.
-        </p>
       </div>}
 
       {especialesBase.length > 0 && (
         <div className="flex flex-col gap-2">
-          <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Capturas especiales</span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Capturas especiales</span>
           <div className="grid grid-cols-3 gap-2">
             {especialesBase.map((e) => chip(e, ESPECIALES[e.id]!.titulo))}
           </div>
@@ -92,7 +89,7 @@ export function PanelEventosBono({ numero, eventosBase: baseTodos, eventosExpans
 
       {especialesExp.length > 0 && (
         <div className="flex flex-col gap-2">
-          <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Expansión</span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Expansión</span>
           <div className="grid grid-cols-2 gap-2">
             {especialesExp.map((e) => chip(e, ESPECIALES[e.id]!.titulo))}
           </div>

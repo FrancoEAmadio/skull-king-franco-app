@@ -136,7 +136,7 @@ export function DiagramaJerarquia({ alto, nodos, flechas, onTocar }: Props) {
               );
             })}
           </div>
-          <span className="-mx-3 mt-1 text-center text-[10px] font-black leading-tight" style={{ color: n.color }}>
+          <span className="-mx-3 mt-1 text-center text-[10px] font-bold leading-tight" style={{ color: n.color }}>
             {n.nombre}
           </span>
         </button>

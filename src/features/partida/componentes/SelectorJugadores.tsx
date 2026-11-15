@@ -18,8 +18,8 @@ export function SelectorJugadores() {
         onClick={() => setSelectorAbierto(true)}
         className={`btn-claro flex w-full items-center justify-between px-4 py-3.5 text-left ${faltan ? 'latir' : ''}`}
       >
-        <span className="text-sm font-black">Seleccionar jugadores</span>
-        <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-azul-vivo px-2 text-xs font-black text-white">
+        <span className="text-sm font-bold">Seleccionar jugadores</span>
+        <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-azul-vivo px-2 text-xs font-bold text-white">
           {idsJugadoresSeleccionados.length}
         </span>
       </button>

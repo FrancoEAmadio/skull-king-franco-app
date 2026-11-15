@@ -87,3 +87,19 @@ describe('presupuesto de cartas de la mesa', () => {
     expect(calcularMaximoDisponible('catorce_color', ctx(j, 0, 1, 'expansion'))).toBeGreaterThan(0);
   });
 });
+
+describe('Davy Jones en ronda de 1 carta', () => {
+  it('3 jugadores, Davy con 2 monstruos: nadie puede ganar la baza', async () => {
+    const { calcularMaxGanadasPara } = await import('../src/features/partida/selectores');
+    const j = [{ ganadas: 0, eventosBono: { monstruo_davy: 2 } }, { ganadas: 0, eventosBono: {} }, { ganadas: 0, eventosBono: {} }] as unknown as Jugador[];
+    expect(calcularMaxGanadasPara(0, j, 1)).toBe(0);
+    expect(calcularMaxGanadasPara(1, j, 1)).toBe(0);
+    expect(calcularMaxGanadasPara(2, j, 1)).toBe(0);
+  });
+  it('5 jugadores, Davy con 3 monstruos: queda una carta que puede ganar', async () => {
+    const { calcularMaxGanadasPara } = await import('../src/features/partida/selectores');
+    const j = [{ ganadas: 0, eventosBono: { monstruo_davy: 3 } }, ...Array(4).fill({ ganadas: 0, eventosBono: {} })] as unknown as Jugador[];
+    expect(calcularMaxGanadasPara(1, j, 1)).toBe(1);
+    expect(calcularMaxGanadasPara(0, j, 1)).toBe(0);
+  });
+});
