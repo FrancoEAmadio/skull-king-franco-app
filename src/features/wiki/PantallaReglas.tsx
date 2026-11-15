@@ -1,3 +1,4 @@
+import { MANUALES_PDF } from '../../datos/manualesPdf';
 import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { CATALOGO_CARTAS_WIKI } from '../../datos/cartasDatos';
@@ -229,6 +230,26 @@ export function PantallaReglas() {
           <Jerarquias modo={modo} />
         </div>
       )}
+
+      <section className="tarjeta flex flex-col gap-2.5 p-4">
+        <h3 className="tarjeta-titulo">Manuales oficiales en PDF</h3>
+        {MANUALES_PDF.length === 0 ? (
+          <p className="text-sm font-semibold text-slate-500">Próximamente.</p>
+        ) : (
+          MANUALES_PDF.map((m) => (
+            <a
+              key={m.archivo}
+              href={`${import.meta.env.BASE_URL}${m.archivo}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-claro flex w-full flex-col items-start px-4 py-3 text-left"
+            >
+              <span className="text-sm font-bold">{m.titulo}</span>
+              {m.descripcion && <span className="text-xs font-semibold text-slate-500">{m.descripcion}</span>}
+            </a>
+          ))
+        )}
+      </section>
 
       <FichaCarta ids={ficha?.ids ?? null} titulo={ficha?.titulo ?? ''} onCerrar={() => setFicha(null)} />
     </main>
