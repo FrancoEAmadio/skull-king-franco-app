@@ -1,6 +1,8 @@
 import { vibrar } from '../infra/vibracion';
 
-export type TonoChip = 'neutro' | 'rojo' | 'verde' | 'dorado' | 'negro';
+import { TONOS_APP, type NombreTono } from './tonos';
+
+export type TonoChip = 'neutro' | 'dorado' | NombreTono;
 
 interface Props {
   titulo: string;
@@ -15,28 +17,31 @@ interface Props {
   onBorrar: () => void;
 }
 
-const TONOS: Record<TonoChip, { reposo: string; activo: string }> = {
-  neutro: { reposo: 'bg-white border-slate-300 text-tinta', activo: 'bg-amber-50 border-oro text-tinta ring-2 ring-oro/40' },
-  rojo: { reposo: 'bg-red-50 border-red-300 text-red-700', activo: 'bg-red-100 border-red-500 text-red-800 ring-2 ring-red-300' },
-  verde: { reposo: 'bg-emerald-50 border-emerald-300 text-emerald-700', activo: 'bg-emerald-100 border-emerald-500 text-emerald-800 ring-2 ring-emerald-300' },
-  dorado: { reposo: 'bg-amber-50 border-amber-300 text-amber-800', activo: 'bg-amber-200 border-oro-osc text-amber-900 ring-2 ring-oro/50' },
-  negro: { reposo: 'bg-slate-100 border-slate-800 text-slate-900', activo: 'bg-slate-300 border-black text-black ring-2 ring-slate-500' },
-};
+const NEUTRO = { reposo: 'bg-white border-slate-300 text-tinta', activo: 'bg-amber-50 border-oro text-tinta ring-2 ring-oro/40' };
+
+function tonoDe(tono: TonoChip) {
+  if (tono === 'neutro') return NEUTRO;
+  return TONOS_APP[tono === 'dorado' ? 'amarillo' : tono];
+}
 
 /** Botón-chip vertical: cada toque suma hasta el máximo y el siguiente lo borra. */
 export function ChipCompacto({ titulo, subtitulo, aclaracion, cantidad, maximo, tono = 'neutro', grande = false, onMas, onBorrar }: Props) {
   const activo = cantidad > 0;
   const bloqueado = maximo <= 0 && cantidad === 0;
-  const clases = TONOS[tono];
+  const clases = tonoDe(tono);
   return (
     <button
       type="button"
       aria-pressed={activo}
       disabled={bloqueado}
       onClick={() => {
-        vibrar();
-        if (cantidad >= maximo) onBorrar();
-        else onMas();
+        if (cantidad >= maximo) {
+          vibrar([25, 45, 25]); // doble toque: se borró
+          onBorrar();
+        } else {
+          vibrar();
+          onMas();
+        }
       }}
       className={`relative flex min-h-[3.75rem] w-full flex-col items-center justify-center gap-0.5 rounded-xl border-2 px-1.5 py-2 text-center disabled:opacity-35 ${
         activo ? clases.activo : clases.reposo

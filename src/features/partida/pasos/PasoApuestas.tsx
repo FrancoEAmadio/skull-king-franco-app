@@ -1,10 +1,11 @@
 import { useApp } from '../../../estado/AppProvider';
 import { avatarDe } from '../../../datos/avatares';
 import { AvatarPirata } from '../../../ui/AvatarPirata';
+import { colorAvatarDe } from '../../../datos/coloresJugador';
 import { FichasNumero } from '../../../ui/FichasNumero';
 
 export function PasoApuestas() {
-  const { partida } = useApp();
+  const { partida, jugadoresPermanentes } = useApp();
   const {
     jugadoresOrdenados,
     cartasPorJugadorEnRonda,
@@ -32,13 +33,29 @@ export function PasoApuestas() {
         <div className="text-right">
           <span className="block text-3xl font-bold leading-none text-azul">{sumaApuestas}</span>
           <span className="block text-xs font-semibold text-slate-500">de {cartasPorJugadorEnRonda} bazas</span>
+          {completo && (
+            <span className="mt-1 block text-[11px] font-semibold text-amber-700">
+              {sumaApuestas === cartasPorJugadorEnRonda
+                ? 'Coinciden: todos podrían cumplir'
+                : sumaApuestas > cartasPorJugadorEnRonda
+                  ? `Sobran ${sumaApuestas - cartasPorJugadorEnRonda}: alguien va a fallar`
+                  : `Faltan ${cartasPorJugadorEnRonda - sumaApuestas}: alguien va a fallar`}
+            </span>
+          )}
         </div>
       </div>
 
       {jugadoresOrdenados.map(({ jugador, originalIndex }) => (
         <div key={originalIndex} className="tarjeta flex flex-col gap-3 p-4">
           <div className="flex items-center gap-3">
-            <AvatarPirata emoji={avatarDe(jugador.permanenteId, jugador.avatar)} tamano="md" />
+            <AvatarPirata
+              emoji={avatarDe(jugador.permanenteId, jugador.avatar)}
+              fondo={(() => {
+                const perm = jugadoresPermanentes.find((p) => p.id === jugador.permanenteId);
+                return colorAvatarDe(jugador.permanenteId, perm?.colorAvatar, perm?.colorTarjeta);
+              })()}
+              tamano="md"
+            />
             <span className="min-w-0 flex-1 truncate text-lg font-bold text-azul">{jugador.nombre}</span>
             <span
               className={`rounded-full px-3 py-1 text-base font-bold ${

@@ -13,8 +13,9 @@ interface ContextoApp {
   setPantallaActual: (pantalla: PantallaId) => void;
 
   jugadoresPermanentes: JugadorPermanente[];
-  crearJugadorPermanente: (nombre: string, avatar?: string) => JugadorPermanente | null;
+  crearJugadorPermanente: (nombre: string, avatar?: string, colores?: { colorTarjeta: string; colorAvatar: string }) => JugadorPermanente | null;
   cambiarAvatarJugadorPermanente: (id: string, avatar: string) => void;
+  cambiarColoresJugadorPermanente: (id: string, colores: { colorTarjeta?: string; colorAvatar?: string }) => void;
   renombrarJugadorPermanente: (id: string, nuevoNombre: string) => void;
   eliminarJugadorPermanente: (id: string) => void;
   reemplazarJugadoresPermanentes: (lista: JugadorPermanente[]) => void;
@@ -62,6 +63,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     crear,
     renombrar,
     cambiarAvatar,
+    cambiarColores,
     eliminar,
     reemplazarLista,
   } = useJugadoresPermanentes();
@@ -99,6 +101,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     crearJugadorPermanente: crear,
     renombrarJugadorPermanente: renombrar,
     cambiarAvatarJugadorPermanente: cambiarAvatar,
+    cambiarColoresJugadorPermanente: cambiarColores,
     eliminarJugadorPermanente: eliminar,
     reemplazarJugadoresPermanentes: reemplazarLista,
     partida,

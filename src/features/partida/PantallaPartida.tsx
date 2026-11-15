@@ -53,7 +53,7 @@ export function PantallaPartida() {
           <button type="button" onClick={() => setPantallaActual('inicio')} className="btn-fantasma px-3 py-2 text-sm">
             ← Menú
           </button>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-amber-100">Partida en curso</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-amber-100">Partida en curso · se guarda sola</span>
         </div>
 
         <div className="flex items-center justify-between gap-2">
