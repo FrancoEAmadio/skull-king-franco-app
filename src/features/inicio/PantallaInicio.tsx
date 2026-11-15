@@ -40,7 +40,7 @@ export function PantallaInicio() {
         src={`${import.meta.env.BASE_URL}archivos/iconos/tapa.png`}
         alt=""
         draggable={false}
-        className="mx-auto mt-10 w-24 rounded-lg shadow-[0_6px_18px_rgba(0,0,0,0.55)]"
+        className="mx-auto mt-8 w-36 rounded-lg shadow-[0_6px_18px_rgba(0,0,0,0.55)]"
       />
       <h1 className="mt-4 font-display text-4xl font-bold tracking-wide text-oro-claro drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
         Skull King

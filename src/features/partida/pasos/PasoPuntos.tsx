@@ -122,8 +122,8 @@ export function PasoPuntos() {
         }))}
       />
 
-      <div key={jugadorSeleccionadoIdx} className={`flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start ${animacion}`}>
-        <div className="tarjeta lg:col-span-2 flex items-end justify-between gap-3 p-4">
+      <div key={jugadorSeleccionadoIdx} className={`flex flex-col gap-4 ${animacion}`}>
+        <div className="tarjeta flex items-end justify-between gap-3 p-4">
           <div className="min-w-0">
             <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
               {indiceVisualActual + 1} de {total}

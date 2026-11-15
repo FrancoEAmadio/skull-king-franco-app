@@ -5,7 +5,7 @@ export const MODOS_REPARTO: ModoReparto[] = [
   {
     id: 'clasico',
     nombre: 'Clásico',
-    icono: '🟢',
+    icono: '🟡',
     descripcion: 'Son 10 rondas: Ronda 1 con 1 carta, Ronda 2 con 2 cartas, Ronda 3 con 3 cartas...',
     cartas: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
   },

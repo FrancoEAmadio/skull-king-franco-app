@@ -14,16 +14,16 @@ interface Props {
 const PALOS: { id: string; titulo: string; tono: TonoChip; aclaracion: string }[] = [
   { id: 'siete_expansion', titulo: '−5', tono: 'rojo', aclaracion: 'capturó un 7' },
   { id: 'ocho_expansion', titulo: '+5', tono: 'verde', aclaracion: 'capturó un 8' },
-  { id: 'catorce_color', titulo: '+10', tono: 'dorado', aclaracion: 'capturó un 14' },
+  { id: 'catorce_color', titulo: '+10', tono: 'amarillo', aclaracion: 'capturó un 14' },
   { id: 'catorce_negro', titulo: '+20', tono: 'negro', aclaracion: 'capturó el 14 negro' },
 ];
 
-const ESPECIALES: Record<string, { titulo: string }> = {
-  pirata_por_sk: { titulo: 'Pirata capturado por SK' },
-  sk_por_sirena: { titulo: 'SK capturado por Sirena' },
-  sirena_por_pirata: { titulo: 'Sirena capturada por Pirata' },
-  kong_por_sk_sirena: { titulo: 'Kong capturado por SK o Sirena' },
-  monstruo_davy: { titulo: 'Monstruo destruido por Davy Jones' },
+const ESPECIALES: Record<string, { titulo: string; tono: TonoChip }> = {
+  pirata_por_sk: { titulo: 'Pirata capturado por SK', tono: 'naranja' },
+  sk_por_sirena: { titulo: 'SK capturado por Sirena', tono: 'agua' },
+  sirena_por_pirata: { titulo: 'Sirena capturada por Pirata', tono: 'rojo' },
+  kong_por_sk_sirena: { titulo: 'Kong capturado por SK o Sirena', tono: 'negro' },
+  monstruo_davy: { titulo: 'Monstruo destruido por Davy Jones', tono: 'verde' },
 };
 
 export function PanelEventosBono({ numero, eventosBase: baseTodos, eventosExpansion: expTodos, sinBazas = false }: Props) {
@@ -82,7 +82,7 @@ export function PanelEventosBono({ numero, eventosBase: baseTodos, eventosExpans
         <div className="flex flex-col gap-2">
           <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Capturas especiales</span>
           <div className="grid grid-cols-3 gap-2">
-            {especialesBase.map((e) => chip(e, ESPECIALES[e.id]!.titulo))}
+            {especialesBase.map((e) => chip(e, ESPECIALES[e.id]!.titulo, ESPECIALES[e.id]!.tono))}
           </div>
         </div>
       )}
@@ -91,7 +91,7 @@ export function PanelEventosBono({ numero, eventosBase: baseTodos, eventosExpans
         <div className="flex flex-col gap-2">
           <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Expansión</span>
           <div className="grid grid-cols-2 gap-2">
-            {especialesExp.map((e) => chip(e, ESPECIALES[e.id]!.titulo))}
+            {especialesExp.map((e) => chip(e, ESPECIALES[e.id]!.titulo, ESPECIALES[e.id]!.tono))}
           </div>
         </div>
       )}

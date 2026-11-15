@@ -5,15 +5,16 @@ import { vibrar } from '../../infra/vibracion';
 import type { ConfiguracionMesa, ModoContenido, ModoRepartoId, ReglasOpcionales } from '../../tipos';
 import { reglasOpcionalesPorDefectoDelModo } from '../../dominio/disponibilidadContenido';
 import { MAX_RONDAS_PERSONALIZADO, MAX_CARTAS_POR_RONDA } from '../../constantes';
+import { TONOS_APP, REPOSO_NEUTRO, type NombreTono } from '../../ui/tonos';
 import { PanelReglasOpcionales } from './componentes/PanelReglasOpcionales';
 import { SelectorJugadores } from './componentes/SelectorJugadores';
 import { SelectorModoReparto } from './componentes/SelectorModoReparto';
 import { ConfiguradorRepartoPersonalizado } from './componentes/ConfiguradorRepartoPersonalizado';
 
-const MODOS_CONTENIDO: { id: ModoContenido; etiqueta: string }[] = [
-  { id: 'base', etiqueta: 'Juego Base' },
-  { id: 'avanzado', etiqueta: 'Reglas Avanzadas' },
-  { id: 'expansion', etiqueta: 'Expansión' },
+const MODOS_CONTENIDO: { id: ModoContenido; etiqueta: string; tono: NombreTono }[] = [
+  { id: 'base', etiqueta: 'Juego Base', tono: 'amarillo' },
+  { id: 'avanzado', etiqueta: 'Reglas Avanzadas', tono: 'violeta' },
+  { id: 'expansion', etiqueta: 'Expansión', tono: 'verde' },
 ];
 
 export function PantallaNuevaPartida() {
@@ -97,8 +98,8 @@ export function PantallaNuevaPartida() {
   const maxPiratasHabilidad = configuracionMesa.modoContenido === 'expansion' ? 'Bribón, Harry y Kong' : 'Bribón y Harry';
 
   return (
-    <main className="entrar flex w-full flex-col gap-4 py-4 lg:grid lg:grid-cols-2 lg:items-start">
-      <div className="flex items-start justify-between gap-3 lg:col-span-2">
+    <main className="entrar flex w-full flex-col gap-4 py-4">
+      <div className="flex items-start justify-between gap-3">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-amber-100">Nueva partida</span>
           <h2 className="font-display text-2xl font-bold text-white">Configurar mesa</h2>
@@ -113,16 +114,18 @@ export function PantallaNuevaPartida() {
         <div className="grid grid-cols-3 gap-2">
           {MODOS_CONTENIDO.map((modo) => {
             const seleccionado = configuracionMesa.modoContenido === modo.id;
+            const tono = TONOS_APP[modo.tono];
             return (
               <button
                 key={modo.id}
                 type="button"
                 onClick={() => cambiarModoContenido(modo.id)}
                 aria-pressed={seleccionado}
-                className={`flex min-h-16 items-center justify-center px-1.5 py-3 text-center text-sm font-semibold leading-tight ${
-                  seleccionado ? 'opcion opcion-sel' : 'opcion'
+                className={`flex min-h-16 flex-col items-center justify-center gap-1.5 rounded-xl border-2 px-1.5 py-3 text-center text-sm font-semibold leading-tight ${
+                  seleccionado ? tono.activo : REPOSO_NEUTRO
                 }`}
               >
+                <span aria-hidden="true" className={`h-2 w-2 rounded-full ${tono.punto}`} />
                 {modo.etiqueta}
               </button>
             );
@@ -143,24 +146,28 @@ export function PantallaNuevaPartida() {
         <div className="grid grid-cols-2 gap-2.5">
           <TarjetaOpcion
             titulo="🃏 Comodines de bonificación"
+            tono="fucsia"
             detalle="Cartas blancas: +5 a +50 pts"
             activo={configuracionMesa.usarComodinesBonificacion}
             onChange={(valor) => actualizarConfig('usarComodinesBonificacion', valor)}
           />
           <TarjetaOpcion
             titulo="🏴‍☠️ Reglas del Bribón"
+            tono="naranja"
             detalle="Metralla o Bala de cañón"
             activo={configuracionMesa.usarModoBribon}
             onChange={(valor) => actualizarConfig('usarModoBribon', valor)}
           />
           <TarjetaOpcion
             titulo="✨ Habilidades de piratas"
+            tono="rojo"
             detalle={maxPiratasHabilidad}
             activo={configuracionMesa.usarHabilidadesPiratas}
             onChange={(valor) => actualizarConfig('usarHabilidadesPiratas', valor)}
           />
           <TarjetaOpcion
             titulo="💰 Bonos al fallar envite"
+            tono="lima"
             detalle="Se cobran aunque falles"
             activo={configuracionMesa.cobrarBonosSinAcierto}
             onChange={(valor) => actualizarConfig('cobrarBonosSinAcierto', valor)}
@@ -170,7 +177,7 @@ export function PantallaNuevaPartida() {
 
       <PanelReglasOpcionales configuracion={configuracionMesa} onCambiar={cambiarReglaOpcional} />
 
-      <button type="button" onClick={intentarComenzarPartida} className="btn-dorado mt-1 w-full py-3.5 text-base lg:col-span-2">
+      <button type="button" onClick={intentarComenzarPartida} className="btn-dorado mt-1 w-full py-3.5 text-base">
         Empezar partida ➔
       </button>
 
@@ -187,12 +194,14 @@ export function PantallaNuevaPartida() {
 interface TarjetaOpcionProps {
   titulo: string;
   detalle: string;
+  tono: NombreTono;
   activo: boolean;
   onChange: (valor: boolean) => void;
 }
 
-/** Tarjeta-botón: activa = borde dorado + tinte (igual que el modo de contenido). */
-function TarjetaOpcion({ titulo, detalle, activo, onChange }: TarjetaOpcionProps) {
+/** Tarjeta-botón: apagada = neutra con una muestra del color; activa = borde y tinte de su color. */
+function TarjetaOpcion({ titulo, detalle, tono, activo, onChange }: TarjetaOpcionProps) {
+  const colores = TONOS_APP[tono];
   return (
     <button
       type="button"
@@ -202,11 +211,14 @@ function TarjetaOpcion({ titulo, detalle, activo, onChange }: TarjetaOpcionProps
         vibrar();
         onChange(!activo);
       }}
-      className={`flex min-h-[6.5rem] flex-col items-start justify-between gap-1 p-3 text-left ${
-        activo ? 'opcion opcion-sel' : 'opcion'
+      className={`flex min-h-[6.5rem] flex-col items-start justify-between gap-1 rounded-xl border-2 p-3 text-left ${
+        activo ? colores.activo : REPOSO_NEUTRO
       }`}
     >
-      <span className="text-sm font-bold leading-tight">{titulo}</span>
+      <span className="flex w-full items-start justify-between gap-2">
+        <span className="text-sm font-bold leading-tight">{titulo}</span>
+        <span aria-hidden="true" className={`mt-1 h-2 w-2 shrink-0 rounded-full ${colores.punto}`} />
+      </span>
       <span className="text-xs font-semibold leading-tight text-slate-500">{detalle}</span>
     </button>
   );
