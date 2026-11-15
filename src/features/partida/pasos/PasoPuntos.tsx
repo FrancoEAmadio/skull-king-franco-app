@@ -11,7 +11,7 @@ import { useGestosMultiDedo } from '../../../ui/useGestosMultiDedo';
 import { vibrar } from '../../../infra/vibracion';
 import { FichasNumero } from '../../../ui/FichasNumero';
 import { ModalConfirmacion } from '../../../ui/ModalConfirmacion';
-import { StepperBono } from '../../../ui/StepperBono';
+import { ChipBono } from '../../../ui/ChipBono';
 import { Seccion } from '../../../ui/Seccion';
 import { PanelAlianzasBotin } from '../componentes/PanelAlianzasBotin';
 import { PanelEventosBono } from '../componentes/PanelEventosBono';
@@ -149,7 +149,7 @@ export function PasoPuntos() {
                 acerto ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'
               }`}
             >
-              {acerto ? '✓ Acertó' : '✕ No acertó'}
+              {acerto ? 'Acertó' : 'No acertó'}
             </span>
             <span className="text-xs font-semibold text-slate-500">
               {bazasSinAsignar > 0 ? `Faltan asignar ${bazasSinAsignar}` : 'Todas asignadas'}
@@ -166,8 +166,8 @@ export function PasoPuntos() {
             onElegir={(numero) => elegirGanadas(jugadorSeleccionadoIdx, numero)}
           />
 
-          <button type="button" onClick={limpiarBazasRonda} className="btn-claro self-end px-3 py-2 text-xs">
-            🔄 Limpiar bazas
+          <button type="button" onClick={limpiarBazasRonda} className="btn-claro mx-auto px-5 py-2.5 text-sm">
+            Limpiar bazas
           </button>
         </Seccion>
 
@@ -180,7 +180,7 @@ export function PasoPuntos() {
         )}
 
         {bonosBloqueados ? (
-          <Seccion numero={numeroBonos} titulo="Bonos de la ronda" marcador="🔒">
+          <Seccion numero={numeroBonos} titulo="Bonos de la ronda" marcador="Bloqueado">
             <p className="text-sm text-slate-600">{sinBazas ? 'Sin bazas ganadas no hay capturas.' : 'Se habilitan al acertar el envite.'}</p>
           </Seccion>
         ) : (
@@ -193,14 +193,14 @@ export function PasoPuntos() {
 
         {numeroComodines !== undefined && (
           <Seccion numero={numeroComodines} titulo="Comodines de bonificación">
-            <StepperBono
+            <ChipBono
               nombre="Comodín"
               detalle={`En mesa: ${limiteComodines.comodinesDisponibles} / ${limiteComodines.maxComodinesPermitidos}`}
               cantidad={jugadorActual.cartasBlancas || 0}
               maximo={limiteComodines.comodinesDisponibles}
               motivoTope="Ya están todos los comodines del mazo repartidos."
               onMas={() => fijarCartasBlancas(jugadorSeleccionadoIdx, (jugadorActual.cartasBlancas || 0) + 1)}
-              onMenos={() => fijarCartasBlancas(jugadorSeleccionadoIdx, Math.max(0, (jugadorActual.cartasBlancas || 0) - 1))}
+              onBorrar={() => fijarCartasBlancas(jugadorSeleccionadoIdx, 0)}
             />
           </Seccion>
         )}
@@ -211,7 +211,7 @@ export function PasoPuntos() {
           ← Anterior
         </button>
         <button type="button" onClick={avanzar} className="btn-dorado py-3.5 text-base">
-          {esUltimo ? textoBotonAvanzar : `Siguiente: ${siguiente?.nombre ?? ''} ➔`}
+          {esUltimo ? textoBotonAvanzar : `Siguiente: ${siguiente?.nombre ?? ''} →`}
         </button>
       </div>
 

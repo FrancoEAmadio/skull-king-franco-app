@@ -113,7 +113,7 @@ export const CATEGORIAS_REGLAS_WIKI: CategoriaRegla[] = [
       {
         titulo: '🏴‍☠️ Nuevos Piratas (Mary Thorne y Primer Oficial Kong)',
         texto:
-          '🏴‍☠️ MARY THORNE: al ganar una baza, elige una carta al azar de la mano de cualquier jugador. Esa carta queda forzada y deberá jugarse obligatoriamente en la siguiente baza.\n\n🧤 PRIMER OFICIAL KONG: derrota a todos los números y Piratas estándar. Pierde contra Sirenas y Skull King. Si gana una baza, copia todas las habilidades de los piratas capturados.',
+          '🏴‍☠️ MARY THORNE: al ganar una baza, elige una carta al azar de la mano de cualquier jugador. Esa carta queda forzada y deberá jugarse obligatoriamente en la siguiente baza.\n\n🧤 PRIMER OFICIAL KONG: derrota a todos los números y Piratas estándar. Pierde contra Sirenas y Skull King. Al jugarlo copia la habilidad de un pirata que se haya jugado antes que él en la baza (si no hay ninguno, no hace nada) y después igual puede ser capturado. Capturarlo no da puntos por sí mismo: solo suma +30 si lo captura un Skull King o una Sirena.',
         abierta: false,
       },
       {

@@ -1,18 +1,19 @@
-import { useState } from 'react';
-import { Toggle } from '../../../ui/Toggle';
 import { modoPermiteRegla } from '../../../dominio/disponibilidadContenido';
+import { vibrar } from '../../../infra/vibracion';
 import type { ConfiguracionMesa, ReglasOpcionales } from '../../../tipos';
 
-const OPCIONES_AVANZADAS: [keyof ReglasOpcionales, string][] = [
-  ['kraken', 'Kraken (nadie gana la baza)'],
-  ['botin', 'Botín (alianzas +20 pts)'],
+type Opcion = [keyof ReglasOpcionales, string, string];
+
+const OPCIONES_AVANZADAS: Opcion[] = [
+  ['kraken', 'Kraken', 'Nadie gana la baza'],
+  ['botin', 'Botín', 'Alianzas +20 pts'],
 ];
 
-const OPCIONES_EXPANSION: [keyof ReglasOpcionales, string][] = [
-  ['primerOficialKong', 'Primer Oficial Kong'],
-  ['davyJones', 'Davy Jones (monstruos destruidos)'],
-  ['carta7', 'Carta 7 (−5 pts)'],
-  ['carta8', 'Carta 8 (+5 pts)'],
+const OPCIONES_EXPANSION: Opcion[] = [
+  ['primerOficialKong', 'Primer Oficial Kong', 'Copia una habilidad'],
+  ['davyJones', 'Davy Jones', 'Monstruos destruidos'],
+  ['carta7', 'Carta 7', '−5 pts al capturarla'],
+  ['carta8', 'Carta 8', '+5 pts al capturarla'],
 ];
 
 interface Props {
@@ -21,57 +22,55 @@ interface Props {
 }
 
 export function PanelReglasOpcionales({ configuracion, onCambiar }: Props) {
-  const [abierto, setAbierto] = useState(false);
-
   return (
-    <section className="tarjeta overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setAbierto(!abierto)}
-        aria-expanded={abierto}
-        className="flex w-full items-center justify-between gap-2 px-4 py-3.5 text-left"
-      >
-        <h3 className="tarjeta-titulo !font-sans">5. Reglas y cartas opcionales</h3>
-        <span className="text-sm font-bold text-azul">{abierto ? '▲' : '▼'}</span>
-      </button>
-
-      {abierto && (
-        <div className="flex flex-col gap-3 px-4 pb-4">
-          <GrupoOpciones titulo="Reglas avanzadas" opciones={OPCIONES_AVANZADAS} configuracion={configuracion} onCambiar={onCambiar} />
-          <GrupoOpciones titulo="Expansión" opciones={OPCIONES_EXPANSION} configuracion={configuracion} onCambiar={onCambiar} />
-        </div>
-      )}
+    <section className="tarjeta flex flex-col gap-4 p-4">
+      <h3 className="tarjeta-titulo">5. Reglas y cartas opcionales</h3>
+      <Grupo titulo="Reglas avanzadas" opciones={OPCIONES_AVANZADAS} configuracion={configuracion} onCambiar={onCambiar} />
+      <Grupo titulo="Expansión" opciones={OPCIONES_EXPANSION} configuracion={configuracion} onCambiar={onCambiar} />
     </section>
   );
 }
 
 interface GrupoProps {
   titulo: string;
-  opciones: [keyof ReglasOpcionales, string][];
+  opciones: Opcion[];
   configuracion: ConfiguracionMesa;
   onCambiar: (regla: keyof ReglasOpcionales, valor: boolean) => void;
 }
 
-function GrupoOpciones({ titulo, opciones, configuracion, onCambiar }: GrupoProps) {
-  const grupoDeshabilitado = opciones.every(([regla]) => !modoPermiteRegla(configuracion.modoContenido, regla));
-
+function Grupo({ titulo, opciones, configuracion, onCambiar }: GrupoProps) {
+  const sinModo = opciones.every(([regla]) => !modoPermiteRegla(configuracion.modoContenido, regla));
   return (
-    <div className={`flex flex-col rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 ${grupoDeshabilitado ? 'opacity-50' : ''}`}>
-      <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">{titulo}</span>
-      {opciones.map(([clave, etiqueta]) => {
-        const deshabilitada = !modoPermiteRegla(configuracion.modoContenido, clave);
-        return (
-          <div key={clave} className="flex items-center justify-between gap-3 border-t border-slate-200 first:border-t-0">
-            <span className="text-sm font-semibold text-tinta">{etiqueta}</span>
-            <Toggle
-              etiqueta={etiqueta}
-              checked={configuracion.reglasOpcionales[clave]}
+    <div className={`flex flex-col gap-2 ${sinModo ? 'opacity-45' : ''}`}>
+      <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+        {titulo}
+        {sinModo && ' · no disponible en este modo'}
+      </span>
+      <div className="grid grid-cols-2 gap-2.5">
+        {opciones.map(([clave, nombre, detalle]) => {
+          const deshabilitada = !modoPermiteRegla(configuracion.modoContenido, clave);
+          const activo = configuracion.reglasOpcionales[clave];
+          return (
+            <button
+              key={clave}
+              type="button"
+              role="switch"
+              aria-checked={activo}
               disabled={deshabilitada}
-              onChange={(valor) => onCambiar(clave, valor)}
-            />
-          </div>
-        );
-      })}
+              onClick={() => {
+                vibrar();
+                onCambiar(clave, !activo);
+              }}
+              className={`flex min-h-[5rem] flex-col items-start justify-between gap-1 p-3 text-left disabled:cursor-not-allowed disabled:opacity-50 ${
+                activo ? 'opcion opcion-sel' : 'opcion'
+              }`}
+            >
+              <span className="text-sm font-black leading-tight">{nombre}</span>
+              <span className="text-xs font-semibold leading-tight text-slate-500">{detalle}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

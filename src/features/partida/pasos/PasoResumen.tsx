@@ -118,11 +118,11 @@ export function PasoResumen() {
       <div className="barra-inferior mt-auto grid gap-2">
         {partidaFinalizada ? (
           <button type="button" onClick={abrirPodio} className="btn-dorado w-full py-4 text-base">
-            🏁 Ver resultado final
+            Ver resultado final
           </button>
         ) : partidaPendienteFinalizar ? (
           <button type="button" onClick={confirmarResultadoFinal} className="btn-dorado w-full py-4 text-base">
-            🏁 Confirmar resultado final
+            Confirmar resultado final
           </button>
         ) : (
           <button type="button" onClick={irASiguienteRonda} className="btn-dorado w-full py-4 text-base">

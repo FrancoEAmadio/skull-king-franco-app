@@ -229,6 +229,8 @@ export interface BackupRondaActual {
 }
 
 export interface PartidaGuardada {
+  id: string;
+  actualizada: string;
   jugadores: Jugador[];
   rondaActual: number;
   configuracionMesa: ConfiguracionMesa;
