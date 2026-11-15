@@ -5,7 +5,7 @@ import {
 } from '../../infra/almacenamiento';
 import type { JugadorPermanente } from '../../tipos';
 import { crearJugadorPermanente } from '../../dominio/estadisticas';
-import { completarColores, coloresParaNuevo } from '../../datos/coloresJugador';
+import { completarColores, coloresParaNuevo, normalizarColores } from '../../datos/coloresJugador';
 
 export function useJugadoresPermanentes() {
   const [jugadores, setJugadores] = useState<JugadorPermanente[]>([]);
@@ -53,7 +53,8 @@ export function useJugadoresPermanentes() {
 
   const cambiarColores = useCallback(
     (id: string, colores: { colorTarjeta?: string; colorAvatar?: string }) => {
-      persistir(jugadores.map((jug) => (jug.id === id ? { ...jug, ...colores } : jug)));
+      const conCambio = jugadores.map((jug) => (jug.id === id ? { ...jug, ...colores } : jug));
+      persistir(normalizarColores(conCambio, id).lista);
     },
     [jugadores, persistir]
   );
