@@ -140,9 +140,9 @@ function Monstruos({ modo }: { modo: ModoContenido }) {
 function SinBazas({ modo }: { modo: ModoContenido }) {
   const lista = [
     { id: 'huida', nombre: 'Huida', frase: 'Pierde contra todo: te salva de ganar una baza.', ok: true },
-    { id: 'botin', nombre: 'Botín', frase: 'Vale 0: permite aliarte con otro jugador.', ok: modo !== 'base' },
-    { id: 'tablon', nombre: 'Caminar por la Tabla', frase: 'Un jugador pasa de ronda su envite.', ok: modo === 'expansion' },
-    { id: 'last_volley', nombre: 'La Última Descarga', frase: 'Cambia el resultado al final de la ronda.', ok: modo === 'expansion' },
+    { id: 'botin', nombre: 'Botín', frase: 'Te permite aliarte con otro jugador.', ok: modo !== 'base' },
+    { id: 'tablon', nombre: 'Caminar por la Tabla', frase: 'Elimina a un pirata de la baza: ese pirata no gana.', ok: modo === 'expansion' },
+    { id: 'last_volley', nombre: 'La Última Descarga', frase: 'Quien la juega tira una segunda carta en la misma baza.', ok: modo === 'expansion' },
   ].filter((c) => c.ok);
   return (
     <Caja titulo="No ganan bazas: tienen habilidades durante la ronda">
