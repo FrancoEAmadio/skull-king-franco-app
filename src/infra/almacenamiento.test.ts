@@ -99,3 +99,64 @@ describe('datos viejos o rotos en localStorage', () => {
     if (r.ok) expect(r.copia.jugadores[0]!.nombre).toBe('Ana');
   });
 });
+
+describe('partidas guardadas con campos que faltan (versiones viejas)', () => {
+  const base = () => ({
+    id: 'p1',
+    actualizada: '2026-11-01T00:00:00.000Z',
+    jugadores: [
+      { permanenteId: 'a', nombre: 'A', puntos: 0, apuesta: 0, ganadas: 0, modoEnvite: 'normal', bribonHabilidadPts: null, bribonStolenFrom: null, eventosBono: {}, fecha: '', historial: [] },
+    ],
+    rondaActual: 1,
+    configuracionMesa: { reglasOpcionales: {} },
+    alianzasBotinRonda: [],
+    jugadorSeleccionadoIdx: 0,
+    registroHabilidadesRonda: [],
+    cartasPorRondaActivas: [1, 2, 3],
+    pasoPartida: 'apuestas',
+    resumenRondaActual: [],
+    editandoRondaAnterior: false,
+    backupRondaActual: null,
+    ultimaRondaEditable: null,
+    partidaPendienteFinalizar: false,
+  });
+
+  it('sin cualquiera de sus campos, la partida carga con todo lo que usa la pantalla definido', () => {
+    for (const campo of Object.keys(base())) {
+      const partida = base() as Record<string, unknown>;
+      delete partida[campo];
+      instalarLocalStorage({ [CLAVE_LS_PARTIDAS]: JSON.stringify([partida]) });
+      const cargadas = cargarPartidasGuardadas();
+      if (campo === 'jugadores') {
+        expect(cargadas, campo).toHaveLength(0);
+        continue;
+      }
+      expect(cargadas, campo).toHaveLength(1);
+      const p = cargadas[0]!;
+      expect(Array.isArray(p.cartasPorRondaActivas), campo).toBe(true);
+      expect(Array.isArray(p.alianzasBotinRonda), campo).toBe(true);
+      expect(Array.isArray(p.registroHabilidadesRonda), campo).toBe(true);
+      expect(Array.isArray(p.resumenRondaActual), campo).toBe(true);
+      expect(typeof p.configuracionMesa, campo).toBe('object');
+    }
+  });
+
+  it('un jugador sin historial ni bonos no rompe', () => {
+    const partida = base();
+    delete (partida.jugadores[0] as Record<string, unknown>).historial;
+    delete (partida.jugadores[0] as Record<string, unknown>).eventosBono;
+    instalarLocalStorage({ [CLAVE_LS_PARTIDAS]: JSON.stringify([partida]) });
+    const j = cargarPartidasGuardadas()[0]!.jugadores[0]!;
+    expect(j.historial).toEqual([]);
+    expect(j.eventosBono).toEqual({});
+  });
+
+  it('un historial viejo con filas sin historial de rondas carga completo', () => {
+    instalarLocalStorage({
+      [CLAVE_LS_HISTORIAL]: JSON.stringify([{ fecha: '01/11/2026', ranking: [{ nombre: 'A', puntos: 10 }] }]),
+    });
+    const h = cargarHistorial();
+    expect(h).toHaveLength(1);
+    expect(h[0]!.ranking[0]!.historial).toEqual([]);
+  });
+});
