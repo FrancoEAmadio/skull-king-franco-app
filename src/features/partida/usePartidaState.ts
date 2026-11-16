@@ -36,7 +36,7 @@ import {
 } from '../../dominio/cierreRonda';
 import { calcularBonoCartasBlancas, calcularPuntajeRonda } from '../../dominio/puntuacion';
 import { calcularBonosAlianzasBotin } from '../../dominio/alianzas';
-import { ajustarBazasBarbagris, construirBarbagris, crearJugadorBarbagris, jugadoresReales } from '../../dominio/barbagris';
+import { construirBarbagris, crearJugadorBarbagris, jugadoresReales } from '../../dominio/barbagris';
 import { calcularMaximoDisponible, hayCartaLibre, limitesPuntosCartas, motivoTopeBono, sanearEventosEspeciales } from '../../dominio/bonos';
 import { aplicarFinDePartida, recalcularEstadisticasDesdeHistorial } from '../../dominio/estadisticas';
 import {
@@ -431,12 +431,6 @@ export function usePartidaState({
       partidaPendienteFinalizar,
     ]
   );
-
-  // Las bazas de Barbagrís son las que sobran: se recalculan solas cada vez que cambia algo en la hoja de puntos.
-  useEffect(() => {
-    if (pasoPartida !== 'puntos') return;
-    setJugadores((previos) => ajustarBazasBarbagris(previos, cartasPorJugadorEnRonda));
-  }, [pasoPartida, jugadores, cartasPorJugadorEnRonda]);
 
   // Autoguardado (equivalente al watch deep de Vue)
   useEffect(() => {

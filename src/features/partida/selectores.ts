@@ -41,10 +41,8 @@ export function calcularMaxGanadasPara(
   jugadores: Jugador[],
   cartasPorJugadorEnRonda: number
 ): number {
-  // Barbagrís se queda con las bazas que sobran: no se carga a mano ni limita a los demás.
-  if (jugadores[indiceJugador]?.fantasma) return 0;
   const sumaOtras = jugadores.reduce((acc, jugador, idx) => {
-    if (idx === indiceJugador || jugador.fantasma) return acc;
+    if (idx === indiceJugador) return acc;
     return acc + (Number(jugador.ganadas) || 0);
   }, 0);
   // Una sola carta por jugador = una sola baza. Si Davy Jones destruyó monstruos y no queda otra carta, nadie la gana.
