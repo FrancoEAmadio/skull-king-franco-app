@@ -481,9 +481,7 @@ function VistaHistorial() {
                   className="flex items-center justify-between rounded-xl border border-slate-400 bg-slate-100 px-3 py-2 text-left"
                 >
                   <span className="flex min-w-0 items-center gap-2">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-slate-400 to-slate-600 text-lg">
-                      {AVATAR_BARBAGRIS}
-                    </span>
+                    <AvatarPirata emoji={AVATAR_BARBAGRIS} fondo="pizarra" tamano="sm" />
                     <span className="flex min-w-0 flex-col">
                       <span className="truncate text-sm font-semibold text-slate-700">{partidaGuardada.barbagris.nombre}</span>
                       <span className="text-[11px] text-slate-500">

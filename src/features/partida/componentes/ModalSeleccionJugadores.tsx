@@ -159,7 +159,7 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
         <div className="flex flex-col gap-2 border-t border-slate-200 p-4">
           {idsJugadoresSeleccionados.length === 2 && (
             <p className="flex items-center gap-2 rounded-xl border border-slate-400 bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-slate-400 to-slate-600 text-base">{AVATAR_BARBAGRIS}</span>
+              <AvatarPirata emoji={AVATAR_BARBAGRIS} fondo="pizarra" tamano="sm" />
               Partida de 2: se suma el fantasma de Barbagrís. No cuenta en la clasificación, pero queda en el historial.
             </p>
           )}
