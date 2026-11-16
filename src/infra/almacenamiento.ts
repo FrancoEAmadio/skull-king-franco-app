@@ -53,8 +53,9 @@ export function guardarJugadoresPermanentes(lista: JugadorPermanente[]): void {
 }
 
 export function cargarHistorial(): EntradaHistorialPartida[] {
-  const lista = leerJson<EntradaHistorialPartida[]>(CLAVE_LS_HISTORIAL);
-  return Array.isArray(lista) ? lista : [];
+  const lista = leerJson<unknown>(CLAVE_LS_HISTORIAL);
+  if (!Array.isArray(lista)) return [];
+  return lista.map(normalizarPartidaHistorial).filter((p): p is EntradaHistorialPartida => p !== null);
 }
 
 export function guardarHistorial(historial: EntradaHistorialPartida[]): void {
@@ -74,6 +75,24 @@ function normalizarPartida(partida: PartidaGuardada): PartidaGuardada {
 
   partida.ultimaRondaEditable ??= null;
   partida.partidaPendienteFinalizar ??= false;
+  // Partidas guardadas por versiones viejas pueden no traer estos campos: se completan para que nada falle al dibujar.
+  partida.cartasPorRondaActivas = Array.isArray(partida.cartasPorRondaActivas) ? partida.cartasPorRondaActivas : [];
+  partida.alianzasBotinRonda = Array.isArray(partida.alianzasBotinRonda) ? partida.alianzasBotinRonda : [];
+  partida.registroHabilidadesRonda = Array.isArray(partida.registroHabilidadesRonda) ? partida.registroHabilidadesRonda : [];
+  partida.resumenRondaActual = Array.isArray(partida.resumenRondaActual) ? partida.resumenRondaActual : [];
+  partida.configuracionMesa = (partida.configuracionMesa ?? {}) as PartidaGuardada['configuracionMesa'];
+  partida.rondaActual = Number.isFinite(partida.rondaActual) ? partida.rondaActual : 1;
+  partida.jugadorSeleccionadoIdx = Number.isFinite(partida.jugadorSeleccionadoIdx) ? partida.jugadorSeleccionadoIdx : 0;
+  partida.editandoRondaAnterior ??= false;
+  partida.backupRondaActual ??= null;
+  partida.jugadores = partida.jugadores.filter((j) => typeof j === 'object' && j !== null).map((j) => ({
+    ...j,
+    eventosBono: j.eventosBono && typeof j.eventosBono === 'object' ? j.eventosBono : {},
+    historial: Array.isArray(j.historial) ? j.historial : [],
+    puntos: Number.isFinite(j.puntos) ? j.puntos : 0,
+    apuesta: Number.isFinite(j.apuesta) ? j.apuesta : 0,
+    ganadas: Number.isFinite(j.ganadas) ? j.ganadas : 0,
+  }));
 
   if (partida.backupRondaActual) {
     const backup = partida.backupRondaActual;
