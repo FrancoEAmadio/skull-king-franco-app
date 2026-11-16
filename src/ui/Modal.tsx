@@ -9,6 +9,8 @@ interface Props {
   zIndex?: string;
   cerrarAlHacerClickAfuera?: boolean;
   etiqueta?: string;
+  /** Fondo de pergamino (resultados). */
+  pergamino?: boolean;
 }
 
 export function Modal({
@@ -19,6 +21,7 @@ export function Modal({
   zIndex = 'z-50',
   cerrarAlHacerClickAfuera = false,
   etiqueta,
+  pergamino = false,
 }: Props) {
   if (!abierto) return null;
 
@@ -35,7 +38,7 @@ export function Modal({
       aria-modal="true"
       aria-label={etiqueta}
     >
-      <div className={`tarjeta entrar flex max-h-[90dvh] w-full ${ancho} flex-col overflow-hidden`}>{children}</div>
+      <div className={`tarjeta ${pergamino ? 'pergamino ' : ''}entrar flex max-h-[90dvh] w-full ${ancho} flex-col overflow-hidden`}>{children}</div>
     </div>,
     document.body
   );

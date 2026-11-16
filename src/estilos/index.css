@@ -115,6 +115,25 @@ main :where(h1, h2, h3, p, span) { overflow-wrap: anywhere; }
   position: relative;
 }
 
+/* Variante pergamino: papel viejo con bordes quemados (solo Jugadores, Estadísticas e Historial). */
+.tarjeta.pergamino {
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.3  0 0 0 0 0.12  0 0 0 0.16 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    radial-gradient(ellipse at 50% 40%, #f6e9c8 0%, #ecd9ab 62%, #d9bd86 100%);
+  border: 1px solid #b08a52;
+  box-shadow:
+    0 12px 24px -10px rgba(2, 6, 23, 0.6),
+    0 2px 4px rgba(2, 6, 23, 0.25),
+    inset 0 0 18px rgba(120, 78, 28, 0.38),
+    inset 0 0 0 2px rgba(255, 244, 214, 0.45);
+}
+
+/* Sobre el pergamino los grises claros no se leen: se pasan a marrones más oscuros. */
+.pergamino .text-slate-400 { color: #7a5c34; }
+.pergamino .text-slate-500 { color: #6a4e2c; }
+.pergamino .text-slate-600,
+.pergamino .text-slate-700 { color: #4a3720; }
+
 .tarjeta-titulo {
   font-size: 0.875rem;
   font-weight: 800;

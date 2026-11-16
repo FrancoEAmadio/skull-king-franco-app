@@ -36,14 +36,13 @@ export function PantallaInicio() {
           <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.65 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06A2 2 0 1 1 7.08 4.14l.06.06a1.7 1.7 0 0 0 1.87.34h0A1.7 1.7 0 0 0 10.04 3V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v0A1.7 1.7 0 0 0 21 10.04H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z" />
         </svg>
       </button>
-      <img
-        src={`${import.meta.env.BASE_URL}archivos/iconos/tapa.png`}
-        alt=""
-        draggable={false}
-        className="mx-auto mt-8 w-36 rounded-lg shadow-[0_6px_18px_rgba(0,0,0,0.55)]"
-      />
-      <h1 className="mt-4 font-display text-4xl font-bold tracking-wide text-oro-claro drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
-        Skull King
+      <h1 className="mt-10 w-full">
+        <img
+          src={`${import.meta.env.BASE_URL}archivos/logo-skull-king.png`}
+          alt="Skull King"
+          draggable={false}
+          className="mx-auto w-full drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
+        />
       </h1>
       <p className="mb-9 mt-2 text-xs font-semibold uppercase tracking-[0.25em] text-white">Anotador de puntos y manual</p>
 

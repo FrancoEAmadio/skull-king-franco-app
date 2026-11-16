@@ -112,7 +112,7 @@ export function PantallaJugadores() {
 
       {vista === 'gestor' && (
         <div className="flex flex-col gap-3">
-          <section className="tarjeta flex flex-col gap-3 p-4">
+          <section className="tarjeta pergamino flex flex-col gap-3 p-4">
             <h3 className="tarjeta-titulo">Nueva tarjeta de jugador</h3>
             <div className="flex gap-2">
               <button
@@ -158,11 +158,11 @@ export function PantallaJugadores() {
           </section>
 
           {jugadoresPermanentes.length === 0 ? (
-            <div className="tarjeta p-8 text-center text-sm text-slate-500">Todavía no hay tarjetas de jugadores. ¡Creá la primera arriba!</div>
+            <div className="tarjeta pergamino p-8 text-center text-sm text-slate-500">Todavía no hay tarjetas de jugadores. ¡Creá la primera arriba!</div>
           ) : (
             jugadoresPermanentes.map((jug) => (
               <div key={jug.id} className="flex flex-col gap-2">
-                <div className="tarjeta flex items-center justify-between gap-2 p-3">
+                <div className="tarjeta pergamino flex items-center justify-between gap-2 p-3">
                   {edicion?.id === jug.id ? (
                     <div className="flex flex-1 gap-2">
                       <input
@@ -247,14 +247,14 @@ export function PantallaJugadores() {
         <div className="flex flex-col gap-3">
           <TablaComparativa />
           {jugadoresPermanentes.length === 0 ? (
-            <div className="tarjeta p-8 text-center text-sm text-slate-500">Creá tarjetas de jugadores para ver sus estadísticas.</div>
+            <div className="tarjeta pergamino p-8 text-center text-sm text-slate-500">Creá tarjetas de jugadores para ver sus estadísticas.</div>
           ) : (
             estadisticasOrdenadas.map((jug, posicion) => (
               <button
                 key={jug.id}
                 type="button"
                 onClick={() => verEstadisticasJugador(jug)}
-                className="tarjeta flex items-center gap-3 p-3 text-left"
+                className="tarjeta pergamino flex items-center gap-3 p-3 text-left"
               >
                 <span className="w-6 shrink-0 text-center text-sm font-bold text-slate-400">{posicion + 1}</span>
                 <AvatarPirata emoji={avatarDe(jug.id, jug.avatar)} fondo={colorAvatarDe(jug.id, jug.colorAvatar, jug.colorTarjeta)} tamano="md" />
@@ -306,7 +306,7 @@ function TablaComparativa() {
   if (rendimientos.length === 0) return null;
 
   return (
-    <section className="tarjeta p-4">
+    <section className="tarjeta pergamino p-4">
       <h3 className="tarjeta-titulo mb-3">⚔️ Comparativa de la tripulación</h3>
       <div className="-mx-1 overflow-x-auto">
         <table className="w-full min-w-[19rem] border-collapse text-sm">
@@ -383,7 +383,7 @@ function PartidasEnCursoHistorial() {
         const ranking = [...guardada.jugadores].sort((a, b) => b.puntos - a.puntos);
         const totalRondas = guardada.cartasPorRondaActivas.length || 10;
         return (
-          <div key={guardada.id} className="tarjeta flex flex-col gap-3 p-4">
+          <div key={guardada.id} className="tarjeta pergamino flex flex-col gap-3 p-4">
             <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
               <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800">En curso</span>
               <span className="text-xs font-bold text-slate-500">{fechaCorta(guardada.actualizada)}</span>
@@ -446,10 +446,10 @@ function VistaHistorial() {
       <PartidasEnCursoHistorial />
       {historialPartidas.length === 0 ? (
         partidasGuardadas.length > 0 ? null :
-        <div className="tarjeta p-8 text-center text-sm text-slate-500">No hay partidas registradas.</div>
+        <div className="tarjeta pergamino p-8 text-center text-sm text-slate-500">No hay partidas registradas.</div>
       ) : (
         historialPartidas.map((partidaGuardada, hIndex) => (
-          <div key={hIndex} className="tarjeta flex flex-col gap-3 p-4">
+          <div key={hIndex} className="tarjeta pergamino flex flex-col gap-3 p-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-azul">{partidaGuardada.fecha}</span>
               <button type="button" onClick={() => eliminarPartidaHistorial(hIndex)} className="btn-peligro px-3 py-2 text-xs">
