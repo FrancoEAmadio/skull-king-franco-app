@@ -87,6 +87,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  // Al editar una tarjeta de jugador, el cambio llega al instante a todas las partidas (en curso, pausadas y terminadas).
+  const renombrarYSincronizar = useCallback(
+    (id: string, nuevoNombre: string) => {
+      const nombreLimpio = nuevoNombre.trim();
+      const previo = jugadoresPermanentes.find((j) => j.id === id);
+      if (!previo || !nombreLimpio || nombreLimpio === previo.nombre) return;
+      renombrar(id, nombreLimpio);
+      partida.sincronizarJugadorEnPartidas({ id, nombreViejo: previo.nombre, cambios: { nombre: nombreLimpio } });
+    },
+    [jugadoresPermanentes, renombrar, partida]
+  );
+
+  const cambiarAvatarYSincronizar = useCallback(
+    (id: string, avatar: string) => {
+      const previo = jugadoresPermanentes.find((j) => j.id === id);
+      cambiarAvatar(id, avatar);
+      if (previo) partida.sincronizarJugadorEnPartidas({ id, nombreViejo: previo.nombre, cambios: { avatar } });
+    },
+    [jugadoresPermanentes, cambiarAvatar, partida]
+  );
+
   const cerrarPodio = useCallback(() => {
     setMostrarPodio(false);
     if (partida.partidaFinalizada) setPantallaActual('inicio');
@@ -99,8 +120,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setPantallaActual,
     jugadoresPermanentes,
     crearJugadorPermanente: crear,
-    renombrarJugadorPermanente: renombrar,
-    cambiarAvatarJugadorPermanente: cambiarAvatar,
+    renombrarJugadorPermanente: renombrarYSincronizar,
+    cambiarAvatarJugadorPermanente: cambiarAvatarYSincronizar,
     cambiarColoresJugadorPermanente: cambiarColores,
     eliminarJugadorPermanente: eliminar,
     reemplazarJugadoresPermanentes: reemplazarLista,
