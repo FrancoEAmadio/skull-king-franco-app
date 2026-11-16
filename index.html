@@ -21,20 +21,35 @@
 <body >
   <div id="root"></div>
   <script>
-    // Si la app no llega a dibujarse (navegador viejo, archivo que no cargó), muestra el motivo en vez de quedar en marrón.
+    // Si la app no llega a dibujarse (archivos viejos en caché, navegador viejo), se limpia la caché una vez y se recarga;
+    // si sigue igual, muestra el motivo. No toca partidas ni jugadores (localStorage).
     (function () {
       var ultimo = '';
       window.addEventListener('error', function (e) { ultimo = (e && e.message) || ultimo; });
       window.addEventListener('unhandledrejection', function (e) { ultimo = String((e && e.reason && e.reason.message) || (e && e.reason) || ultimo); });
+      function limpiar() {
+        var tareas = [];
+        if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+          tareas.push(navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); }));
+        }
+        if (window.caches && caches.keys) {
+          tareas.push(caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }));
+        }
+        return Promise.all(tareas).catch(function () {});
+      }
+      window.__limpiarYRecargar = function () { limpiar().then(function () { location.reload(); }); };
       setTimeout(function () {
         var raiz = document.getElementById('root');
         if (!raiz || raiz.childNodes.length) return;
+        var intentado = false;
+        try { intentado = !!sessionStorage.getItem('auto-limpieza'); sessionStorage.setItem('auto-limpieza', '1'); } catch (e) {}
+        if (!intentado) { window.__limpiarYRecargar(); return; }
         raiz.innerHTML = '<div style="min-height:100vh;background:#2f241a;color:#fff;padding:24px;font-family:system-ui,sans-serif;display:flex;flex-direction:column;gap:14px;justify-content:center">' +
           '<h1 style="font-size:22px">La app no pudo abrir</h1>' +
-          '<p style="opacity:.85">Probá abrirla en Chrome o Safari (no desde WhatsApp u otra app) y que el navegador esté actualizado.</p>' +
+          '<p style="opacity:.85">Tus partidas no se borraron. Probá recargar; si sigue igual, abrila en Chrome o Safari actualizado.</p>' +
           '<pre style="white-space:pre-wrap;font-size:12px;background:rgba(0,0,0,.35);padding:10px;border-radius:8px">' + String(ultimo || 'Sin detalle de error').slice(0, 300).replace(/</g, '&lt;') + '</pre>' +
-          '<button onclick="location.reload()" style="padding:14px;border-radius:12px;border:0;font-weight:700;font-size:16px">Recargar</button></div>';
-      }, 8000);
+          '<button onclick="window.__limpiarYRecargar()" style="padding:14px;border-radius:12px;border:0;font-weight:700;font-size:16px">Limpiar archivos guardados y recargar</button></div>';
+      }, 6000);
     })();
   </script>
   <script type="module" src="/src/main.tsx"></script>
