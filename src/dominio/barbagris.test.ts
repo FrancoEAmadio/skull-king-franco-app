@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { construirBarbagris } from './barbagris';
+import { ajustarBazasBarbagris, construirBarbagris, crearJugadorBarbagris } from './barbagris';
+import { calcularJugadoresOrdenados } from '../features/partida/selectores';
 import type { EntradaHistorialRonda } from '../tipos';
 
 const ent = (ronda: number, ganadas: number): EntradaHistorialRonda => ({
@@ -20,5 +21,22 @@ describe('Barbagrís', () => {
     expect(r.historial.map((h) => h.ganadas)).toEqual([0, 1]);
     expect(r.puntos).toBe(10 - 20);
     expect(r.historial[1]!.acumuladoNuevo).toBe(-10);
+  });
+});
+
+describe('Barbagrís como jugador de la partida', () => {
+  it('se queda con las bazas que no ganó ninguno de los jugadores', () => {
+    const ana = { ...crearJugadorBarbagris(), fantasma: false, permanenteId: 'a', ganadas: 1 };
+    const beto = { ...crearJugadorBarbagris(), fantasma: false, permanenteId: 'b', ganadas: 2 };
+    const [, , fantasma] = ajustarBazasBarbagris([ana, beto, crearJugadorBarbagris()], 5);
+    expect(fantasma!.ganadas).toBe(2);
+    expect(fantasma!.fantasma).toBe(true);
+  });
+
+  it('va siempre último en el orden de la mesa', () => {
+    const ana = { ...crearJugadorBarbagris(), fantasma: false, permanenteId: 'a' };
+    const beto = { ...crearJugadorBarbagris(), fantasma: false, permanenteId: 'b' };
+    const orden = calcularJugadoresOrdenados([ana, beto, crearJugadorBarbagris()], 1).map((i) => i.jugador.permanenteId);
+    expect(orden).toEqual(['b', 'a', 'barbagris']);
   });
 });
