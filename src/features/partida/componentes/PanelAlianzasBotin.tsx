@@ -117,7 +117,7 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
           {alianzasBotinRonda.map((alianza, idx) => (
             <span
               key={idx}
-              className="flex items-center gap-1.5 rounded-full border border-oro bg-slate-50 py-1 pl-1 pr-1 text-base font-semibold text-azul"
+              className="flex items-center gap-1.5 text-base font-semibold text-azul"
             >
               <span className={`rounded-full border-2 px-2.5 py-0.5 ${coloresDe(alianza.idxA).activo}`}>{alianza.nombreA}</span>
               🤝
@@ -126,7 +126,7 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
                 type="button"
                 onClick={() => eliminarAlianzaBotin(idx)}
                 aria-label={`Borrar alianza ${alianza.nombreA} y ${alianza.nombreB}`}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-red-700"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold text-red-700"
               >
                 ✕
               </button>
