@@ -17,9 +17,10 @@ import type {
 } from '../tipos';
 
 function leerJson<T>(clave: string): T | null {
-  const crudo = localStorage.getItem(clave);
-  if (!crudo) return null;
+  // Con el almacenamiento bloqueado (modo privado, navegadores dentro de otras apps) getItem puede tirar error.
   try {
+    const crudo = localStorage.getItem(clave);
+    if (!crudo) return null;
     return JSON.parse(crudo) as T;
   } catch {
     return null;
@@ -27,7 +28,19 @@ function leerJson<T>(clave: string): T | null {
 }
 
 function escribirJson(clave: string, valor: unknown): void {
-  localStorage.setItem(clave, JSON.stringify(valor));
+  try {
+    localStorage.setItem(clave, JSON.stringify(valor));
+  } catch {
+    /* sin espacio o almacenamiento bloqueado: la app sigue funcionando sin guardar */
+  }
+}
+
+function quitarClave(clave: string): void {
+  try {
+    localStorage.removeItem(clave);
+  } catch {
+    /* almacenamiento bloqueado */
+  }
 }
 
 export function cargarJugadoresPermanentes(): JugadorPermanente[] {
@@ -49,7 +62,7 @@ export function guardarHistorial(historial: EntradaHistorialPartida[]): void {
 }
 
 export function borrarHistorial(): void {
-  localStorage.removeItem(CLAVE_LS_HISTORIAL);
+  quitarClave(CLAVE_LS_HISTORIAL);
 }
 
 function normalizarPartida(partida: PartidaGuardada): PartidaGuardada {
@@ -98,7 +111,7 @@ export function cargarPartidasGuardadas(): PartidaGuardada[] {
   const antigua = leerJson<unknown>(CLAVE_LS_PARTIDA_GUARDADA);
   if (antigua) {
     if (esPartida(antigua)) lista.push(antigua);
-    localStorage.removeItem(CLAVE_LS_PARTIDA_GUARDADA);
+    quitarClave(CLAVE_LS_PARTIDA_GUARDADA);
     escribirJson(CLAVE_LS_PARTIDAS, lista.filter(esPartida).flatMap(normalizarSeguro));
   }
   return lista
