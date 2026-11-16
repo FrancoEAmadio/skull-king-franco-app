@@ -84,9 +84,9 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
       {!limiteAlcanzado && !sinBazas && (
         <>
           <span className="text-sm font-semibold text-tinta">
-            Alianza de <span className={`rounded-lg border-2 px-2 py-0.5 ${coloresDe(jugadorSeleccionadoIdx).activo}`}>{activo.nombre}</span> con:
+            Alianza de <span className="font-bold text-azul">{activo.nombre}</span> con:
           </span>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3 py-1">
             {otros.map(({ jug, idx }) => (
               <button
                 key={idx}
@@ -94,7 +94,7 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
                 aria-pressed={idxOtro === idx}
                 disabled={cartaYaIdentificada(idx)}
                 onClick={() => setIdxOtro(idx)}
-                className={`rounded-xl border-2 px-4 py-2.5 text-sm font-bold disabled:opacity-35 ${
+                className={`rounded-xl border-2 px-5 py-3 text-sm font-bold disabled:opacity-35 ${
                   idxOtro === idx ? coloresDe(idx).activo : coloresDe(idx).reposo
                 }`}
               >
@@ -113,7 +113,7 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
       )}
 
       {alianzasBotinRonda.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3">
           {alianzasBotinRonda.map((alianza, idx) => (
             <span
               key={idx}
