@@ -1,7 +1,7 @@
 import type { EntradaHistorialRonda, RankingJugador } from '../tipos';
 
 export const NOMBRE_BARBAGRIS = 'Barbagrís';
-export const AVATAR_BARBAGRIS = '🧔';
+export const AVATAR_BARBAGRIS = 'img:pirata-gris';
 
 /**
  * Barbagrís es el fantasma que se suma en partidas de 2 jugadores: no envida y no puntúa en las reglas reales.
