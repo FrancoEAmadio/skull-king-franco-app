@@ -1321,6 +1321,15 @@ export function usePartidaState({
         }
         return mezclados;
       }),
+    /** Mueve a un jugador elegido a otra posición del orden de juego. */
+    moverJugadorSeleccionado: (desde: number, hasta: number) =>
+      setIdsJugadoresSeleccionados((ids) => {
+        if (desde === hasta || desde < 0 || hasta < 0 || desde >= ids.length || hasta >= ids.length) return ids;
+        const copia = [...ids];
+        const [movido] = copia.splice(desde, 1);
+        copia.splice(hasta, 0, movido!);
+        return copia;
+      }),
     alternarSeleccionJugador,
     sincronizarJugadorEnPartidas,
     posicionSeleccion,
