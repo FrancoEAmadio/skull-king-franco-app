@@ -36,6 +36,7 @@ import {
 } from '../../dominio/cierreRonda';
 import { calcularBonoCartasBlancas, calcularPuntajeRonda } from '../../dominio/puntuacion';
 import { calcularBonosAlianzasBotin } from '../../dominio/alianzas';
+import { construirBarbagris } from '../../dominio/barbagris';
 import { calcularMaximoDisponible, hayCartaLibre, limitesPuntosCartas, motivoTopeBono, sanearEventosEspeciales } from '../../dominio/bonos';
 import { aplicarFinDePartida, recalcularEstadisticasDesdeHistorial } from '../../dominio/estadisticas';
 import {
@@ -1003,6 +1004,8 @@ export function usePartidaState({
           historial: jug.historial,
         })),
       };
+      const barbagris = construirBarbagris(rankingFinal, cartasPorRondaActivas);
+      if (barbagris) nuevaEntrada.barbagris = barbagris;
       const nuevoHistorial = [nuevaEntrada, ...historialPartidas];
       setHistorialPartidas(nuevoHistorial);
       guardarHistorial(nuevoHistorial);
@@ -1032,7 +1035,7 @@ export function usePartidaState({
       setPartidaFinalizada(true);
       setPasoPartida('resumen');
     },
-    [configuracionMesa, historialPartidas, jugadoresPermanentes, actualizarJugadoresPermanentes]
+    [configuracionMesa, historialPartidas, jugadoresPermanentes, actualizarJugadoresPermanentes, cartasPorRondaActivas]
   );
 
   const guardarJugadorYContinuar = useCallback(() => {

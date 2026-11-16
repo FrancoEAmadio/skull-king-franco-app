@@ -199,6 +199,8 @@ export interface RankingJugador {
 export interface EntradaHistorialPartida {
   fecha: string;
   ranking: RankingJugador[];
+  /** Fantasma de las partidas de 2 jugadores (solo se muestra en el historial). */
+  barbagris?: RankingJugador;
 }
 
 export interface BackupRondaJugador {
