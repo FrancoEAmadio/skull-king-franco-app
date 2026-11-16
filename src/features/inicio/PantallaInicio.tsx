@@ -42,8 +42,13 @@ export function PantallaInicio() {
         draggable={false}
         className="mx-auto mt-8 w-36 rounded-lg shadow-[0_6px_18px_rgba(0,0,0,0.55)]"
       />
-      <h1 className="mt-4 font-display text-4xl font-bold tracking-wide text-oro-claro drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
-        Skull King
+      <h1 className="mt-5">
+        <img
+          src={`${import.meta.env.BASE_URL}archivos/logo-skull-king.png`}
+          alt="Skull King"
+          draggable={false}
+          className="mx-auto w-52 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
+        />
       </h1>
       <p className="mb-9 mt-2 text-xs font-semibold uppercase tracking-[0.25em] text-white">Anotador de puntos y manual</p>
 
