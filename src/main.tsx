@@ -1,11 +1,11 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { registerSW } from 'virtual:pwa-register';
 import { App } from './App';
+import { iniciarServiceWorker } from './actualizar';
 import './estilos/index.css';
 
 // Service worker: la app queda instalable y funciona sin conexión.
-registerSW({ immediate: true });
+iniciarServiceWorker();
 
 // Sin menú contextual (mantener apretado) ni arrastrar imágenes, salvo en los campos de texto.
 document.addEventListener('contextmenu', (e) => {
