@@ -1,4 +1,4 @@
-import type { EntradaHistorialRonda, RankingJugador } from '../tipos';
+import type { EntradaHistorialRonda, Jugador, RankingJugador } from '../tipos';
 
 export const NOMBRE_BARBAGRIS = 'Barbagrís';
 export const AVATAR_BARBAGRIS = '👴';
@@ -48,4 +48,46 @@ export function construirBarbagris(
   }
   if (historial.length === 0) return null;
   return { nombre: NOMBRE_BARBAGRIS, puntos: acumulado, historial };
+}
+
+export const ID_BARBAGRIS = 'barbagris';
+
+/** Barbagrís como jugador de la partida: envite 0 fijo, sin ganar bazas por su cuenta. */
+export function crearJugadorBarbagris(): Jugador {
+  return {
+    permanenteId: ID_BARBAGRIS,
+    nombre: NOMBRE_BARBAGRIS,
+    avatar: AVATAR_BARBAGRIS,
+    fantasma: true,
+    puntos: 0,
+    apuesta: 0,
+    apuestaElegida: true,
+    ganadas: 0,
+    modoEnvite: 'metralla',
+    bribonHabilidadPts: null,
+    bribonStolenFrom: null,
+    eventosBono: {},
+    cartasBlancas: 0,
+    apuestasAcertadas: 0,
+    apuestasFalladas: 0,
+    capturasSkullKing: 0,
+    capturasSirena: 0,
+    capturasMonstruo: 0,
+    historial: [],
+  };
+}
+
+/** Los jugadores de carne y hueso (sin el fantasma). */
+export function jugadoresReales<T extends { fantasma?: boolean }>(jugadores: T[]): T[] {
+  return jugadores.filter((j) => !j.fantasma);
+}
+
+/** Las bazas de Barbagrís son las que no ganó ninguno de los jugadores reales. */
+export function ajustarBazasBarbagris(jugadores: Jugador[], cartasPorJugadorEnRonda: number): Jugador[] {
+  const idx = jugadores.findIndex((j) => j.fantasma);
+  if (idx === -1) return jugadores;
+  const ganadasReales = jugadoresReales(jugadores).reduce((suma, j) => suma + (Number(j.ganadas) || 0), 0);
+  const resto = Math.max(0, cartasPorJugadorEnRonda - ganadasReales);
+  if (jugadores[idx]!.ganadas === resto) return jugadores;
+  return jugadores.map((j, i) => (i === idx ? { ...j, ganadas: resto } : j));
 }

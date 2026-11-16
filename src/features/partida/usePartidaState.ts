@@ -36,7 +36,7 @@ import {
 } from '../../dominio/cierreRonda';
 import { calcularBonoCartasBlancas, calcularPuntajeRonda } from '../../dominio/puntuacion';
 import { calcularBonosAlianzasBotin } from '../../dominio/alianzas';
-import { construirBarbagris } from '../../dominio/barbagris';
+import { ajustarBazasBarbagris, construirBarbagris, crearJugadorBarbagris, jugadoresReales } from '../../dominio/barbagris';
 import { calcularMaximoDisponible, hayCartaLibre, limitesPuntosCartas, motivoTopeBono, sanearEventosEspeciales } from '../../dominio/bonos';
 import { aplicarFinDePartida, recalcularEstadisticasDesdeHistorial } from '../../dominio/estadisticas';
 import {
@@ -257,8 +257,8 @@ export function usePartidaState({
   const totalRondas = cartasPorRondaActivas.length || 10;
 
   const indiceJugadorInicial = useMemo(
-    () => calcularIndiceJugadorInicial(rondaActual, jugadores.length),
-    [rondaActual, jugadores.length]
+    () => calcularIndiceJugadorInicial(rondaActual, jugadoresReales(jugadores).length),
+    [rondaActual, jugadores]
   );
 
   const jugadoresOrdenados = useMemo(
@@ -313,7 +313,7 @@ export function usePartidaState({
   );
 
   const tablaGeneralOrdenada = useMemo(
-    () => [...jugadores].sort((a, b) => b.puntos - a.puntos),
+    () => jugadoresReales(jugadores).sort((a, b) => b.puntos - a.puntos),
     [jugadores]
   );
 
@@ -432,6 +432,12 @@ export function usePartidaState({
     ]
   );
 
+  // Las bazas de Barbagrís son las que sobran: se recalculan solas cada vez que cambia algo en la hoja de puntos.
+  useEffect(() => {
+    if (pasoPartida !== 'puntos') return;
+    setJugadores((previos) => ajustarBazasBarbagris(previos, cartasPorJugadorEnRonda));
+  }, [pasoPartida, jugadores, cartasPorJugadorEnRonda]);
+
   // Autoguardado (equivalente al watch deep de Vue)
   useEffect(() => {
     if (pantallaActual !== 'partida' || partidaFinalizada) return;
@@ -464,6 +470,8 @@ export function usePartidaState({
       .map((id) => jugadoresPermanentes.find((jug) => jug.id === id))
       .filter((jug): jug is JugadorPermanente => Boolean(jug))
       .map(crearJugadorDePartida);
+    // En partidas de 2 se suma Barbagrís, el fantasma: juega una carta por baza pero no envida.
+    if (nuevosJugadores.length === 2) nuevosJugadores.push(crearJugadorBarbagris());
 
     partidaIdRef.current = `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
     setConfiguracionMesa(configuracionActiva);
@@ -986,7 +994,8 @@ export function usePartidaState({
         ? aplicarBonoFinalDeBlancas(jugadoresFinales, resumen, calcularBonoCartasBlancas)
         : { jugadores: jugadoresFinales, resumen };
 
-      const rankingFinal = [...conBlancas.jugadores].sort((a, b) => b.puntos - a.puntos);
+      const fantasma = conBlancas.jugadores.find((j) => j.fantasma);
+      const rankingFinal = jugadoresReales(conBlancas.jugadores).sort((a, b) => b.puntos - a.puntos);
       const fecha = new Date().toLocaleDateString('es-AR', {
         day: '2-digit',
         month: '2-digit',
@@ -1004,7 +1013,10 @@ export function usePartidaState({
           historial: jug.historial,
         })),
       };
-      const barbagris = construirBarbagris(rankingFinal, cartasPorRondaActivas);
+      // Con el fantasma como jugador de la partida, su historial real (con lo que le anotaron); en partidas viejas, el estimado.
+      const barbagris = fantasma && fantasma.historial.length > 0
+        ? { nombre: fantasma.nombre, puntos: fantasma.puntos, historial: fantasma.historial }
+        : construirBarbagris(rankingFinal, cartasPorRondaActivas);
       if (barbagris) nuevaEntrada.barbagris = barbagris;
       const nuevoHistorial = [nuevaEntrada, ...historialPartidas];
       setHistorialPartidas(nuevoHistorial);
@@ -1100,7 +1112,7 @@ export function usePartidaState({
     if (rondaActual < totalRondas) {
       const siguienteRonda = rondaActual + 1;
       setRondaActual(siguienteRonda);
-      setJugadorSeleccionadoIdx(calcularIndiceJugadorInicial(siguienteRonda, jugadoresCerrados.length));
+      setJugadorSeleccionadoIdx(calcularIndiceJugadorInicial(siguienteRonda, jugadoresReales(jugadoresCerrados).length));
       setPasoPartida('resumen');
       return;
     }

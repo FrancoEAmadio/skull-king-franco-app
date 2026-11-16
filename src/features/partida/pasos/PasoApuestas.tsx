@@ -15,10 +15,12 @@ export function PasoApuestas() {
     avanzarAPasoPuntos,
   } = partida;
 
-  const elegidas = jugadoresOrdenados.filter(({ jugador }) => jugador.apuestaElegida).length;
-  const total = jugadoresOrdenados.length;
+  // Barbagrís (fantasma) no envida: siempre es 0.
+  const conEnvite = jugadoresOrdenados.filter(({ jugador }) => !jugador.fantasma);
+  const elegidas = conEnvite.filter(({ jugador }) => jugador.apuestaElegida).length;
+  const total = conEnvite.length;
   const completo = elegidas === total;
-  const sumaApuestas = jugadoresOrdenados.reduce(
+  const sumaApuestas = conEnvite.reduce(
     (acc, { jugador }) => acc + (jugador.apuestaElegida ? jugador.apuesta : 0),
     0
   );
@@ -45,7 +47,7 @@ export function PasoApuestas() {
         </div>
       </div>
 
-      {jugadoresOrdenados.map(({ jugador, originalIndex }) => (
+      {conEnvite.map(({ jugador, originalIndex }) => (
         <div key={originalIndex} className="tarjeta flex flex-col gap-3 p-4">
           <div className="flex items-center gap-3">
             <AvatarPirata
