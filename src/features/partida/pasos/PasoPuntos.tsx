@@ -219,24 +219,33 @@ export function PasoPuntos() {
 
       <ModalConfirmacion
         abierto={confirmarBazas}
-        titulo="Hay bazas sin ganador"
+        titulo={bazasSinAsignar === 1 ? 'Hay una baza sin ganador' : 'Faltan bazas por asignar'}
         descripcion={
-          <div className="flex items-center gap-3">
-            <img
-              src={`${import.meta.env.BASE_URL}archivos/cartas/kraken.webp`}
-              alt="Carta del Kraken"
-              draggable={false}
-              className="h-24 w-auto shrink-0 rounded-lg shadow"
-            />
-            <div>
-              En esta ronda se juegan {cartasPorJugadorEnRonda} baza{cartasPorJugadorEnRonda === 1 ? '' : 's'} y se asignaron {totalGanadasAsignadas}.
-              <span className="mt-2 block text-sm font-medium text-slate-600">
-                Una baza queda sin ganador si el último monstruo jugado fue el Kraken, o si la Ballena Blanca o la Mantarraya quedaron sin ninguna carta numerada que ganar. ¿Pasó eso?
-              </span>
+          bazasSinAsignar === 1 ? (
+            <div className="flex items-center gap-3">
+              <img
+                src={`${import.meta.env.BASE_URL}archivos/cartas/kraken.webp`}
+                alt="Carta del Kraken"
+                draggable={false}
+                className="h-24 w-auto shrink-0 rounded-lg shadow"
+              />
+              <div>
+                En esta ronda se juegan {cartasPorJugadorEnRonda} baza{cartasPorJugadorEnRonda === 1 ? '' : 's'} y se asignaron {totalGanadasAsignadas}.
+                <span className="mt-2 block text-sm font-medium text-slate-600">
+                  Una baza queda sin ganador si el último monstruo jugado fue el Kraken, o si la Ballena Blanca o la Mantarraya quedaron sin ninguna carta numerada que ganar. ¿Pasó eso?
+                </span>
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              En esta ronda se juegan {cartasPorJugadorEnRonda} baza{cartasPorJugadorEnRonda === 1 ? '' : 's'} y se asignaron {totalGanadasAsignadas}: faltan {bazasSinAsignar}.
+              <span className="mt-2 block text-sm font-medium text-slate-600">
+                Como máximo una baza puede quedar sin ganador, así que seguramente falta anotar alguna.
+              </span>
+            </>
+          )
         }
-        textoConfirmar="Sí, el Kraken la destruyó"
+        textoConfirmar={bazasSinAsignar === 1 ? 'Sí, el Kraken la destruyó' : 'Ver resumen igual'}
         textoCancelar="No, corregir bazas"
         onCancelar={() => setConfirmarBazas(false)}
         onConfirmar={() => {
