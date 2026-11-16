@@ -219,9 +219,17 @@ export function PasoPuntos() {
 
       <ModalConfirmacion
         abierto={confirmarBazas}
-        titulo="Faltan bazas por asignar"
-        descripcion={`En esta ronda se juegan ${cartasPorJugadorEnRonda} baza${cartasPorJugadorEnRonda === 1 ? '' : 's'} y se asignaron ${totalGanadasAsignadas}. ¿Querés ver el resumen igual?`}
-        textoConfirmar="Ver resumen"
+        titulo="Hay bazas sin ganador"
+        descripcion={
+          <>
+            En esta ronda se juegan {cartasPorJugadorEnRonda} baza{cartasPorJugadorEnRonda === 1 ? '' : 's'} y se asignaron {totalGanadasAsignadas}.
+            <span className="mt-2 block text-sm font-medium text-slate-600">
+              Una baza sin ganador solo pasa si se destruyó: se jugó el Kraken (y nadie lo anuló), o la Ballena Blanca con solo cartas especiales. ¿Fue eso?
+            </span>
+          </>
+        }
+        textoConfirmar="Sí, se destruyó"
+        textoCancelar="No, corregir bazas"
         onCancelar={() => setConfirmarBazas(false)}
         onConfirmar={() => {
           setConfirmarBazas(false);
