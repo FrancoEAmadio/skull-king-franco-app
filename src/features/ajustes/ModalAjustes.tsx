@@ -7,6 +7,7 @@ import {
 } from '../../infra/almacenamiento';
 import { copiarLink, descargarArchivo } from '../../infra/compartir';
 import { VERSION_APP } from '../../constantes';
+import { buscarActualizacion, limpiarYRecargar } from '../../actualizar';
 import { Toggle } from '../../ui/Toggle';
 import { ModalFeedback } from './ModalFeedback';
 import { EncabezadoModal, Modal } from '../../ui/Modal';
@@ -28,6 +29,19 @@ export function ModalAjustes() {
   const [aviso, setAviso] = useState<{ titulo: string; mensaje: string } | null>(null);
   const [feedbackAbierto, setFeedbackAbierto] = useState(false);
   const [linkCopiado, setLinkCopiado] = useState(false);
+  const [estadoActualizacion, setEstadoActualizacion] = useState<string | null>(null);
+
+  const buscarNovedades = async () => {
+    setEstadoActualizacion('Buscando…');
+    const r = await buscarActualizacion();
+    setEstadoActualizacion(
+      r === 'nueva'
+        ? 'Hay una versión nueva: se está instalando y la app se recarga sola.'
+        : r === 'actual'
+          ? 'Ya tenés la última versión.'
+          : 'No se pudo comprobar. Revisá la conexión o usá "Limpiar y recargar".'
+    );
+  };
 
   const copiar = async () => {
     const ok = await copiarLink();
@@ -167,6 +181,17 @@ export function ModalAjustes() {
               <li>Versión: <strong className="text-tinta">{VERSION_APP}</strong></li>
               <li>Pantalla: <strong className="text-tinta">{window.innerWidth} px de ancho</strong> · densidad {window.devicePixelRatio}×</li>
             </ul>
+            <button type="button" onClick={() => void buscarNovedades()} className="btn-claro mt-3 w-full py-3 text-sm">
+              🔄 Buscar actualizaciones
+            </button>
+            {estadoActualizacion && <p className="mt-2 text-sm text-slate-600">{estadoActualizacion}</p>}
+            <button
+              type="button"
+              onClick={() => void limpiarYRecargar()}
+              className="mt-2 w-full py-2 text-xs text-slate-500 underline"
+            >
+              Si algo se ve viejo: limpiar archivos guardados y recargar (no borra tus partidas)
+            </button>
           </section>
 
           <section className="tarjeta p-4">
