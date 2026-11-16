@@ -289,7 +289,8 @@ function normalizarPartidaHistorial(crudo: unknown): EntradaHistorialPartida | n
   if (!esObjeto(crudo) || typeof crudo.fecha !== 'string' || !Array.isArray(crudo.ranking)) return null;
   const ranking = crudo.ranking.map(normalizarRanking).filter((r): r is RankingJugador => r !== null);
   if (ranking.length === 0) return null;
-  return { fecha: crudo.fecha, ranking };
+  const barbagris = crudo.barbagris === undefined ? null : normalizarRanking(crudo.barbagris);
+  return { fecha: crudo.fecha, ranking, ...(barbagris ? { barbagris } : {}) };
 }
 
 /** Valida el contenido de un archivo .json de copia de seguridad. */
