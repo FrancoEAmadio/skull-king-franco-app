@@ -7,6 +7,7 @@ interface Props {
   descripcion: ReactNode;
   advertencia?: ReactNode;
   textoConfirmar: string;
+  textoCancelar?: string;
   onCancelar: () => void;
   onConfirmar: () => void;
   zIndex?: string;
@@ -18,6 +19,7 @@ export function ModalConfirmacion({
   descripcion,
   advertencia,
   textoConfirmar,
+  textoCancelar = 'Cancelar',
   onCancelar,
   onConfirmar,
   zIndex = 'z-[70]',
@@ -33,7 +35,7 @@ export function ModalConfirmacion({
       </div>
       <div className="grid grid-cols-2 gap-2.5 border-t border-slate-200 p-4">
         <button type="button" onClick={onCancelar} className="btn-claro py-3 text-sm">
-          Cancelar
+          {textoCancelar}
         </button>
         <button type="button" onClick={onConfirmar} className="btn-peligro py-3 text-sm">
           {textoConfirmar}
