@@ -113,7 +113,8 @@ function agregarAlianzasJugador(
     if (!jugadorA || !jugadorB) continue;
 
     const ambosAcertaron =
-      jugadorA.apuesta === jugadorA.ganadas && jugadorB.apuesta === jugadorB.ganadas;
+      (Boolean(jugadorA.fantasma) || jugadorA.apuesta === jugadorA.ganadas) &&
+      (Boolean(jugadorB.fantasma) || jugadorB.apuesta === jugadorB.ganadas);
 
     const detalle: DetalleBono = {
       etiqueta: `Alianza de Botín (con ${nombreOtro})`,
@@ -162,6 +163,7 @@ export function cerrarRondaParaJugador(
     modoEnvite: jugador.modoEnvite,
     bribonHabilidadPts: jugador.bribonHabilidadPts,
     cobrarBonosSinAcierto: ctx.configuracion.cobrarBonosSinAcierto,
+    fantasma: jugador.fantasma,
   });
 
   const bonos = clasificarEventosBono(
@@ -183,7 +185,7 @@ export function cerrarRondaParaJugador(
 
   const entradaRonda: EntradaHistorialRonda = {
     ronda: ctx.ronda,
-    apuesta,
+    apuesta: jugador.fantasma ? '-' : apuesta,
     ganadas,
     acierto: resultado.acierto,
     puntajeBase: resultado.puntajeBase,

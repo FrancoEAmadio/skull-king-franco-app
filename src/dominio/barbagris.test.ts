@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { construirBarbagris, crearJugadorBarbagris } from './barbagris';
+import { calcularPuntajeRonda } from './puntuacion';
 import { calcularJugadoresOrdenados } from '../features/partida/selectores';
 import type { EntradaHistorialRonda } from '../tipos';
 
@@ -30,5 +31,17 @@ describe('Barbagrís como jugador de la partida', () => {
     const beto = { ...crearJugadorBarbagris(), fantasma: false, permanenteId: 'b' };
     const orden = calcularJugadoresOrdenados([ana, beto, crearJugadorBarbagris()], 1).map((i) => i.jugador.permanenteId);
     expect(orden).toEqual(['b', 'a', 'barbagris']);
+  });
+});
+
+describe('Puntaje de Barbagrís', () => {
+  const base = { numeroRonda: 3, usarModoBribon: false, modoEnvite: 'metralla' as const, bribonHabilidadPts: null, cobrarBonosSinAcierto: false, fantasma: true };
+  it('no suma ni resta por el envite, pero sí cobra sus bonos', () => {
+    const falla = calcularPuntajeRonda({ ...base, apuesta: 0, ganadas: 2, eventosBono: { catorce_negro: 1 } });
+    expect(falla.puntajeBase).toBe(0);
+    expect(falla.totalBonos).toBeGreaterThan(0);
+    expect(falla.puntajeTotal).toBe(falla.totalBonos);
+    const sinBonos = calcularPuntajeRonda({ ...base, apuesta: 0, ganadas: 0, eventosBono: {} });
+    expect(sinBonos.puntajeTotal).toBe(0);
   });
 });

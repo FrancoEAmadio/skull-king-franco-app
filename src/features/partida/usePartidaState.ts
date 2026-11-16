@@ -348,6 +348,7 @@ export function usePartidaState({
         modoEnvite: jug.modoEnvite,
         bribonHabilidadPts: jug.bribonHabilidadPts,
         cobrarBonosSinAcierto: configuracionMesa.cobrarBonosSinAcierto,
+        fantasma: jug.fantasma,
       });
       const botin = estaReglaActiva(configuracionMesa, 'botin') ? calcularBonosAlianzasBotin(alianzasBotinRonda, jugadores) : {};
       return resultado.puntajeTotal + (botin[idx] ?? 0);
@@ -370,6 +371,7 @@ export function usePartidaState({
       modoEnvite: jugadorActual.modoEnvite,
       bribonHabilidadPts: jugadorActual.bribonHabilidadPts,
       cobrarBonosSinAcierto: configuracionMesa.cobrarBonosSinAcierto,
+      fantasma: jugadorActual.fantasma,
     });
     const bonosBotin = estaReglaActiva(configuracionMesa, 'botin')
       ? calcularBonosAlianzasBotin(alianzasBotinRonda, jugadores)

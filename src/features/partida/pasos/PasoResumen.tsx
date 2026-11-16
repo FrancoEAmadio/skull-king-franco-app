@@ -84,7 +84,7 @@ export function PasoResumen() {
                   res.acierto ? 'sello-ok' : 'sello-mal'
                 }`}
               >
-                {res.acierto ? '✓ Acertó' : '✕ No acertó'} ({res.ganadas} de {res.apuesta})
+                {res.apuesta === '-' ? `${res.ganadas} baza${res.ganadas === 1 ? '' : 's'}` : `${res.acierto ? '✓ Acertó' : '✕ No acertó'} (${res.ganadas} de ${res.apuesta})`}
               </span>
             </header>
 
