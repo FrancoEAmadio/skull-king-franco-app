@@ -1,10 +1,10 @@
 import type { JugadorPermanente } from '../tipos';
 import type { NombreTono } from '../ui/tonos';
 
-/** Colores que puede elegir un jugador (el negro y el gris quedan para cosas del juego). */
+/** Colores que puede elegir un jugador (9 como máximo: es el tope de jugadores; el negro y el gris quedan para cosas del juego). */
 export const PALETA_JUGADOR: NombreTono[] = [
   'rojo', 'azul', 'verde', 'amarillo', 'violeta', 'naranja',
-  'rosa', 'agua', 'fucsia', 'indigo', 'lima', 'cian',
+  'rosa', 'agua', 'lima',
 ];
 
 function esTono(valor: unknown): valor is NombreTono {
@@ -53,25 +53,49 @@ export function coloresParaNuevo(existentes: JugadorPermanente[]): { colorTarjet
   return { colorTarjeta: tarjeta, colorAvatar: avatar };
 }
 
-/** Migración: a los jugadores que todavía no tienen colores se les asignan distintos entre sí. */
-export function completarColores(lista: JugadorPermanente[]): { lista: JugadorPermanente[]; cambio: boolean } {
-  let cambio = false;
-  const resultado: JugadorPermanente[] = [];
-  for (const jug of lista) {
-    if (esTono(jug.colorTarjeta) && esTono(jug.colorAvatar) && jug.colorTarjeta !== jug.colorAvatar) {
-      resultado.push(jug);
-      continue;
+/**
+ * Deja a todos los jugadores con colores válidos y con color de tarjeta distinto entre sí.
+ * `prioridadId` es el jugador que acaba de elegir su color: conserva el suyo y, si otro tenía
+ * el mismo, ese otro pasa automáticamente a un color libre.
+ */
+export function normalizarColores(
+  lista: JugadorPermanente[],
+  prioridadId?: string
+): { lista: JugadorPermanente[]; cambio: boolean } {
+  const orden = lista
+    .map((jug, indice) => ({ jug, indice }))
+    .sort((a, b) => Number(b.jug.id === prioridadId) - Number(a.jug.id === prioridadId) || a.indice - b.indice);
+  const usados: NombreTono[] = [];
+  const tarjetas = new Map<string, NombreTono>();
+  // 1.ª pasada: cada uno conserva su color si es válido y nadie lo tomó antes.
+  for (const { jug } of orden) {
+    if (esTono(jug.colorTarjeta) && !usados.includes(jug.colorTarjeta)) {
+      tarjetas.set(jug.id, jug.colorTarjeta);
+      usados.push(jug.colorTarjeta);
     }
-    const nuevos = coloresParaNuevo(resultado.concat(lista.filter((o) => o !== jug && !resultado.includes(o) && esTono(o.colorTarjeta))));
-    resultado.push({
-      ...jug,
-      colorTarjeta: esTono(jug.colorTarjeta) ? jug.colorTarjeta : nuevos.colorTarjeta,
-      colorAvatar:
-        esTono(jug.colorAvatar) && jug.colorAvatar !== (esTono(jug.colorTarjeta) ? jug.colorTarjeta : nuevos.colorTarjeta)
-          ? jug.colorAvatar
-          : nuevos.colorAvatar,
-    });
-    cambio = true;
   }
-  return { lista: resultado, cambio };
+  // 2.ª pasada: a los que quedaron sin color (repetido o inexistente) se les da uno libre.
+  for (const { jug } of orden) {
+    if (tarjetas.has(jug.id)) continue;
+    const avatarPrevio = esTono(jug.colorAvatar) ? jug.colorAvatar : undefined;
+    const libres = PALETA_JUGADOR.filter((t) => !usados.includes(t) && t !== avatarPrevio);
+    const tarjeta = libres[0] ?? colorLibre(usados);
+    tarjetas.set(jug.id, tarjeta);
+    usados.push(tarjeta);
+  }
+
+  const nuevos = new Map<string, JugadorPermanente>();
+  let cambio = false;
+  for (const { jug } of orden) {
+    const tarjeta = tarjetas.get(jug.id)!;
+    const avatar = colorAvatarDe(jug.id, jug.colorAvatar, tarjeta);
+    if (tarjeta !== jug.colorTarjeta || avatar !== jug.colorAvatar) cambio = true;
+    nuevos.set(jug.id, { ...jug, colorTarjeta: tarjeta, colorAvatar: avatar });
+  }
+  return { lista: lista.map((jug) => nuevos.get(jug.id)!), cambio };
+}
+
+/** Migración al cargar: asigna colores a quien no tiene y corrige repetidos. */
+export function completarColores(lista: JugadorPermanente[]) {
+  return normalizarColores(lista);
 }
