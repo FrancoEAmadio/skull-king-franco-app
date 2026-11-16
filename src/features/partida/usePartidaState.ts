@@ -313,7 +313,7 @@ export function usePartidaState({
   );
 
   const tablaGeneralOrdenada = useMemo(
-    () => jugadoresReales(jugadores).sort((a, b) => b.puntos - a.puntos),
+    () => [...jugadores].sort((a, b) => b.puntos - a.puntos),
     [jugadores]
   );
 
