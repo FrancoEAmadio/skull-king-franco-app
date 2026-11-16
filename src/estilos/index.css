@@ -128,6 +128,30 @@ main :where(h1, h2, h3, p, span) { overflow-wrap: anywhere; }
     inset 0 0 0 2px rgba(255, 244, 214, 0.45);
 }
 
+/* Botón del color del pergamino (p. ej. "Tabla" en la cabecera de la partida). */
+.btn-pergamino {
+  color: #4a3720;
+  background: linear-gradient(180deg, #f6e9c8 0%, #ecd9ab 100%);
+  border-color: #b08a52;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25), inset 0 1px 0 rgba(255, 250, 235, 0.7);
+}
+.btn-pergamino:active:not(:disabled) { transform: scale(0.97); }
+
+/* Sellos de tinta: Acertó / No acertó sobre papel, en verde y rojo oscuros. */
+.sello-ok, .sello-mal { border-width: 1.5px; border-style: solid; }
+.sello-ok { color: #2f5f35; border-color: #4f8a5a; background: rgba(79, 138, 90, 0.12); }
+.sello-mal { color: #8f2a20; border-color: #b9473b; background: rgba(185, 71, 59, 0.1); }
+
+/* Todo lo que va adentro de un pergamino toma el color del papel (filas, hojas, botones claros, separadores). */
+.pergamino .opcion { background: rgba(255, 249, 232, 0.6); border-color: #b89556; }
+.pergamino .opcion-sel { background: rgba(247, 218, 114, 0.55); border-color: #c9951c; box-shadow: 0 0 0 2px rgba(201, 149, 28, 0.25); }
+.pergamino .bg-white { background-color: rgba(255, 249, 232, 0.6); }
+.pergamino .bg-slate-50 { background-color: rgba(255, 249, 232, 0.35); }
+.pergamino .border-slate-100,
+.pergamino .border-slate-200 { border-color: rgba(120, 78, 28, 0.28); }
+.pergamino .btn-claro { color: #4a3720; background: rgba(255, 247, 225, 0.75); border-color: #b08a52; }
+.pergamino .btn-claro:hover:not(:disabled) { background: rgba(255, 247, 225, 0.95); }
+
 /* Sobre el pergamino los grises claros no se leen: se pasan a marrones más oscuros. */
 .pergamino .text-slate-400 { color: #7a5c34; }
 .pergamino .text-slate-500 { color: #6a4e2c; }
@@ -158,7 +182,7 @@ main :where(h1, h2, h3, p, span) { overflow-wrap: anywhere; }
 }
 
 /* ── Botones ─────────────────────────────────────────────────────────── */
-.btn-primario, .btn-dorado, .btn-claro, .btn-fantasma, .btn-peligro {
+.btn-primario, .btn-dorado, .btn-claro, .btn-fantasma, .btn-peligro, .btn-pergamino {
   display: inline-flex;
   align-items: center;
   justify-content: center;
