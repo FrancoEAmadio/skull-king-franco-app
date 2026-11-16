@@ -179,15 +179,15 @@ export function PasoPuntos() {
           />
         )}
 
-        {bonosBloqueados ? (
-          <Seccion numero={numeroBonos} titulo="Bonos de la ronda" marcador="Bloqueado">
-            <p className="text-sm text-slate-600">Se habilitan al acertar el envite.</p>
-          </Seccion>
-        ) : (
-          <div className="entra-subiendo">
-            <PanelEventosBono numero={numeroBonos} eventosBase={eventosBase} eventosExpansion={eventosExpansion} sinBazas={sinBazas} />
-          </div>
-        )}
+        <div className="entra-subiendo">
+          <PanelEventosBono
+            numero={numeroBonos}
+            eventosBase={eventosBase}
+            eventosExpansion={eventosExpansion}
+            sinBazas={sinBazas}
+            noSeCobran={bonosBloqueados}
+          />
+        </div>
 
         {numeroAlianzas !== undefined && <PanelAlianzasBotin numero={numeroAlianzas} />}
 
