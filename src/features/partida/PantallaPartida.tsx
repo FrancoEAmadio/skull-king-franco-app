@@ -77,7 +77,7 @@ export function PantallaPartida() {
               </h2>
             </div>
           </div>
-          <button type="button" onClick={abrirPodio} aria-label="Ver tabla de puntajes" className="btn-claro px-3.5 py-2.5 text-xs">
+          <button type="button" onClick={abrirPodio} aria-label="Ver tabla de puntajes" className="btn-pergamino px-3.5 py-2.5 text-xs">
             Tabla
           </button>
         </div>
