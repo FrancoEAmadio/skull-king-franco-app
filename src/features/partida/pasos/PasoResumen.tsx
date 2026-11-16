@@ -81,7 +81,7 @@ export function PasoResumen() {
               <h3 className="min-w-0 flex-1 truncate text-lg font-bold text-azul">{res.nombre}</h3>
               <span
                 className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-bold ${
-                  res.acierto ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'
+                  res.acierto ? 'sello-ok' : 'sello-mal'
                 }`}
               >
                 {res.acierto ? '✓ Acertó' : '✕ No acertó'} ({res.ganadas} de {res.apuesta})
