@@ -221,14 +221,22 @@ export function PasoPuntos() {
         abierto={confirmarBazas}
         titulo="Hay bazas sin ganador"
         descripcion={
-          <>
-            En esta ronda se juegan {cartasPorJugadorEnRonda} baza{cartasPorJugadorEnRonda === 1 ? '' : 's'} y se asignaron {totalGanadasAsignadas}.
-            <span className="mt-2 block text-sm font-medium text-slate-600">
-              Una baza sin ganador solo pasa si se destruyó: se jugó el Kraken (y nadie lo anuló), o la Ballena Blanca con solo cartas especiales. ¿Fue eso?
-            </span>
-          </>
+          <div className="flex items-center gap-3">
+            <img
+              src={`${import.meta.env.BASE_URL}archivos/cartas/kraken.webp`}
+              alt="Carta del Kraken"
+              draggable={false}
+              className="h-24 w-auto shrink-0 rounded-lg shadow"
+            />
+            <div>
+              En esta ronda se juegan {cartasPorJugadorEnRonda} baza{cartasPorJugadorEnRonda === 1 ? '' : 's'} y se asignaron {totalGanadasAsignadas}.
+              <span className="mt-2 block text-sm font-medium text-slate-600">
+                Una baza queda sin ganador si el último monstruo jugado fue el Kraken, o si la Ballena Blanca o la Mantarraya quedaron sin ninguna carta numerada que ganar. ¿Pasó eso?
+              </span>
+            </div>
+          </div>
         }
-        textoConfirmar="Sí, se destruyó"
+        textoConfirmar="Sí, el Kraken la destruyó"
         textoCancelar="No, corregir bazas"
         onCancelar={() => setConfirmarBazas(false)}
         onConfirmar={() => {
