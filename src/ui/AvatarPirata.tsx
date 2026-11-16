@@ -5,6 +5,7 @@ const TAMANOS = {
   xl: 'h-20 w-20 text-5xl',
 } as const;
 
+import { esImagenAvatar, urlAvatar } from '../datos/avatares';
 import { FONDO_AVATAR, type NombreTono } from './tonos';
 
 interface Props {
@@ -23,7 +24,11 @@ export function AvatarPirata({ emoji, fondo, tamano = 'md', activo = false }: Pr
       style={claro ? { background: `radial-gradient(circle at 35% 30%, ${claro} 0%, ${oscuro} 100%)` } : undefined}
       className={`avatar-pirata ${TAMANOS[tamano]} ${activo ? 'avatar-pirata-activo' : ''}`}
     >
-      {emoji}
+      {esImagenAvatar(emoji) ? (
+        <img src={urlAvatar(emoji)} alt="" draggable={false} className="h-full w-full select-none object-contain p-[7%]" />
+      ) : (
+        emoji
+      )}
     </span>
   );
 }
