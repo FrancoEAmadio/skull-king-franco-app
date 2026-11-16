@@ -130,7 +130,7 @@ export function PasoPuntos() {
               {indiceVisualActual + 1} de {total}
             </span>
             <h3 className="truncate text-xl font-bold text-azul">{jugadorActual.nombre}</h3>
-            {esFantasma && <span className="block text-[11px] font-semibold text-slate-500">Fantasma: no envida, sus bazas son las que sobran</span>}
+            {esFantasma && <span className="block text-[11px] font-semibold text-slate-500">Fantasma: no envida (siempre 0). Anotá las bazas que ganó y lo que capturó</span>}
             <span className="block text-xs font-semibold text-slate-500">
               Total: <strong className="text-tinta">{jugadorActual.puntos}</strong> pts
             </span>
@@ -145,13 +145,6 @@ export function PasoPuntos() {
         </div>
 
         <Seccion numero={numeroBazas} titulo="Bazas ganadas" marcador={`Envite ${jugadorActual.apuesta}`}>
-          {esFantasma ? (
-            <p className="text-sm text-slate-600">
-              Barbagrís ganó <strong className="text-tinta">{jugadorActual.ganadas}</strong> baza{jugadorActual.ganadas === 1 ? '' : 's'}: las que no ganó ninguno de los jugadores.
-              Anotale abajo lo que capturó.
-            </p>
-          ) : (
-            <>
           <div className="flex items-center justify-between gap-2">
             <span
               className={`rounded-full border px-3 py-1 text-xs font-bold ${
@@ -178,8 +171,6 @@ export function PasoPuntos() {
           <button type="button" onClick={limpiarBazasRonda} className="btn-claro mx-auto px-5 py-2.5 text-sm">
             Limpiar bazas
           </button>
-            </>
-          )}
         </Seccion>
 
         {numeroHabilidades !== undefined && (

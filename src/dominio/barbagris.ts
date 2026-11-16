@@ -81,13 +81,3 @@ export function crearJugadorBarbagris(): Jugador {
 export function jugadoresReales<T extends { fantasma?: boolean }>(jugadores: T[]): T[] {
   return jugadores.filter((j) => !j.fantasma);
 }
-
-/** Las bazas de Barbagrís son las que no ganó ninguno de los jugadores reales. */
-export function ajustarBazasBarbagris(jugadores: Jugador[], cartasPorJugadorEnRonda: number): Jugador[] {
-  const idx = jugadores.findIndex((j) => j.fantasma);
-  if (idx === -1) return jugadores;
-  const ganadasReales = jugadoresReales(jugadores).reduce((suma, j) => suma + (Number(j.ganadas) || 0), 0);
-  const resto = Math.max(0, cartasPorJugadorEnRonda - ganadasReales);
-  if (jugadores[idx]!.ganadas === resto) return jugadores;
-  return jugadores.map((j, i) => (i === idx ? { ...j, ganadas: resto } : j));
-}

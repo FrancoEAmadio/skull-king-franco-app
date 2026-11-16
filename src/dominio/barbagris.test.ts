@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ajustarBazasBarbagris, construirBarbagris, crearJugadorBarbagris } from './barbagris';
+import { construirBarbagris, crearJugadorBarbagris } from './barbagris';
 import { calcularJugadoresOrdenados } from '../features/partida/selectores';
 import type { EntradaHistorialRonda } from '../tipos';
 
@@ -25,14 +25,6 @@ describe('Barbagrís', () => {
 });
 
 describe('Barbagrís como jugador de la partida', () => {
-  it('se queda con las bazas que no ganó ninguno de los jugadores', () => {
-    const ana = { ...crearJugadorBarbagris(), fantasma: false, permanenteId: 'a', ganadas: 1 };
-    const beto = { ...crearJugadorBarbagris(), fantasma: false, permanenteId: 'b', ganadas: 2 };
-    const [, , fantasma] = ajustarBazasBarbagris([ana, beto, crearJugadorBarbagris()], 5);
-    expect(fantasma!.ganadas).toBe(2);
-    expect(fantasma!.fantasma).toBe(true);
-  });
-
   it('va siempre último en el orden de la mesa', () => {
     const ana = { ...crearJugadorBarbagris(), fantasma: false, permanenteId: 'a' };
     const beto = { ...crearJugadorBarbagris(), fantasma: false, permanenteId: 'b' };

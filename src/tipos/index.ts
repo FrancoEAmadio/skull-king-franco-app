@@ -89,7 +89,7 @@ export interface Jugador {
   permanenteId: string;
   nombre: string;
   avatar?: string;
-  /** Barbagrís: el fantasma que se suma en partidas de 2. No envida y sus bazas son las que sobran. */
+  /** Barbagrís: el fantasma que se suma en partidas de 2. No envida (siempre 0); las bazas y capturas se le anotan a mano. */
   fantasma?: boolean;
   puntos: number;
   apuesta: number;
