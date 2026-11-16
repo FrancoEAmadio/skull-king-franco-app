@@ -119,7 +119,7 @@ export function PantallaJugadores() {
                 type="button"
                 onClick={() => setAvatarAbierto(avatarAbierto === 'nuevo' ? null : 'nuevo')}
                 aria-label="Elegir icono del nuevo pirata"
-                className="btn-claro shrink-0 px-2"
+                className="shrink-0 px-1"
               >
                 <AvatarPirata emoji={avatarNuevo} fondo={coloresNuevo.colorAvatar} tamano="md" />
               </button>
