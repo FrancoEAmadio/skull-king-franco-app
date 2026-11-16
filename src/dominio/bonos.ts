@@ -152,7 +152,9 @@ function asignacionesCon(ctx: ContextoLimite, idEvento: string, valor: number): 
 function maximoCartasPalo(idEvento: string, ctx: ContextoLimite): number {
   const actual = ctx.jugadores[ctx.jugadorSeleccionadoIdx];
   if (!actual) return 0;
-  if (ctx.jugadores.some((j) => (Number(j.eventosBono?.monstruo_davy) || 0) >= 3)) return 0;
+  // Con los 3 monstruos destruidos (sumando a todos los jugadores) Davy Jones ocupa toda la baza.
+  const monstruosEnTotal = ctx.jugadores.reduce((acc, j) => acc + (Number(j.eventosBono?.monstruo_davy) || 0), 0);
+  if (monstruosEnTotal >= 3) return 0;
   const capturables = Math.min(totalCartasEnMesa(ctx), actual.ganadas * (ctx.jugadores.length || 2));
   const otrasDelJugador = PALOS.filter((id) => id !== idEvento).reduce(
     (acc, id) => acc + (Number(actual.eventosBono?.[id]) || 0),
@@ -165,7 +167,13 @@ function maximoCartasPalo(idEvento: string, ctx: ContextoLimite): number {
   );
   const especiales = contarCartasFisicas(ctx.jugadores.map((j) => j.eventosBono ?? {}), ctx, true);
   const libres = Math.max(0, totalCartasEnMesa(ctx) - especiales - deTodos - otrasDelJugador);
-  return Math.max(0, Math.min(LIMITES_FIJOS[idEvento] ?? 99, capturables - otrasDelJugador, libres));
+  // Las cartas de cada tipo son las del mazo, no por jugador: lo que ya capturaron los demás cuenta (ej. un solo 14 negro).
+  const delMismoTipoEnOtros = ctx.jugadores.reduce(
+    (acc, j, idx) => (idx === ctx.jugadorSeleccionadoIdx ? acc : acc + (Number(j.eventosBono?.[idEvento]) || 0)),
+    0
+  );
+  const topeDelMazo = Math.max(0, (LIMITES_FIJOS[idEvento] ?? 99) - delMismoTipoEnOtros);
+  return Math.max(0, Math.min(topeDelMazo, capturables - otrasDelJugador, libres));
 }
 
 /**
