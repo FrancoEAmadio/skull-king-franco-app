@@ -1271,6 +1271,16 @@ export function usePartidaState({
     setConfiguracionMesa,
     idsJugadoresSeleccionados,
     borrarSeleccionJugadores: () => setIdsJugadoresSeleccionados([]),
+    /** Mezcla el orden de los jugadores elegidos (Fisher-Yates). */
+    aleatorizarSeleccionJugadores: () =>
+      setIdsJugadoresSeleccionados((ids) => {
+        const mezclados = [...ids];
+        for (let i = mezclados.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [mezclados[i], mezclados[j]] = [mezclados[j]!, mezclados[i]!];
+        }
+        return mezclados;
+      }),
     alternarSeleccionJugador,
     posicionSeleccion,
     // estado de partida
