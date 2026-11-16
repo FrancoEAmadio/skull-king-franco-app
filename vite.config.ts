@@ -31,6 +31,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,webp,woff2,webmanifest}'],
         navigateFallback: 'index.html',
+        // Los PDF (y todo lo de /archivos/) se piden como página: sin esto el service worker devolvía la app en vez del archivo.
+        navigateFallbackDenylist: [/\.pdf$/i, /\/archivos\//],
         cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
