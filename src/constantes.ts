@@ -22,4 +22,4 @@ export const CLAVE_LS_PARTIDA_GUARDADA = 'skullking_guardado';
 export const CLAVE_LS_HISTORIAL = 'skullking_historial';
 export const CLAVE_LS_JUGADORES_PERMANENTES = 'skullking_jugadores_permanentes';
 export const CLAVE_LS_PARTIDAS = 'skullking_partidas';
-export const VERSION_APP = '3.5.3';
+export const VERSION_APP = '3.5.4';
