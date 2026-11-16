@@ -17,7 +17,10 @@ export function calcularJugadoresOrdenados(
 ): ItemJugadorOrdenado[] {
   if (jugadores.length === 0) return [];
   const items = jugadores.map((jugador, originalIndex) => ({ jugador, originalIndex }));
-  return items.slice(indiceInicial).concat(items.slice(0, indiceInicial));
+  // Barbagrís no juega en la rotación de la mesa: siempre va al final.
+  const reales = items.filter((item) => !item.jugador.fantasma);
+  const fantasmas = items.filter((item) => item.jugador.fantasma);
+  return reales.slice(indiceInicial).concat(reales.slice(0, indiceInicial), fantasmas);
 }
 
 export function calcularIndiceJugadorReparte(indiceInicial: number, cantidadJugadores: number): number {
@@ -38,8 +41,10 @@ export function calcularMaxGanadasPara(
   jugadores: Jugador[],
   cartasPorJugadorEnRonda: number
 ): number {
+  // Barbagrís se queda con las bazas que sobran: no se carga a mano ni limita a los demás.
+  if (jugadores[indiceJugador]?.fantasma) return 0;
   const sumaOtras = jugadores.reduce((acc, jugador, idx) => {
-    if (idx === indiceJugador) return acc;
+    if (idx === indiceJugador || jugador.fantasma) return acc;
     return acc + (Number(jugador.ganadas) || 0);
   }, 0);
   // Una sola carta por jugador = una sola baza. Si Davy Jones destruyó monstruos y no queda otra carta, nadie la gana.

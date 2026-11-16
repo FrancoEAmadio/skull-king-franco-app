@@ -35,7 +35,7 @@ export function PantallaPartida() {
   const [avisoRonda, setAvisoRonda] = useState<number | null>(null);
 
   const jugadorInicial = jugadores[indiceJugadorInicial];
-  const indiceReparte = indiceJugadorInicial > 0 ? indiceJugadorInicial - 1 : jugadores.length - 1;
+  const indiceReparte = indiceJugadorInicial > 0 ? indiceJugadorInicial - 1 : jugadores.filter((j) => !j.fantasma).length - 1;
   const jugadorReparte = jugadores[indiceReparte];
 
   const tocarRonda = (numero: number) => {

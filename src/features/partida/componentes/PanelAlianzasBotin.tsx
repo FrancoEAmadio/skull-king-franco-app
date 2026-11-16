@@ -40,7 +40,7 @@ export function PanelAlianzasBotin({ numero }: { numero?: number }) {
 
   const limiteAlcanzado = alianzasBotinRonda.length >= MAX_ALIANZAS_POR_RONDA || !hayCartaLibreBotin;
   const sinBazas = activo.ganadas === 0;
-  const otros = jugadores.map((jug, idx) => ({ jug, idx })).filter(({ idx }) => idx !== jugadorSeleccionadoIdx);
+  const otros = jugadores.map((jug, idx) => ({ jug, idx })).filter(({ idx, jug }) => idx !== jugadorSeleccionadoIdx && !jug.fantasma);
 
   // Con una carta por jugador, quien jugó el Botín no ganó la baza y su carta no puede ser otra cosa.
   const cartaYaIdentificada = (idx: number): boolean => {
