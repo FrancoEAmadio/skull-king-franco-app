@@ -1,4 +1,4 @@
-import { AVATARES } from '../datos/avatares';
+import { AVATARES, urlAvatar } from '../datos/avatares';
 
 interface Props {
   valor: string;
@@ -17,11 +17,11 @@ export function SelectorAvatar({ valor, onCambiar }: Props) {
             role="radio"
             aria-checked={activo}
             onClick={() => onCambiar(emoji)}
-            className={`flex aspect-square items-center justify-center rounded-2xl text-3xl ${
+            className={`flex aspect-square items-center justify-center rounded-2xl p-1.5 ${
               activo ? 'ficha-activa' : 'ficha-inactiva'
             }`}
           >
-            {emoji}
+            <img src={urlAvatar(emoji)} alt="" loading="lazy" draggable={false} className="h-full w-full select-none object-contain" />
           </button>
         );
       })}
