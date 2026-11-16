@@ -1,11 +1,14 @@
 import type { JugadorPermanente } from '../tipos';
 import type { NombreTono } from '../ui/tonos';
 
-/** Colores que puede elegir un jugador (9 como máximo: es el tope de jugadores; el negro y el gris quedan para cosas del juego). */
-export const PALETA_JUGADOR: NombreTono[] = [
+/** Colores que puede elegir un jugador (el negro queda para cosas del juego). */
+const PALETA_BASE: NombreTono[] = [
   'rojo', 'azul', 'verde', 'amarillo', 'violeta', 'naranja',
   'rosa', 'agua', 'lima',
 ];
+
+/** Gris (pizarra) y otros tonos extra para elegir a mano: el color automático sigue saliendo de los 9 primeros. */
+export const PALETA_JUGADOR: NombreTono[] = [...PALETA_BASE, 'pizarra', 'fucsia', 'indigo', 'cian'];
 
 function esTono(valor: unknown): valor is NombreTono {
   return typeof valor === 'string' && (PALETA_JUGADOR as string[]).includes(valor);
@@ -20,16 +23,16 @@ function hashDe(id: string): number {
 /** Color de la tarjeta (borde y tinte). Si todavía no se asignó uno, sale de forma estable según el id. */
 export function colorTarjetaDe(id: string, colorTarjeta?: string): NombreTono {
   if (esTono(colorTarjeta)) return colorTarjeta;
-  return PALETA_JUGADOR[hashDe(id) % PALETA_JUGADOR.length]!;
+  return PALETA_BASE[hashDe(id) % PALETA_BASE.length]!;
 }
 
 /** Color de fondo del emoji. Nunca coincide con el de la tarjeta. */
 export function colorAvatarDe(id: string, colorAvatar?: string, colorTarjeta?: string): NombreTono {
   const tarjeta = colorTarjetaDe(id, colorTarjeta);
   if (esTono(colorAvatar) && colorAvatar !== tarjeta) return colorAvatar;
-  const base = (hashDe(id) + 5) % PALETA_JUGADOR.length;
-  for (let i = 0; i < PALETA_JUGADOR.length; i += 1) {
-    const candidato = PALETA_JUGADOR[(base + i) % PALETA_JUGADOR.length]!;
+  const base = (hashDe(id) + 5) % PALETA_BASE.length;
+  for (let i = 0; i < PALETA_BASE.length; i += 1) {
+    const candidato = PALETA_BASE[(base + i) % PALETA_BASE.length]!;
     if (candidato !== tarjeta) return candidato;
   }
   return 'azul';
