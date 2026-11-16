@@ -47,7 +47,7 @@ export function ModalPodio() {
 
   return (
     <>
-      <Modal abierto={mostrarPodio} onCerrar={cerrarPodio} ancho="max-w-sm" cerrarAlHacerClickAfuera={!partidaFinalizada}>
+      <Modal abierto={mostrarPodio} onCerrar={cerrarPodio} ancho="max-w-sm" pergamino cerrarAlHacerClickAfuera={!partidaFinalizada}>
         <EncabezadoModal
           titulo={partidaFinalizada ? 'Resultado final' : 'Tabla general'}
           subtitulo={`${rondasJugadas} ronda${rondasJugadas === 1 ? '' : 's'} jugada${rondasJugadas === 1 ? '' : 's'}`}

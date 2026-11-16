@@ -1,3 +1,4 @@
+import { sincronizarHistorial, sincronizarPartida, type ReferenciaJugador } from '../../dominio/sincronizarJugador';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { avatarDe } from '../../datos/avatares';
 import type {
@@ -1237,6 +1238,45 @@ export function usePartidaState({
     actualizarJugadoresPermanentes(recalcularEstadisticasDesdeHistorial(jugadoresPermanentes, []));
   }, [jugadoresPermanentes, actualizarJugadoresPermanentes]);
 
+  /**
+   * Una tarjeta de jugador cambió de nombre o de icono: se actualiza al instante en la partida en curso,
+   * en las partidas pausadas y en el historial de partidas terminadas.
+   */
+  const sincronizarJugadorEnPartidas = useCallback(
+    (ref: ReferenciaJugador) => {
+      // Partida en curso (estado en memoria).
+      const actual = sincronizarPartida(
+        {
+          jugadores,
+          alianzasBotinRonda,
+          registroHabilidadesRonda,
+          resumenRondaActual,
+          backupRondaActual,
+          ultimaRondaEditable,
+        },
+        ref
+      );
+      setJugadores(actual.jugadores);
+      setAlianzasBotinRonda(actual.alianzasBotinRonda);
+      setRegistroHabilidadesRonda(actual.registroHabilidadesRonda);
+      setResumenRondaActual(actual.resumenRondaActual);
+      setBackupRondaActual(actual.backupRondaActual);
+      setUltimaRondaEditable(actual.ultimaRondaEditable);
+
+      // Partidas pausadas (guardadas en el teléfono).
+      for (const guardada of cargarPartidasGuardadas()) {
+        guardarPartidaEnLista(sincronizarPartida(guardada, ref));
+      }
+      setPartidasGuardadas(cargarPartidasGuardadas());
+
+      // Partidas terminadas.
+      const nuevoHistorial = sincronizarHistorial(historialPartidas, ref);
+      setHistorialPartidas(nuevoHistorial);
+      guardarHistorial(nuevoHistorial);
+    },
+    [jugadores, alianzasBotinRonda, registroHabilidadesRonda, resumenRondaActual, backupRondaActual, ultimaRondaEditable, historialPartidas]
+  );
+
   const alternarSeleccionJugador = useCallback(
     (id: string) => {
       const yaSeleccionado = idsJugadoresSeleccionados.includes(id);
@@ -1282,6 +1322,7 @@ export function usePartidaState({
         return mezclados;
       }),
     alternarSeleccionJugador,
+    sincronizarJugadorEnPartidas,
     posicionSeleccion,
     // estado de partida
     jugadores,

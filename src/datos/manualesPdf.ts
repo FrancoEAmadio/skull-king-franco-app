@@ -7,6 +7,6 @@ export interface ManualPdf {
 
 /** Cuando se sume cada PDF a public/archivos/manuales/, se completa su `archivo` y el botón se habilita solo. */
 export const MANUALES_PDF: ManualPdf[] = [
-  { titulo: 'Manual oficial', descripcion: 'Juego base y reglas avanzadas', archivo: null },
-  { titulo: 'Manual de la expansión', descripcion: 'Cartas y reglas de la expansión', archivo: null },
+  { titulo: 'Manual oficial', descripcion: 'Juego base y reglas avanzadas (Devir, en español)', archivo: 'archivos/manuales/manual-oficial.pdf' },
+  { titulo: 'Manual de la expansión', descripcion: 'Cartas y reglas de la expansión (en inglés)', archivo: 'archivos/manuales/manual-expansion-en.pdf' },
 ];
