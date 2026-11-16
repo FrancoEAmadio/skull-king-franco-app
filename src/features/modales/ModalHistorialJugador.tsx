@@ -8,7 +8,7 @@ export function ModalHistorialJugador() {
   const { jugadorViendoHistorial, cerrarHistorialJugador } = useApp();
 
   return (
-    <Modal abierto={!!jugadorViendoHistorial} onCerrar={cerrarHistorialJugador} ancho="max-w-md" zIndex="z-[70]" cerrarAlHacerClickAfuera>
+    <Modal abierto={!!jugadorViendoHistorial} onCerrar={cerrarHistorialJugador} ancho="max-w-md" zIndex="z-[70]" pergamino cerrarAlHacerClickAfuera>
       {jugadorViendoHistorial && (
         <>
           <EncabezadoModal titulo={jugadorViendoHistorial.nombre} subtitulo="Auditoría de puntaje" onCerrar={cerrarHistorialJugador} />

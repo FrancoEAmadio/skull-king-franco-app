@@ -19,7 +19,7 @@ export function ModalEstadisticasJugador() {
     : null;
 
   return (
-    <Modal abierto={!!jugador} onCerrar={cerrarEstadisticasJugador} ancho="max-w-md" zIndex="z-[70]" cerrarAlHacerClickAfuera>
+    <Modal abierto={!!jugador} onCerrar={cerrarEstadisticasJugador} ancho="max-w-md" zIndex="z-[70]" pergamino cerrarAlHacerClickAfuera>
       {jugador && (
         <>
           <EncabezadoModal titulo={`🏴‍☠️ ${jugador.nombre}`} subtitulo="Perfil pirata" onCerrar={cerrarEstadisticasJugador} />
