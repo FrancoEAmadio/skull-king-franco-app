@@ -17,8 +17,8 @@ export function calcularBonosAlianzasBotin(
     const jugadorB = jugadores[alianza.idxB];
     if (!jugadorA || !jugadorB) continue;
 
-    const aciertoA = jugadorA.apuesta === jugadorA.ganadas;
-    const aciertoB = jugadorB.apuesta === jugadorB.ganadas;
+    const aciertoA = Boolean(jugadorA.fantasma) || jugadorA.apuesta === jugadorA.ganadas;
+    const aciertoB = Boolean(jugadorB.fantasma) || jugadorB.apuesta === jugadorB.ganadas;
 
     if (aciertoA && aciertoB) {
       bonosPorIndice[alianza.idxA] += BONO_ALIANZA_BOTIN;

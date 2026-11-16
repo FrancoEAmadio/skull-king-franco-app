@@ -10,6 +10,8 @@ export interface EntradaCalculoRonda {
   modoEnvite: ModoEnvite;
   bribonHabilidadPts: number | null;
   cobrarBonosSinAcierto: boolean;
+  /** Barbagrís: no envida, así que no suma ni resta por el envite; solo cuentan sus bonos. */
+  fantasma?: boolean;
 }
 
 export interface ResultadoRonda {
@@ -63,11 +65,14 @@ export function calcularPuntajeRonda(entrada: EntradaCalculoRonda): ResultadoRon
     modoEnvite,
     bribonHabilidadPts,
     cobrarBonosSinAcierto,
+    fantasma = false,
   } = entrada;
 
-  const acierto = apuesta === ganadas;
+  const acierto = fantasma || apuesta === ganadas;
 
-  const puntajeBase = usarModoBribon
+  const puntajeBase = fantasma
+    ? 0
+    : usarModoBribon
     ? calcularPuntajeBaseBribon(numeroRonda, modoEnvite, acierto)
     : calcularPuntajeBaseEstandar(apuesta, ganadas, numeroRonda, acierto);
 

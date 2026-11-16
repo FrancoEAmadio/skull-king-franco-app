@@ -77,7 +77,7 @@ export function PasoPuntos() {
   const esFantasma = Boolean(jugadorActual.fantasma);
   const esUltimo = indiceVisualActual === total - 1;
   const siguiente = jugadoresOrdenados[indiceVisualActual + 1]?.jugador;
-  const acerto = jugadorActual.ganadas === jugadorActual.apuesta;
+  const acerto = Boolean(jugadorActual.fantasma) || jugadorActual.ganadas === jugadorActual.apuesta;
   const bazasSinAsignar = cartasPorJugadorEnRonda - totalGanadasAsignadas;
 
   // Si el envite no se cumplió, los bonos no se cobran (salvo que la mesa tenga activada esa regla).
@@ -106,7 +106,7 @@ export function PasoPuntos() {
   const numeroBazas = n++;
   const numeroHabilidades = configuracionMesa.usarHabilidadesPiratas && !esFantasma ? n++ : undefined;
   const numeroBonos = n++;
-  const numeroAlianzas = estaReglaActiva(configuracionMesa, 'botin') && !esFantasma ? n++ : undefined;
+  const numeroAlianzas = estaReglaActiva(configuracionMesa, 'botin') ? n++ : undefined;
   const numeroComodines = configuracionMesa.usarComodinesBonificacion && !esFantasma ? n++ : undefined;
 
   return (
@@ -130,7 +130,7 @@ export function PasoPuntos() {
               {indiceVisualActual + 1} de {total}
             </span>
             <h3 className="truncate text-xl font-bold text-azul">{jugadorActual.nombre}</h3>
-            {esFantasma && <span className="block text-[11px] font-semibold text-slate-500">Fantasma: no envida (siempre 0). Anotá las bazas que ganó y lo que capturó</span>}
+            {esFantasma && <span className="block text-[11px] font-semibold text-slate-500">No envida: no suma ni resta por el envite</span>}
             <span className="block text-xs font-semibold text-slate-500">
               Total: <strong className="text-tinta">{jugadorActual.puntos}</strong> pts
             </span>
@@ -144,15 +144,15 @@ export function PasoPuntos() {
           </div>
         </div>
 
-        <Seccion numero={numeroBazas} titulo="Bazas ganadas" marcador={`Envite ${jugadorActual.apuesta}`}>
+        <Seccion numero={numeroBazas} titulo="Bazas ganadas" marcador={esFantasma ? undefined : `Envite ${jugadorActual.apuesta}`}>
           <div className="flex items-center justify-between gap-2">
-            <span
+            {esFantasma ? <span /> : <span
               className={`rounded-full border px-3 py-1 text-xs font-bold ${
                 acerto ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'
               }`}
             >
               {acerto ? 'Acertó' : 'No acertó'}
-            </span>
+            </span>}
             <span className="text-xs font-semibold text-slate-500">
               {bazasSinAsignar > 0 ? `Faltan asignar ${bazasSinAsignar}` : 'Todas asignadas'}
             </span>
@@ -162,8 +162,8 @@ export function PasoPuntos() {
             etiqueta={`Bazas de ${jugadorActual.nombre}`}
             valor={jugadorActual.ganadas}
             max={cartasPorJugadorEnRonda}
-            meta={jugadorActual.apuesta}
-            resultado={acerto ? 'ok' : 'mal'}
+            meta={esFantasma ? null : jugadorActual.apuesta}
+            resultado={esFantasma ? null : acerto ? 'ok' : 'mal'}
             deshabilitada={(numero) => numero > maxGanadasPara(jugadorSeleccionadoIdx)}
             onElegir={(numero) => elegirGanadas(jugadorSeleccionadoIdx, numero)}
           />

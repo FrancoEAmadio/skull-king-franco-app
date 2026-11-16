@@ -53,10 +53,7 @@ export function SelectorJugadores() {
         <div className="flex items-center gap-3 rounded-xl border-2 border-slate-400 bg-slate-100 p-2.5">
           <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-500 text-xs font-bold text-white">3</span>
           <AvatarPirata emoji={AVATAR_BARBAGRIS} fondo="pizarra" tamano="sm" />
-          <span className="flex min-w-0 flex-1 flex-col">
-            <span className="truncate text-base font-semibold text-slate-700">{NOMBRE_BARBAGRIS}</span>
-            <span className="text-[11px] font-medium text-slate-500">Fantasma de la partida de 2. No cuenta en la clasificación.</span>
-          </span>
+          <span className="min-w-0 flex-1 truncate text-base font-semibold text-slate-700">{NOMBRE_BARBAGRIS}</span>
         </div>
       )}
       {elegidos.length > 1 && (
