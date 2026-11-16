@@ -1,4 +1,5 @@
 import { MANUALES_PDF } from '../../datos/manualesPdf';
+import { VERSION_APP } from '../../constantes';
 import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { CATALOGO_CARTAS_WIKI } from '../../datos/cartasDatos';
@@ -244,7 +245,7 @@ export function PantallaReglas() {
                   m.archivo ? (
                     <a
                       key={m.titulo}
-                      href={`${import.meta.env.BASE_URL}${m.archivo}`}
+                      href={`${import.meta.env.BASE_URL}${m.archivo}?v=${VERSION_APP}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-claro flex w-full flex-col items-start px-4 py-3 text-left"
