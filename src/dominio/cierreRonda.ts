@@ -8,6 +8,7 @@ import type {
   RegistroHabilidad,
   ResumenRondaJugador,
 } from '../tipos';
+import { MAX_ALIANZAS_POR_RONDA } from '../constantes';
 import { calcularBonosAlianzasBotin } from './alianzas';
 import {
   estaDisponibleRegistroHabilidad,
@@ -267,7 +268,8 @@ export function cerrarRonda(
   ctx: ContextoCierre,
   editandoRondaAnterior: boolean
 ): ResultadoCierreRonda {
-  const alianzas = estaReglaActiva(ctx.configuracion, 'botin') ? ctx.alianzas : [];
+  // Solo cuentan las primeras alianzas permitidas, igual que en el cálculo del bono (detalle y total tienen que coincidir).
+  const alianzas = estaReglaActiva(ctx.configuracion, 'botin') ? ctx.alianzas.slice(0, MAX_ALIANZAS_POR_RONDA) : [];
   const contexto = { ...ctx, alianzas };
   const bonosBotin = calcularBonosAlianzasBotin(alianzas, ctx.jugadores);
 
