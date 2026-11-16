@@ -474,7 +474,7 @@ function VistaHistorial() {
                 </button>
               ))}
             </div>
-            {partidaGuardada.ranking.some((jug) => jug.historial.length > 1) && (
+            {partidaGuardada.ranking.some((jug) => jug.historial.length > 0) && (
               <>
                 <button
                   type="button"
