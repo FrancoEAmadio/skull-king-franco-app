@@ -15,12 +15,12 @@ export function ModalHistorialJugador() {
 
           <div className="scroll-oculto flex flex-1 flex-col gap-3 overflow-y-auto overscroll-contain bg-slate-50 p-4">
             {(jugadorViendoHistorial.historial as EntradaHistorialRonda[]).map((ronda) => (
-              <div key={ronda.ronda} className="rounded-xl border border-slate-200 bg-white p-3.5 text-sm shadow-sm">
+              <div key={ronda.ronda} className="rounded-xl border border-slate-200 bg-white p-3.5 text-sm">
                 <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
                   <span className="text-base font-bold text-azul">Ronda {ronda.ronda}</span>
                   <span
                     className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${
-                      ronda.acierto ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'
+                      ronda.acierto ? 'sello-ok' : 'sello-mal'
                     }`}
                   >
                     Envite {ronda.apuesta} · Bazas {ronda.ganadas}
