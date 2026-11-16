@@ -4,6 +4,7 @@ import { useGestosMultiDedo } from '../../ui/useGestosMultiDedo';
 import { calcularPorcentajeVictorias } from '../../dominio/estadisticas';
 import { calcularRendimientos, construirSeriesEvolucion } from '../../dominio/comparativas';
 import { GraficoEvolucion } from '../../ui/GraficoEvolucion';
+import { AVATAR_BARBAGRIS } from '../../dominio/barbagris';
 import { AVATARES, avatarDe } from '../../datos/avatares';
 import { AvatarPirata } from '../../ui/AvatarPirata';
 import { SelectorAvatar } from '../../ui/SelectorAvatar';
@@ -473,6 +474,26 @@ function VistaHistorial() {
                   <span className="shrink-0 pl-2 font-bold text-tinta">{jug.puntos} pts</span>
                 </button>
               ))}
+              {partidaGuardada.barbagris && (
+                <button
+                  type="button"
+                  onClick={() => verHistorialJugador(partidaGuardada.barbagris!)}
+                  className="flex items-center justify-between rounded-xl border border-slate-400 bg-slate-100 px-3 py-2 text-left"
+                >
+                  <span className="flex min-w-0 items-center gap-2">
+                    <AvatarPirata emoji={AVATAR_BARBAGRIS} fondo="pizarra" tamano="sm" />
+                    <span className="flex min-w-0 flex-col">
+                      <span className="truncate text-sm font-semibold text-slate-700">{partidaGuardada.barbagris.nombre}</span>
+                      <span className="text-[11px] text-slate-500">
+                        {partidaGuardada.barbagris.puntos > (partidaGuardada.ranking[0]?.puntos ?? 0)
+                          ? 'El fantasma le ganó a todos'
+                          : 'Fantasma de la partida de 2 · Ver detalles'}
+                      </span>
+                    </span>
+                  </span>
+                  <span className="shrink-0 pl-2 font-bold text-slate-700">{partidaGuardada.barbagris.puntos} pts</span>
+                </button>
+              )}
             </div>
             {partidaGuardada.ranking.some((jug) => jug.historial.length > 0) && (
               <>
@@ -484,7 +505,7 @@ function VistaHistorial() {
                 >
                   {graficosAbiertos.has(hIndex) ? '▲ Ocultar evolución' : '📈 Ver evolución por ronda'}
                 </button>
-                {graficosAbiertos.has(hIndex) && <GraficoPartidaHistorial jugadores={partidaGuardada.ranking} />}
+                {graficosAbiertos.has(hIndex) && <GraficoPartidaHistorial jugadores={partidaGuardada.barbagris ? [...partidaGuardada.ranking, partidaGuardada.barbagris] : partidaGuardada.ranking} />}
               </>
             )}
           </div>
