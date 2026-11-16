@@ -2,6 +2,13 @@
 export const AVATARES: string[] = [
   'img:pirata-gris',
   'img:capitan',
+  'img:capitan-cruel',
+  'img:encapuchado',
+  'img:calavera-ojos-rojos',
+  'img:calavera-cuchillo',
+  'img:calavera-parche',
+  'img:calavera-corona',
+  'img:fantasma-verde',
   'img:pirata-panuelo',
   'img:pirata-marron',
   'img:pirata-mujer',
