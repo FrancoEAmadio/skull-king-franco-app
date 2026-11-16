@@ -3,6 +3,7 @@ import { useApp } from '../../../estado/AppProvider';
 import { MIN_JUGADORES } from '../../../constantes';
 import { AvatarPirata } from '../../../ui/AvatarPirata';
 import { avatarDe } from '../../../datos/avatares';
+import { AVATAR_BARBAGRIS, NOMBRE_BARBAGRIS } from '../../../dominio/barbagris';
 import { colorAvatarDe, colorTarjetaDe } from '../../../datos/coloresJugador';
 import { TONOS_APP } from '../../../ui/tonos';
 import { ItemOrdenable, ListaOrdenable } from '../../../ui/ListaOrdenable';
@@ -47,6 +48,16 @@ export function SelectorJugadores() {
           })}
         </ul>
         </ListaOrdenable>
+      )}
+      {elegidos.length === 2 && (
+        <div className="flex items-center gap-3 rounded-xl border-2 border-slate-400 bg-slate-100 p-2.5">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-500 text-xs font-bold text-white">3</span>
+          <AvatarPirata emoji={AVATAR_BARBAGRIS} fondo="pizarra" tamano="sm" />
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className="truncate text-base font-semibold text-slate-700">{NOMBRE_BARBAGRIS}</span>
+            <span className="text-[11px] font-medium text-slate-500">Fantasma de la partida de 2. No cuenta en la clasificación.</span>
+          </span>
+        </div>
       )}
       {elegidos.length > 1 && (
         <p className="text-center text-xs font-semibold text-slate-400">Mantené apretado un jugador y arrastralo para cambiar el orden</p>
