@@ -17,10 +17,11 @@ export function calcularJugadoresOrdenados(
 ): ItemJugadorOrdenado[] {
   if (jugadores.length === 0) return [];
   const items = jugadores.map((jugador, originalIndex) => ({ jugador, originalIndex }));
-  // Barbagrís no juega en la rotación de la mesa: siempre va al final.
+  // Barbagrís no rota con la mesa: según el manual, siempre juega su carta en segundo lugar.
   const reales = items.filter((item) => !item.jugador.fantasma);
   const fantasmas = items.filter((item) => item.jugador.fantasma);
-  return reales.slice(indiceInicial).concat(reales.slice(0, indiceInicial), fantasmas);
+  const orden = reales.slice(indiceInicial).concat(reales.slice(0, indiceInicial));
+  return [...orden.slice(0, 1), ...fantasmas, ...orden.slice(1)];
 }
 
 export function calcularIndiceJugadorReparte(indiceInicial: number, cantidadJugadores: number): number {

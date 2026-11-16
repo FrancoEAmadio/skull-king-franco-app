@@ -26,11 +26,11 @@ describe('Barbagrís', () => {
 });
 
 describe('Barbagrís como jugador de la partida', () => {
-  it('va siempre último en el orden de la mesa', () => {
+  it('va siempre segundo en el orden de la mesa, como dice el manual', () => {
     const ana = { ...crearJugadorBarbagris(), fantasma: false, permanenteId: 'a' };
     const beto = { ...crearJugadorBarbagris(), fantasma: false, permanenteId: 'b' };
     const orden = calcularJugadoresOrdenados([ana, beto, crearJugadorBarbagris()], 1).map((i) => i.jugador.permanenteId);
-    expect(orden).toEqual(['b', 'a', 'barbagris']);
+    expect(orden).toEqual(['b', 'barbagris', 'a']);
   });
 });
 
