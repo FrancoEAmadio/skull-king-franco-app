@@ -48,7 +48,7 @@ export function PasoResumen() {
 
   return (
     <section className="entrar flex flex-1 flex-col gap-4">
-      <div className="tarjeta p-4">
+      <div className="tarjeta pergamino p-4">
         <span className="tarjeta-titulo block">Resumen de la ronda {rondaVisible}</span>
         {(partidaFinalizada || partidaPendienteFinalizar) && (
           <span className="mt-1 block text-xs text-slate-500">
@@ -76,7 +76,7 @@ export function PasoResumen() {
         ];
 
         return (
-          <article key={res.nombre} className="tarjeta flex flex-col gap-3 p-4">
+          <article key={res.nombre} className="tarjeta pergamino flex flex-col gap-3 p-4">
             <header className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
               <h3 className="min-w-0 flex-1 truncate text-lg font-bold text-azul">{res.nombre}</h3>
               <span
