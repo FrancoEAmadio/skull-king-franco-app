@@ -14,7 +14,7 @@ export function SelectorColor({ titulo, valor, bloqueado, onCambiar }: Props) {
   return (
     <div className="flex flex-col gap-1.5">
       <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">{titulo}</span>
-      <div className="grid grid-cols-6 gap-2" role="radiogroup" aria-label={titulo}>
+      <div className="grid grid-cols-7 gap-2" role="radiogroup" aria-label={titulo}>
         {PALETA_JUGADOR.map((tono) => {
           const activo = tono === valor;
           const deshabilitado = tono === bloqueado;

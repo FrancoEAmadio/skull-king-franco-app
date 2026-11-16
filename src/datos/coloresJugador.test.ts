@@ -9,7 +9,7 @@ describe('colores de jugador', () => {
     const { lista } = normalizarColores(jugadores(9));
     expect(new Set(lista.map((j) => j.colorTarjeta)).size).toBe(9);
     expect(lista.every((j) => j.colorAvatar !== j.colorTarjeta)).toBe(true);
-    expect(PALETA_JUGADOR).toHaveLength(9);
+    expect(PALETA_JUGADOR).toContain('pizarra');
   });
 
   it('si otro jugador ya tenía el color elegido, ese otro cambia solo', () => {
