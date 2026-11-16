@@ -175,10 +175,12 @@ function maximoCartasPalo(idEvento: string, ctx: ContextoLimite): number {
 export function calcularMaximoDisponible(idEvento: string, ctx: ContextoLimite): number {
   if (!estaDisponibleEventoBono(idEvento, ctx.configuracion)) return 0;
   if (idEvento === 'monstruo_davy' && (ctx.jugadores[ctx.jugadorSeleccionadoIdx]?.ganadas ?? 0) >= ctx.cartasPorJugadorEnRonda) return 0;
+  // Tope extra de Davy Jones: con una baza única, tiene que quedar una carta que la gane si alguien ya anotó una baza.
+  // Es solo un tope: después se sigue con la cuenta de cartas de la mesa (palos, piratas, etc. ya capturados).
+  let topeDavy = Infinity;
   if (idEvento === 'monstruo_davy' && ctx.cartasPorJugadorEnRonda === 1) {
-    // Con una baza única, tiene que quedar una carta que la gane si alguien ya anotó una baza.
     const otrosGanaron = ctx.jugadores.some((j, i) => i !== ctx.jugadorSeleccionadoIdx && (Number(j.ganadas) || 0) > 0);
-    if (otrosGanaron) return Math.max(0, Math.min(3, (ctx.jugadores.length || 2) - 2));
+    if (otrosGanaron) topeDavy = Math.max(0, Math.min(3, (ctx.jugadores.length || 2) - 2));
   }
   if ((PALOS as readonly string[]).includes(idEvento)) return maximoCartasPalo(idEvento, ctx);
   if (!(EVENTOS_ESPECIALES as readonly string[]).includes(idEvento)) return LIMITES_FIJOS[idEvento] ?? 99;
@@ -188,7 +190,7 @@ export function calcularMaximoDisponible(idEvento: string, ctx: ContextoLimite):
     if (!esPosibleAsignacionEspeciales(asignacionesCon(ctx, idEvento, valor), ctx)) break;
     maximo = valor;
   }
-  return maximo;
+  return Math.min(maximo, topeDavy);
 }
 
 /** Línea corta con el motivo por el cual el + de un bono ya no se puede usar. */
