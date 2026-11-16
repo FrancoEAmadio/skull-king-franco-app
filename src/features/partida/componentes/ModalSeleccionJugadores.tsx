@@ -61,18 +61,20 @@ export function ModalSeleccionJugadores({ abierto, onCerrar }: Props) {
 
   const coloresNuevo = coloresParaNuevo(jugadoresPermanentes);
 
+  const seleccionarJugador = (id: string) => {
+    const resultado = alternarSeleccionJugador(id);
+    if (resultado === 'limite_alcanzado') setMostrarLimite(true);
+  };
+
   const crearJugador = () => {
     const nuevo = crearJugadorPermanente(nombreNuevo, avatarNuevo, coloresNuevo);
     if (!nuevo) return;
+    // El jugador recién creado queda elegido para la partida (como en La Canasta).
+    seleccionarJugador(nuevo.id);
     setEligiendoAvatar(false);
     setAvatarNuevo(AVATARES[(AVATARES.indexOf(avatarNuevo) + 1) % AVATARES.length]!);
     setNombreNuevo('');
     setBusqueda('');
-  };
-
-  const seleccionarJugador = (id: string) => {
-    const resultado = alternarSeleccionJugador(id);
-    if (resultado === 'limite_alcanzado') setMostrarLimite(true);
   };
 
   return (

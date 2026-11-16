@@ -38,9 +38,9 @@ export function SelectorJugadores() {
                 type="button"
                 onClick={() => alternarSeleccionJugador(j.id)}
                 aria-label={`Quitar a ${j.nombre}`}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-600 text-base font-bold text-white"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-lg font-bold text-slate-400 hover:bg-slate-200"
               >
-                ✕
+                ×
               </button>
             </ItemOrdenable>
             );
