@@ -91,18 +91,29 @@ function normalizarPartida(partida: PartidaGuardada): PartidaGuardada {
 
 /** Lista de partidas en curso (la más reciente primero). Migra el guardado único anterior. */
 export function cargarPartidasGuardadas(): PartidaGuardada[] {
-  let lista = leerJson<PartidaGuardada[]>(CLAVE_LS_PARTIDAS);
-  if (!Array.isArray(lista)) lista = [];
-  const antigua = leerJson<PartidaGuardada>(CLAVE_LS_PARTIDA_GUARDADA);
+  const esPartida = (p: unknown): p is PartidaGuardada =>
+    typeof p === 'object' && p !== null && Array.isArray((p as { jugadores?: unknown }).jugadores);
+  const leida = leerJson<unknown>(CLAVE_LS_PARTIDAS);
+  const lista: unknown[] = Array.isArray(leida) ? leida : [];
+  const antigua = leerJson<unknown>(CLAVE_LS_PARTIDA_GUARDADA);
   if (antigua) {
-    lista.push(antigua);
+    if (esPartida(antigua)) lista.push(antigua);
     localStorage.removeItem(CLAVE_LS_PARTIDA_GUARDADA);
-    escribirJson(CLAVE_LS_PARTIDAS, lista.map(normalizarPartida));
+    escribirJson(CLAVE_LS_PARTIDAS, lista.filter(esPartida).flatMap(normalizarSeguro));
   }
   return lista
-    .filter((p) => p && Array.isArray(p.jugadores))
-    .map(normalizarPartida)
-    .sort((x, y) => y.actualizada.localeCompare(x.actualizada));
+    .filter(esPartida)
+    .flatMap(normalizarSeguro)
+    .sort((x, y) => String(y.actualizada ?? '').localeCompare(String(x.actualizada ?? '')));
+}
+
+/** Una partida guardada rota se descarta sola en vez de tirar abajo toda la carga. */
+function normalizarSeguro(partida: PartidaGuardada): PartidaGuardada[] {
+  try {
+    return [normalizarPartida(partida)];
+  } catch {
+    return [];
+  }
 }
 
 export function guardarPartidaEnLista(partida: PartidaGuardada): void {
