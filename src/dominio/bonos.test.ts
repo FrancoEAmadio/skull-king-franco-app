@@ -28,4 +28,17 @@ describe('cartas de la mesa agotadas', () => {
     const libres = [jugador('Eisenag', 0), jugador('Martina', 0), jugador('Lady', 1)];
     expect(calcularMaximoDisponible('monstruo_davy', ctxBase(libres, 0))).toBe(1);
   });
+
+  it('Davy Jones es una sola carta: si ya lo registró un jugador, otro no puede', () => {
+    const dos = [jugador('Eisenag', 0, { monstruo_davy: 1 }), jugador('Martina', 0), jugador('Lady', 0)];
+    expect(calcularMaximoDisponible('monstruo_davy', { ...ctxBase(dos, 2), cartasPorJugadorEnRonda: 3 })).toBe(0);
+    expect(motivoTopeBono('monstruo_davy', { ...ctxBase(dos, 2), cartasPorJugadorEnRonda: 3 })).toMatch(/una sola carta/);
+    // El mismo jugador sí puede seguir sumando monstruos (hasta lo que entra en la baza).
+    expect(calcularMaximoDisponible('monstruo_davy', { ...ctxBase(dos, 0), cartasPorJugadorEnRonda: 3 })).toBe(2);
+  });
+
+  it('con 4 jugadores un solo jugador puede llegar a 3 monstruos', () => {
+    const cuatro = [jugador('A', 0), jugador('B', 0), jugador('C', 0), jugador('D', 0)];
+    expect(calcularMaximoDisponible('monstruo_davy', { ...ctxBase(cuatro, 0), cartasPorJugadorEnRonda: 3 })).toBe(3);
+  });
 });

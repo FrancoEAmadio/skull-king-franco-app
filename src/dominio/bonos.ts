@@ -34,9 +34,14 @@ const LIMITES_FIJOS: Record<string, number> = {
   siete_expansion: 4,
 };
 
+/** Cartas que entran en cada baza: una por jugador (Barbagrís, en partidas de 2, todavía no se cuenta). */
+export function cartasPorBaza(ctx: Pick<ContextoLimite, 'jugadores'>): number {
+  return ctx.jugadores.length || 2;
+}
+
 /** Cartas que se reparten en la mesa en esta ronda (jugadores × cartas de cada uno). */
 export function totalCartasEnMesa(ctx: Pick<ContextoLimite, 'jugadores' | 'cartasPorJugadorEnRonda'>): number {
-  return (ctx.jugadores.length || 2) * ctx.cartasPorJugadorEnRonda;
+  return cartasPorBaza(ctx) * ctx.cartasPorJugadorEnRonda;
 }
 
 /** Piratas que existen en el mazo: 6 en Base/Avanzadas; Mary Thorne es la 7.ª y solo está en Expansión. */
@@ -51,7 +56,7 @@ function monstruosEnMazo(configuracion: ConfiguracionMesa): number {
 
 /** En una baza entra una carta por jugador: una carta especial captura, como máximo, a las otras jugadores − 1. */
 function maximoPorBaza(ctx: Pick<ContextoLimite, 'jugadores'>): number {
-  return Math.max(0, (ctx.jugadores.length || 2) - 1);
+  return Math.max(0, cartasPorBaza(ctx) - 1);
 }
 
 interface Totales {
@@ -83,7 +88,7 @@ export function esPosibleAsignacionEspeciales(asignaciones: Eventos[], ctx: Cont
   return detectarMotivoImposible(asignaciones, ctx) === null;
 }
 
-type Motivo = 'davy_total' | 'baza' | 'sk_unico' | 'sk_excluyente' | 'sirenas' | 'piratas' | 'kong' | 'monstruos' | 'mesa';
+type Motivo = 'davy_unico' | 'davy_total' | 'baza' | 'sk_unico' | 'sk_excluyente' | 'sirenas' | 'piratas' | 'kong' | 'monstruos' | 'mesa';
 
 /** Cartas de la mesa que ya quedaron identificadas (capturas especiales, palos, habilidades y Botín). */
 export function contarCartasFisicas(asignaciones: Eventos[], ctx: ContextoLimite, sinPalos = false): number {
@@ -120,6 +125,8 @@ function detectarMotivoImposible(asignaciones: Eventos[], ctx: ContextoLimite): 
   const porBaza = maximoPorBaza(ctx);
 
   if (t.pirataSk > porBaza) return 'baza';
+  // Davy Jones es una sola carta: solo un jugador puede haberla jugado y registrar monstruos.
+  if (asignaciones.filter((e) => (Number(e.monstruo_davy) || 0) > 0).length > 1) return 'davy_unico';
 
   // Con los 3 monstruos destruidos, Davy Jones ocupa la baza: no queda lugar para otras capturas (solo comodines).
   if (t.monstruos >= 3) {
@@ -155,7 +162,7 @@ function maximoCartasPalo(idEvento: string, ctx: ContextoLimite): number {
   // Con los 3 monstruos destruidos (sumando a todos los jugadores) Davy Jones ocupa toda la baza.
   const monstruosEnTotal = ctx.jugadores.reduce((acc, j) => acc + (Number(j.eventosBono?.monstruo_davy) || 0), 0);
   if (monstruosEnTotal >= 3) return 0;
-  const capturables = Math.min(totalCartasEnMesa(ctx), actual.ganadas * (ctx.jugadores.length || 2));
+  const capturables = Math.min(totalCartasEnMesa(ctx), actual.ganadas * cartasPorBaza(ctx));
   const otrasDelJugador = PALOS.filter((id) => id !== idEvento).reduce(
     (acc, id) => acc + (Number(actual.eventosBono?.[id]) || 0),
     0
@@ -188,7 +195,7 @@ export function calcularMaximoDisponible(idEvento: string, ctx: ContextoLimite):
   let topeDavy = Infinity;
   if (idEvento === 'monstruo_davy' && ctx.cartasPorJugadorEnRonda === 1) {
     const otrosGanaron = ctx.jugadores.some((j, i) => i !== ctx.jugadorSeleccionadoIdx && (Number(j.ganadas) || 0) > 0);
-    if (otrosGanaron) topeDavy = Math.max(0, Math.min(3, (ctx.jugadores.length || 2) - 2));
+    if (otrosGanaron) topeDavy = Math.max(0, Math.min(3, cartasPorBaza(ctx) - 2));
   }
   if ((PALOS as readonly string[]).includes(idEvento)) return maximoCartasPalo(idEvento, ctx);
   if (!(EVENTOS_ESPECIALES as readonly string[]).includes(idEvento)) return LIMITES_FIJOS[idEvento] ?? 99;
@@ -207,15 +214,17 @@ export function motivoTopeBono(idEvento: string, ctx: ContextoLimite): string {
   if (idEvento === 'monstruo_davy' && (ctx.jugadores[ctx.jugadorSeleccionadoIdx]?.ganadas ?? 0) >= ctx.cartasPorJugadorEnRonda) {
     return 'Davy Jones no gana bazas: si este jugador ganó todas las suyas, no pudo jugarlo.';
   }
-  if (idEvento === 'monstruo_davy' && ctx.cartasPorJugadorEnRonda === 1 && ctx.jugadores.some((j, i) => i !== ctx.jugadorSeleccionadoIdx && (Number(j.ganadas) || 0) > 0) && actual + 1 > (ctx.jugadores.length || 2) - 2) {
+  if (idEvento === 'monstruo_davy' && ctx.cartasPorJugadorEnRonda === 1 && ctx.jugadores.some((j, i) => i !== ctx.jugadorSeleccionadoIdx && (Number(j.ganadas) || 0) > 0) && actual + 1 > cartasPorBaza(ctx) - 2) {
     return 'Otro jugador ya ganó la baza: tiene que quedar una carta que la gane.';
   }
   const motivo = detectarMotivoImposible(asignacionesCon(ctx, idEvento, actual + 1), ctx);
   switch (motivo) {
+    case 'davy_unico':
+      return 'Davy Jones es una sola carta: ya lo registró otro jugador.';
     case 'davy_total':
       return 'Con los 3 monstruos, Davy Jones ocupa toda la baza: solo se admiten comodines.';
     case 'baza':
-      return `En una baza entran ${(ctx.jugadores.length || 2)} cartas: el Skull King captura hasta ${maximoPorBaza(ctx)}.`;
+      return `En una baza entran ${cartasPorBaza(ctx)} cartas: el Skull King captura hasta ${maximoPorBaza(ctx)}.`;
     case 'sk_unico':
       return 'Ya se asignó el Skull King en esta ronda.';
     case 'sk_excluyente':
@@ -263,7 +272,7 @@ export function sanearEventosEspeciales(jugadores: Jugador[], ctx: Omit<Contexto
 export function limitesPuntosCartas(ctx: ContextoLimite): { minimo: number; maximo: number } {
   const ganadas = ctx.jugadores[ctx.jugadorSeleccionadoIdx]?.ganadas ?? 0;
   // Solo se capturan cartas de las bazas que se ganaron (una carta por jugador en cada baza).
-  const enMesa = Math.min(totalCartasEnMesa(ctx), ganadas * (ctx.jugadores.length || 2));
+  const enMesa = Math.min(totalCartasEnMesa(ctx), ganadas * cartasPorBaza(ctx));
   const positivas = [20, 10, 10, 10];
   if (estaReglaActiva(ctx.configuracion, 'carta8')) positivas.push(5, 5, 5, 5);
   const maximo = positivas.slice(0, enMesa).reduce((acc, pts) => acc + pts, 0);

@@ -252,6 +252,7 @@ describe('simulación de rondas al azar', () => {
       expect(suma('ocho_expansion'), detalle).toBeLessThanOrEqual(4);
       expect(suma('siete_expansion'), detalle).toBeLessThanOrEqual(4);
       expect(suma('monstruo_davy'), detalle).toBeLessThanOrEqual(3);
+      expect(ctx.jugadores.filter((j) => (Number(j.eventosBono.monstruo_davy) || 0) > 0).length, detalle).toBeLessThanOrEqual(1);
       expect(suma('sirena_por_pirata') + suma('sk_por_sirena'), detalle).toBeLessThanOrEqual(2);
       void EVENTOS_ESPECIALES;
     }

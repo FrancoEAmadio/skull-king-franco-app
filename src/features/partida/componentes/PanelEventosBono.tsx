@@ -9,6 +9,8 @@ interface Props {
   eventosExpansion: EventoBono[];
   /** Sin bazas ganadas no hay capturas: solo queda Davy Jones (no gana bazas). */
   sinBazas?: boolean;
+  /** El envite no se cumplió: los bonos se registran pero no suman puntos. */
+  noSeCobran?: boolean;
 }
 
 const PALOS: { id: string; titulo: string; tono: TonoChip; aclaracion: string }[] = [
@@ -26,7 +28,7 @@ const ESPECIALES: Record<string, { titulo: string; tono: TonoChip }> = {
   monstruo_davy: { titulo: 'Monstruo destruido por Davy Jones', tono: 'verde' },
 };
 
-export function PanelEventosBono({ numero, eventosBase: baseTodos, eventosExpansion: expTodos, sinBazas = false }: Props) {
+export function PanelEventosBono({ numero, eventosBase: baseTodos, eventosExpansion: expTodos, sinBazas = false, noSeCobran = false }: Props) {
   const { partida } = useApp();
   const {
     jugadorActual,
@@ -70,6 +72,11 @@ export function PanelEventosBono({ numero, eventosBase: baseTodos, eventosExpans
 
   return (
     <Seccion numero={numero} titulo="Bonos de la ronda">
+      {noSeCobran && (
+        <p className="text-xs font-semibold text-amber-700">
+          No cumplió el envite: los bonos quedan registrados a su nombre pero no suman puntos.
+        </p>
+      )}
       {sinBazas && <p className="text-sm text-slate-600">Sin bazas ganadas no hay capturas{eventosExpansion.length > 0 ? ', salvo los monstruos que destruyó Davy Jones' : ''}.</p>}
       {!sinBazas && <div className="flex flex-col gap-2">
         <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Cartas de palo capturadas</span>
