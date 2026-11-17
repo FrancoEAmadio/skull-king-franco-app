@@ -8,7 +8,7 @@ export const MAX_COMODINES_EXPANSION = 8;
 export const MAX_ALIANZAS_POR_RONDA = 2;
 export const BONO_ALIANZA_BOTIN = 20;
 
-export const MAX_HABILIDADES_POR_RONDA = 3;
+export const MAX_HABILIDADES_POR_RONDA = 4;
 export const MAX_PARTIDAS_EVOLUCION = 20;
 
 export const UMBRAL_SWIPE_PX = 45;
@@ -22,4 +22,4 @@ export const CLAVE_LS_PARTIDA_GUARDADA = 'skullking_guardado';
 export const CLAVE_LS_HISTORIAL = 'skullking_historial';
 export const CLAVE_LS_JUGADORES_PERMANENTES = 'skullking_jugadores_permanentes';
 export const CLAVE_LS_PARTIDAS = 'skullking_partidas';
-export const VERSION_APP = '3.13.17';
+export const VERSION_APP = '3.13.18';

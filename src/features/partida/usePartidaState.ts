@@ -759,11 +759,12 @@ export function usePartidaState({
     [registroHabilidadesRonda]
   );
 
-  // Habilidades posibles por ronda: Bribón y Harry (2); con Kong activo en Expansión, 3.
+  // Habilidades posibles por ronda: Bribón y Harry (2). Con Kong activo en Expansión, el Kong puede copiar las dos
+  // (las únicas que afectan la puntuación), así que son hasta 4 registros.
   const maxHabilidadesRonda =
     configuracionMesa.modoContenido === 'expansion' && estaReglaActiva(configuracionMesa, 'primerOficialKong')
       ? MAX_HABILIDADES_POR_RONDA
-      : MAX_HABILIDADES_POR_RONDA - 1;
+      : MAX_HABILIDADES_POR_RONDA - 2;
   const habilidadesBloqueadasPorLimite = registroHabilidadesRonda.length >= maxHabilidadesRonda;
 
   const registrarHabilidad = useCallback(
