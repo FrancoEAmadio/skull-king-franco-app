@@ -117,7 +117,7 @@ export function DiagramaJerarquia({ alto, nodos, flechas, onTocar }: Props) {
               {f.etiqueta && (
                 <text
                   x={lx}
-                  y={ly}
+                  y={ly - ((f.etiqueta.split('\n').length - 1) * 3.6) / 2}
                   textAnchor={onx > 0.3 ? 'start' : onx < -0.3 ? 'end' : 'middle'}
                   fontSize={3.3}
                   fontWeight={800}
@@ -126,7 +126,11 @@ export function DiagramaJerarquia({ alto, nodos, flechas, onTocar }: Props) {
                   strokeWidth={1.2}
                   paintOrder="stroke"
                 >
-                  {f.etiqueta}
+                  {f.etiqueta.split('\n').map((linea, k) => (
+                    <tspan key={k} x={lx} dy={k === 0 ? 0 : 3.6}>
+                      {linea}
+                    </tspan>
+                  ))}
                 </text>
               )}
             </g>
