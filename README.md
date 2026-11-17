@@ -36,18 +36,31 @@ src/
   estilos/              CSS global
 ```
 
-## Novedades de la versión 2.1
+## Qué hace
 
-- **Habilidades de piratas**: al borrar el registro de Harry el Gigante (o de Kong copiándolo) el envite del jugador afectado vuelve automáticamente a su valor original.
-- **Gráfico de evolución** interactivo (podio, resultado final e historial).
-- **Estadísticas comparativas**: rendimiento de cada jugador contra el promedio del resto (victorias, promedio, envites acertados, racha, bonos cobrados).
-- **Copia de seguridad**: exportar e importar jugadores e historial en `.json`, con validación y fusión sin duplicados.
-- **Compartir resultado**: texto (Web Share API / portapapeles) y tarjeta PNG descargable.
-- Interfaz: textos más legibles, zoom habilitado, márgenes seguros en celulares con notch y foco visible.
+- **Puntaje automático por ronda**: envites, bazas ganadas, bonificaciones por capturas (piratas, sirenas, Skull King, 14 de colores y 14 negro) y validación de combinaciones imposibles.
+- **Tres modos de contenido**: juego base, reglas avanzadas (Kraken, Ballena Blanca, Botín) y expansión (Primer Oficial Kong, Mary Thorne, Mono, Mantarraya, Davy Jones y más).
+- **Habilidades de piratas** (Bribón de Roatán, Harry el Gigante, Primer Oficial Kong), alianzas del Botín y cartas blancas como regla propia opcional (no oficial).
+- **2 a 8 jugadores**, con Barbagrís para partidas de a dos.
+- **Historial y estadísticas** por jugador, comparativas contra el promedio de la mesa, gráfico de evolución y podio con empates.
+- **Compartir el resultado** como texto o como imagen PNG.
+- **Copia de seguridad**: exportar e importar jugadores e historial en `.json`.
+- **Manual y catálogo de cartas** dentro de la app, con diagramas de jerarquías.
+- **PWA instalable**, pensada para el celular, que funciona sin conexión.
+
+## Reglas
+
+La app sigue las reglas de la edición en español de Devir.
+
+## Pruebas
+
+```bash
+npm test
+```
 
 > Nota: `js/` y `estilos.css` son restos de la versión anterior en JavaScript puro; `index.html` carga únicamente `src/main.tsx`.
 
 ## Créditos
 
-Desarrollado por Franco Ezequiel Amadio — Versión Original: Agosto 2026 | Edición adaptada para Devir.
+Desarrollado por Franco Ezequiel Amadio — Versión original: julio 2026 | Edición adaptada para Devir.
 Proyecto independiente de portfolio; Skull King y su arte pertenecen a sus respectivos titulares.
