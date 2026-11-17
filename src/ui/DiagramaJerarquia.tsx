@@ -48,7 +48,7 @@ export function DiagramaJerarquia({ alto, nodos, flechas, onTocar }: Props) {
   const porId = Object.fromEntries(nodos.map((n) => [n.id, n]));
   const mh = (H + ETIQUETA) / 2 + 2.5;
   // Las miniaturas apiladas se abren hacia los costados: la flecha tiene que frenar fuera de toda la pila.
-  const mwDe = (n: NodoDiagrama) => W / 2 + 2.5 + (n.imgs.length > 1 ? ((n.imgs.length - 1) / 2) * 0.22 * W + 1.5 : 0);
+  const mwDe = (n: NodoDiagrama) => W / 2 + 2 + (n.imgs.length > 1 ? ((n.imgs.length - 1) / 2) * 0.22 * W + 0.5 : 0);
   const colores = Array.from(new Set(flechas.map((f) => f.color ?? '#5a3d1e')));
   const marcador = (color: string) => `${uid}m${colores.indexOf(color)}`;
 
