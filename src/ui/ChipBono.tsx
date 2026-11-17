@@ -25,7 +25,7 @@ export function ChipBono({ nombre, detalle, cantidad, maximo, onMas, onBorrar, m
           if (cantidad >= maximo) onBorrar();
           else onMas();
         }}
-        className={`flex min-h-12 w-full items-center justify-between gap-2 px-3 py-2 text-left disabled:opacity-40 ${activo ? 'opcion opcion-sel' : 'opcion'}`}
+        className={`flex min-h-12 w-full items-center justify-between gap-2 px-3 py-2 text-left disabled:!border-slate-300 disabled:!bg-slate-100 disabled:opacity-50 ${activo ? 'opcion opcion-sel' : 'opcion'}`}
       >
         <span className="min-w-0">
           <span className="block text-sm font-semibold leading-tight text-tinta">{nombre}</span>

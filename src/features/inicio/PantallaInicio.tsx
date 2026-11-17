@@ -6,7 +6,7 @@ import { ModalConfirmacion } from '../../ui/ModalConfirmacion';
 
 function formatearFecha(iso: string): string {
   try {
-    return new Date(iso).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    return new Date(iso).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
   } catch {
     return '';
   }

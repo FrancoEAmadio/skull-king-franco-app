@@ -62,7 +62,7 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
   const geometria = useMemo(() => {
     const todos = series.flatMap((serie) => serie.puntos);
     const minimo = Math.min(0, ...todos);
-    const maximo = Math.max(100, ...todos);
+    const maximo = Math.max(20, ...todos);
     const rango = maximo - minimo || 1;
     const anchoUtil = ANCHO - MARGEN.izq - MARGEN.der;
     const altoUtil = ALTO - MARGEN.arr - MARGEN.aba;

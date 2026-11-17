@@ -1,3 +1,4 @@
+import { puestosConEmpate } from '../../dominio/posiciones';
 import { sincronizarHistorial, sincronizarPartida, type ReferenciaJugador } from '../../dominio/sincronizarJugador';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { avatarDe } from '../../datos/avatares';
@@ -998,6 +999,7 @@ export function usePartidaState({
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
       });
 
       const nuevaEntrada: EntradaHistorialPartida = {
@@ -1018,6 +1020,7 @@ export function usePartidaState({
       setHistorialPartidas(nuevoHistorial);
       guardarHistorial(nuevoHistorial);
 
+      const puestosFinales = puestosConEmpate(rankingFinal.map((j) => j.puntos));
       const permanentesActualizados = jugadoresPermanentes.map((permanente) => {
         const indice = rankingFinal.findIndex((j) => j.permanenteId === permanente.id);
         if (indice === -1) return permanente;
@@ -1025,7 +1028,7 @@ export function usePartidaState({
         return aplicarFinDePartida(permanente, {
           fecha,
           puntos: jugadorFinal.puntos,
-          posicion: indice + 1,
+          posicion: puestosFinales[indice]!,
           apuestasAcertadas: jugadorFinal.apuestasAcertadas,
           apuestasFalladas: jugadorFinal.apuestasFalladas,
           capturasSkullKing: jugadorFinal.capturasSkullKing,
