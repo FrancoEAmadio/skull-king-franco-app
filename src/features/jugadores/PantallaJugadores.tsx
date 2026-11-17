@@ -13,6 +13,7 @@ import { colorAvatarDe, colorGraficoDe, colorTarjetaDe, coloresParaNuevo } from 
 import type { NombreTono } from '../../ui/tonos';
 import type { JugadorPermanente } from '../../tipos';
 import { ModalConfirmarEliminacionJugador } from './ModalConfirmarEliminacionJugador';
+import { puestosConEmpate } from '../../dominio/posiciones';
 import { ModalConfirmacion } from '../../ui/ModalConfirmacion';
 import { ModalAviso } from '../../ui/ModalAviso';
 import { compartirTarjetaResultado, compartirTexto, textoResultado } from '../../infra/compartir';
@@ -426,7 +427,7 @@ function BotonesCompartirPartida({ partidaGuardada }: { partidaGuardada: Entrada
 function fechaCorta(iso: string): string {
   const fecha = new Date(iso);
   if (Number.isNaN(fecha.getTime())) return '';
-  return fecha.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  return fecha.toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 /** Partidas que quedaron sin terminar: aparecen arriba del historial para retomarlas o descartarlas. */
@@ -491,6 +492,8 @@ function VistaHistorial() {
   const { partida, verHistorialJugador } = useApp();
   const { historialPartidas, eliminarPartidaHistorial, borrarTodoElHistorial, partidasGuardadas } = partida;
   const [graficosAbiertos, setGraficosAbiertos] = useState<Set<number>>(new Set());
+  const [historialAEliminar, setHistorialAEliminar] = useState<number | null>(null);
+  const [confirmarBorrarTodo, setConfirmarBorrarTodo] = useState(false);
 
   const alternarGrafico = (indice: number) =>
     setGraficosAbiertos((previos) => {
@@ -511,27 +514,30 @@ function VistaHistorial() {
           <div key={hIndex} className="tarjeta pergamino flex flex-col gap-3 p-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-azul">{partidaGuardada.fecha}</span>
-              <button type="button" onClick={() => eliminarPartidaHistorial(hIndex)} className="btn-peligro px-3 py-2 text-xs">
+              <button type="button" onClick={() => setHistorialAEliminar(hIndex)} className="btn-peligro px-3 py-2 text-xs">
                 Eliminar
               </button>
             </div>
             <div className="flex flex-col gap-1.5">
-              {partidaGuardada.ranking.map((jug, jIndex) => (
+              {partidaGuardada.ranking.map((jug, jIndex, lista) => {
+                const puesto = puestosConEmpate(lista.map((f) => f.puntos))[jIndex]!;
+                return (
                 <button
                   type="button"
                   key={jIndex}
                   onClick={() => verHistorialJugador(jug)}
-                  className={`flex items-center justify-between px-3 py-2 text-left ${jIndex === 0 ? 'opcion opcion-sel' : 'opcion'}`}
+                  className={`flex items-center justify-between px-3 py-2 text-left ${puesto === 1 ? 'opcion opcion-sel' : 'opcion'}`}
                 >
                   <span className="flex min-w-0 flex-col">
                     <span className="truncate text-sm font-semibold text-tinta">
-                      {jIndex + 1}.º {jug.nombre}
+                      {puesto}.º {jug.nombre}
                     </span>
                     <span className="text-[11px] text-slate-500">Ver detalles</span>
                   </span>
                   <span className="shrink-0 pl-2 font-bold text-tinta">{jug.puntos} pts</span>
                 </button>
-              ))}
+                );
+              })}
               {partidaGuardada.barbagris && (
                 <button
                   type="button"
@@ -571,10 +577,32 @@ function VistaHistorial() {
         ))
       )}
       {historialPartidas.length > 0 && (
-        <button type="button" onClick={borrarTodoElHistorial} className="btn-peligro mx-auto mt-2 px-5 py-3 text-sm">
+        <button type="button" onClick={() => setConfirmarBorrarTodo(true)} className="btn-peligro mx-auto mt-2 px-5 py-3 text-sm">
           Borrar historial
         </button>
       )}
+      <ModalConfirmacion
+        abierto={historialAEliminar !== null}
+        titulo="¿Eliminar esta partida?"
+        descripcion="Se borra del historial y las estadísticas se recalculan sin ella."
+        textoConfirmar="Eliminar"
+        onConfirmar={() => {
+          if (historialAEliminar !== null) eliminarPartidaHistorial(historialAEliminar);
+          setHistorialAEliminar(null);
+        }}
+        onCancelar={() => setHistorialAEliminar(null)}
+      />
+      <ModalConfirmacion
+        abierto={confirmarBorrarTodo}
+        titulo="¿Borrar todo el historial?"
+        descripcion="Se borran todas las partidas terminadas y las estadísticas vuelven a cero."
+        textoConfirmar="Borrar todo"
+        onConfirmar={() => {
+          borrarTodoElHistorial();
+          setConfirmarBorrarTodo(false);
+        }}
+        onCancelar={() => setConfirmarBorrarTodo(false)}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { construirSeriesEvolucion } from '../../dominio/comparativas';
+import { puestosConEmpate } from '../../dominio/posiciones';
 import { colorGraficoDe } from '../../datos/coloresJugador';
 import { compartirTarjetaResultado, compartirTexto, textoResultado } from '../../infra/compartir';
 import type { DatosResultado, ResultadoCompartir } from '../../infra/compartir';
@@ -26,6 +27,7 @@ export function ModalPodio() {
     () => construirSeriesEvolucion(tablaGeneralOrdenada.map((j) => ({ ...j, color: colorGraficoDe(jugadoresPermanentes, j) }))),
     [tablaGeneralOrdenada, jugadoresPermanentes]
   );
+  const puestos = puestosConEmpate(tablaGeneralOrdenada.map((j) => j.puntos));
   const rondasJugadas = Math.max(0, ...tablaGeneralOrdenada.map((jugador) => jugador.historial.length));
 
   const datos: DatosResultado = {
@@ -61,11 +63,11 @@ export function ModalPodio() {
               type="button"
               key={jugador.nombre}
               onClick={() => verHistorialJugador(jugador)}
-              className={`flex items-center justify-between p-3 text-left ${index === 0 ? 'opcion opcion-sel' : 'opcion'}`}
+              className={`flex items-center justify-between p-3 text-left ${puestos[index] === 1 ? 'opcion opcion-sel' : 'opcion'}`}
             >
               <span className="flex min-w-0 items-center gap-3">
                 <span className="w-7 shrink-0 text-center text-xl font-semibold">
-                  {index + 1}.º
+                  {puestos[index]}.º
                 </span>
                 <span className="flex min-w-0 flex-col">
                   <span className="block truncate font-bold text-azul">{jugador.nombre}</span>
