@@ -189,6 +189,11 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
     );
   };
 
+  // Cada habilidad sale de un pirata que ganó una baza: no puede haber más habilidades que bazas ganadas por el jugador.
+  const habilidadesDeEste = registroHabilidadesRonda.filter((h) => h.jugadorIdx === jugadorSeleccionadoIdx).length;
+  const bazasGanadas = Number(jugadorActual.ganadas) || 0;
+  const excedeBazas = habilidadesDeEste > bazasGanadas;
+
   return (
     <Seccion
       numero={numero}
@@ -311,6 +316,12 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
             </div>
           )}
         </>
+      )}
+
+      {excedeBazas && (
+        <p role="alert" className="rounded-xl border border-amber-300 bg-amber-50 p-2.5 text-left text-sm font-semibold text-amber-800">
+          {nombre} tiene {habilidadesDeEste} habilidades pero ganó {bazasGanadas} {bazasGanadas === 1 ? 'baza' : 'bazas'}: cada habilidad sale de un pirata que ganó una baza. Revisá las bazas ganadas o quitá una habilidad.
+        </p>
       )}
 
       {registroHabilidadesRonda.length > 0 && (
