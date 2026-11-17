@@ -1,5 +1,6 @@
 import type { MouseEvent, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import { useBloqueoScroll } from './useBloqueoScroll';
 
 interface Props {
   abierto: boolean;
@@ -23,6 +24,7 @@ export function Modal({
   etiqueta,
   pergamino = false,
 }: Props) {
+  useBloqueoScroll(abierto);
   if (!abierto) return null;
 
   const alTocarFondo = (evento: MouseEvent<HTMLDivElement>) => {
@@ -32,7 +34,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className={`fixed inset-0 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm ${zIndex}`}
+      className={`fixed inset-0 flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm overscroll-none ${zIndex}`}
       onClick={alTocarFondo}
       role="dialog"
       aria-modal="true"

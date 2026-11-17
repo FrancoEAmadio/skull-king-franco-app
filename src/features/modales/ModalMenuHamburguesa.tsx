@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { copiarLink } from '../../infra/compartir';
+import { useBloqueoScroll } from '../../ui/useBloqueoScroll';
 import { ModalFeedback } from '../ajustes/ModalFeedback';
 
 export function ModalMenuHamburguesa() {
@@ -8,6 +9,8 @@ export function ModalMenuHamburguesa() {
     useApp();
   const [copiado, setCopiado] = useState(false);
   const [feedbackAbierto, setFeedbackAbierto] = useState(false);
+
+  useBloqueoScroll(menuHamburguesaAbierto);
 
   if (!menuHamburguesaAbierto && !feedbackAbierto) {
     return null;
@@ -28,7 +31,7 @@ export function ModalMenuHamburguesa() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-start bg-black/70 p-4 backdrop-blur-sm" onClick={cerrar}>
+    <div className="fixed inset-0 z-50 overscroll-none flex items-start justify-start bg-black/70 p-4 backdrop-blur-sm" onClick={cerrar}>
       <div className="tarjeta entrar mt-12 flex w-full max-w-sm flex-col gap-3 p-4" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-slate-200 pb-3">
           <span className="text-lg font-bold text-azul">Menú de la partida</span>
