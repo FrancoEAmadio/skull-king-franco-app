@@ -14,6 +14,10 @@ import type { NombreTono } from '../../ui/tonos';
 import type { JugadorPermanente } from '../../tipos';
 import { ModalConfirmarEliminacionJugador } from './ModalConfirmarEliminacionJugador';
 import { ModalConfirmacion } from '../../ui/ModalConfirmacion';
+import { ModalAviso } from '../../ui/ModalAviso';
+import { compartirTarjetaResultado, compartirTexto, textoResultado } from '../../infra/compartir';
+import type { DatosResultado, ResultadoCompartir } from '../../infra/compartir';
+import type { EntradaHistorialPartida } from '../../tipos';
 
 type Vista = 'gestor' | 'historial' | 'estadisticas';
 
@@ -369,6 +373,56 @@ function GraficoPartidaHistorial({
   return <GraficoEvolucion series={evolucion.series} etiquetas={evolucion.etiquetas} />;
 }
 
+const MENSAJES_COMPARTIR: Record<ResultadoCompartir, string | null> = {
+  compartido: null,
+  cancelado: null,
+  copiado: 'Resultado copiado al portapapeles.',
+  descargado: 'La tarjeta se descargó como imagen PNG.',
+  error: 'No se pudo compartir desde este dispositivo.',
+};
+
+/** Compartir una partida ya terminada del historial: texto o tarjeta PNG con el gráfico. */
+function BotonesCompartirPartida({ partidaGuardada }: { partidaGuardada: EntradaHistorialPartida }) {
+  const { jugadoresPermanentes } = useApp();
+  const [aviso, setAviso] = useState<string | null>(null);
+  const [trabajando, setTrabajando] = useState(false);
+
+  const armarDatos = (): DatosResultado => {
+    const conFantasma = partidaGuardada.barbagris ? [...partidaGuardada.ranking, partidaGuardada.barbagris] : partidaGuardada.ranking;
+    const series = construirSeriesEvolucion(conFantasma.map((j) => ({ ...j, color: colorGraficoDe(jugadoresPermanentes, j) })));
+    return {
+      ranking: partidaGuardada.ranking.map((j) => ({ nombre: j.nombre, puntos: j.puntos })),
+      fecha: partidaGuardada.fecha,
+      rondas: Math.max(0, ...partidaGuardada.ranking.map((j) => j.historial.length)),
+      series,
+    };
+  };
+
+  const ejecutar = async (accion: (datos: DatosResultado) => Promise<ResultadoCompartir>) => {
+    if (trabajando) return;
+    setTrabajando(true);
+    try {
+      setAviso(MENSAJES_COMPARTIR[await accion(armarDatos())]);
+    } finally {
+      setTrabajando(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="grid grid-cols-2 gap-2">
+        <button type="button" disabled={trabajando} onClick={() => void ejecutar((d) => compartirTexto('Skull King', textoResultado(d)))} className="btn-claro py-2.5 text-xs">
+          📤 Compartir
+        </button>
+        <button type="button" disabled={trabajando} onClick={() => void ejecutar(compartirTarjetaResultado)} className="btn-claro py-2.5 text-xs">
+          🖼️ Tarjeta (PNG)
+        </button>
+      </div>
+      <ModalAviso abierto={aviso !== null} titulo="Compartir" mensaje={aviso} onCerrar={() => setAviso(null)} textoBoton="OK" zIndex="z-[80]" />
+    </>
+  );
+}
+
 function fechaCorta(iso: string): string {
   const fecha = new Date(iso);
   if (Number.isNaN(fecha.getTime())) return '';
@@ -499,6 +553,7 @@ function VistaHistorial() {
                 </button>
               )}
             </div>
+            <BotonesCompartirPartida partidaGuardada={partidaGuardada} />
             {partidaGuardada.ranking.some((jug) => jug.historial.length > 0) && (
               <>
                 <button

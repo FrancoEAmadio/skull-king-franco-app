@@ -27,7 +27,7 @@ export function textoResultado(datos: DatosResultado): string {
   });
   return [
     '🏴‍☠️ SKULL KING — Resultado final',
-    `${datos.fecha} · ${datos.rondas} ronda${datos.rondas === 1 ? '' : 's'}`,
+    datos.rondas > 0 ? `${datos.fecha} · ${datos.rondas} ronda${datos.rondas === 1 ? '' : 's'}` : datos.fecha,
     '',
     ...lineas,
     '',
@@ -198,7 +198,7 @@ export async function crearTarjetaResultado(datos: DatosResultado): Promise<Blob
   ctx.fillStyle = '#94a3b8';
   ctx.font = '28px system-ui, sans-serif';
   ctx.fillText(
-    `${datos.fecha} · ${datos.rondas} ronda${datos.rondas === 1 ? '' : 's'}`,
+    datos.rondas > 0 ? `${datos.fecha} · ${datos.rondas} ronda${datos.rondas === 1 ? '' : 's'}` : datos.fecha,
     ANCHO_TARJETA / 2,
     296
   );
