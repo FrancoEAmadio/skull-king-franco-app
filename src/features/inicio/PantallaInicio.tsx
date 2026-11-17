@@ -41,7 +41,7 @@ export function PantallaInicio() {
           src={`${import.meta.env.BASE_URL}archivos/logo-skull-king.png`}
           alt="Skull King"
           draggable={false}
-          className="mx-auto w-[84%] drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
+          className="mx-auto w-[84%] md:w-full drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
         />
       </h1>
       <p className="mb-6 mt-2 text-xs md:mb-9 font-semibold uppercase tracking-[0.25em] text-white">Anotador de puntos y manual</p>
