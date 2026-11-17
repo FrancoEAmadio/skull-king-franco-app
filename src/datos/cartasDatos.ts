@@ -279,15 +279,15 @@ export const CATALOGO_CARTAS_WIKI: CartaWiki[] = [
   },
   {
     id: 'carta_blanca_base',
-    nombre: 'Carta Blanca (Comodín de Bonificación)',
+    nombre: 'Carta Blanca (Comodín)',
     modo: 'Reglas Avanzadas',
     cantidad: '4 cartas (u 8 con expansión)',
     imagen: 'archivos/cartas/carta_blanca.webp',
-    habilidad: 'Se aparta al recibirla y se roba otra carta. Otorga bonificación acumulada al final.',
+    habilidad: 'Carta en blanco oficial: sirve para inventar reglas nuevas o para reponer una carta perdida. Cada mesa decide su uso.',
     ganaContra: 'No se juega en las bazas',
     pierdeContra: 'No se juega en las bazas',
-    bonificacion: '1 = +5 pts | 2 = +10 pts | 3 = +20 pts | 4+ = +50 pts al final',
-    descripcion: 'Comodín de bonificación acumulativo.',
+    bonificacion: 'Sin bonificación oficial. Regla propia de esta app (opcional): 1 = +5 pts | 2 = +10 | 3 = +20 | 4+ = +50 al final.',
+    descripcion: 'El juego no le da una habilidad. La bonificación acumulativa es una regla inventada por el autor de la app, activable al crear la partida.',
   },
 ];
 
