@@ -141,14 +141,22 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
   // Cada habilidad es un pirata jugado: un jugador no puede usar más habilidades que cartas tiene en la ronda
   // (con una carta, solo una). Si ya registró una, esa se puede cambiar o quitar, pero no sumar otra.
   const misHabilidades = registroHabilidadesRonda.filter((h) => h.jugadorIdx === jugadorSeleccionadoIdx);
-  const cartasUsadasPorEste = misHabilidades.length + (cartaPropiaUsada ? 1 : 0);
-  const sinCartasPropias = cartasUsadasPorEste >= cartasPorJugadorEnRonda;
+  // El Primer Oficial Kong es una sola carta aunque copie varias habilidades (Bribón y Harry a la vez).
   const kongDeEste = misHabilidades.some((h) => h.tipo === 'Primer Oficial Kong');
+  const kongDeOtro = registroHabilidadesRonda.some((h) => h.tipo === 'Primer Oficial Kong' && h.jugadorIdx !== jugadorSeleccionadoIdx);
+  const cartasUsadasPorEste = misHabilidades.filter((h) => h.tipo !== 'Primer Oficial Kong').length + (kongDeEste ? 1 : 0) + (cartaPropiaUsada ? 1 : 0);
+  const sinCartasPropias = cartasUsadasPorEste >= cartasPorJugadorEnRonda;
 
   const habilitada: Record<HabId, boolean> = {
     bribon_rotan: !bribonDeOtro && hayCartaLibreHabilidad && (!sinCartasPropias || bribonDeEste),
     harry_gigante: !harryUsado && hayCartaLibreHabilidad && (!sinCartasPropias || harryDeEste),
-    kong: kongActivo && kongHabilitado && hayCartaLibreKong && (!sinCartasPropias || kongDeEste),
+    // Hay un solo Primer Oficial Kong: si lo registró otro jugador, este ya no puede usarlo.
+    kong:
+      kongActivo &&
+      kongHabilitado &&
+      hayCartaLibreKong &&
+      !kongDeOtro &&
+      (!sinCartasPropias || kongDeEste),
   };
   const habilidadEfectiva: HabId | null = habilitada[habSeleccionada]
     ? habSeleccionada
