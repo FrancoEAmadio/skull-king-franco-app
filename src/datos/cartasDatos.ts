@@ -11,7 +11,7 @@ export const CATALOGO_CARTAS_WIKI: CartaWiki[] = [
     ganaContra: 'Todos los números, todos los Piratas y Primer Oficial Kong',
     pierdeContra: 'Sirenas',
     bonificacion: '+30 pts por Pirata capturado',
-    descripcion: 'El rey de los mares. Vence a todo el mundo pero es seducido ante el canto de las Sirenas.',
+    descripcion: 'El rey de los mares. Vence a todo el mundo pero es seducido por el canto de las Sirenas.',
   },
   {
     id: 'kong',

@@ -28,7 +28,7 @@ const MODOS: { id: ModoContenido; etiqueta: string; carta: string; tono: NombreT
 const IMAGENES_PARRAFO: [RegExp, string[]][] = [
   [/^PALOS DE COLOR/i, ['palo_amarillo', 'palo_violeta', 'palo_verde']],
   [/^PALO NEGRO/i, ['palo_negro']],
-  [/^🏳️ HUÍDA/i, ['huida']],
+  [/^🏳️ HUIDA/i, ['huida']],
   [/^⚔️ PIRATAS/i, ['pirata_harry', 'sirena', 'sk']],
   [/^Los piratas no le temen/i, ['kraken']],
   [/^La Ballena Blanca afecta/i, ['ballena']],

@@ -823,7 +823,7 @@ export function usePartidaState({
       const envitePrevio = jugador.apuesta || 0;
       const ok = registrarHabilidad('Harry el Gigante', indiceJugador, {
         etiqueta: 'Harry el Gigante (Modificó Envite)',
-        detalle: `Modificó su envite de ${envitePrevio} a ${nuevoEnvite} baza(s) (${delta > 0 ? '+1' : '-1'})`,
+        detalle: `Modificó su envite de ${envitePrevio} a ${nuevoEnvite} ${nuevoEnvite === 1 ? 'baza' : 'bazas'} (${delta > 0 ? '+1' : '-1'})`,
         deltaEnvite: nuevoEnvite - envitePrevio,
         envitePrevio,
       });
@@ -877,7 +877,7 @@ export function usePartidaState({
       const envitePrevio = jugador.apuesta || 0;
       const ok = registrarHabilidad('Primer Oficial Kong', indiceJugador, {
         etiqueta: 'Primer Oficial Kong (Copió Harry el Gigante)',
-        detalle: `Modificó su envite de ${envitePrevio} a ${nuevoEnvite} baza(s) (${delta > 0 ? '+1' : '-1'}) copiando a Harry`,
+        detalle: `Modificó su envite de ${envitePrevio} a ${nuevoEnvite} ${nuevoEnvite === 1 ? 'baza' : 'bazas'} (${delta > 0 ? '+1' : '-1'}) copiando a Harry`,
         deltaEnvite: nuevoEnvite - envitePrevio,
         envitePrevio,
       });

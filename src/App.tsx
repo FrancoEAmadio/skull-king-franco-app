@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { VERSION_APP } from './constantes';
 import { AppProvider, useApp } from './estado/AppProvider';
 import { PantallaInicio } from './features/inicio/PantallaInicio';
@@ -13,9 +14,24 @@ import { ModalAjustes } from './features/ajustes/ModalAjustes';
 
 function ContenidoApp() {
   const { pantallaActual } = useApp();
+  const enInicio = pantallaActual === 'inicio';
+
+  // En el inicio se bloquea el scroll de la página: solo se desplaza (dentro del contenedor fijo) si el contenido no entra en la pantalla.
+  useEffect(() => {
+    if (!enInicio) return;
+    const { documentElement: html, body } = document;
+    const anterior = [html.style.overflow, body.style.overflow];
+    html.style.overflow = 'hidden';
+    body.style.overflow = 'hidden';
+    return () => {
+      html.style.overflow = anterior[0];
+      body.style.overflow = anterior[1];
+    };
+  }, [enInicio]);
 
   return (
-    <div className="contenedor-app mx-auto flex min-h-dvh w-full max-w-md flex-col justify-between md:max-w-3xl">
+    <div className={enInicio ? 'fixed inset-0 overflow-y-auto overscroll-none' : undefined}>
+    <div className={`contenedor-app mx-auto flex ${enInicio ? 'min-h-full' : 'min-h-dvh'} w-full max-w-md flex-col justify-between md:max-w-3xl`}>
       {pantallaActual === 'inicio' && <PantallaInicio />}
       {pantallaActual === 'nueva_partida' && <PantallaNuevaPartida />}
       {pantallaActual === 'partida' && <PantallaPartida />}
@@ -33,6 +49,7 @@ function ContenidoApp() {
       <ModalEstadisticasJugador />
       <ModalMenuHamburguesa />
       <ModalAjustes />
+    </div>
     </div>
   );
 }
