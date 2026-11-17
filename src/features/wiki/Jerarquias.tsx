@@ -35,9 +35,9 @@ function EspecialesTriangulo({ onFicha }: { onFicha: OnFicha }) {
     { id: 'si', x: 20, y: 74, imgs: [img('sirena'), img('sirena')], nombre: 'Sirenas ×2', color: COLOR.sirena },
   ];
   const flechas: FlechaDiagrama[] = [
-    { de: 'sk', a: 'pi', etiqueta: 'vence · +30 c/u', color: COLOR.sk },
-    { de: 'pi', a: 'si', etiqueta: 'vencen · +20', color: COLOR.pirata },
-    { de: 'si', a: 'sk', etiqueta: 'vencen · +40', color: COLOR.sirena },
+    { de: 'sk', a: 'pi', etiqueta: '+30 c/u', color: COLOR.sk },
+    { de: 'pi', a: 'si', etiqueta: '+20 c/u', color: COLOR.pirata },
+    { de: 'si', a: 'sk', etiqueta: '+40', color: COLOR.sirena },
   ];
   return (
     <Caja titulo="Cartas especiales" texto={`1 Skull King · ${piratas} Piratas · ${cantidad('sirena')} Sirenas`}>
@@ -60,8 +60,8 @@ function EspecialesCuadrado({ onFicha }: { onFicha: OnFicha }) {
   ];
   const flechas: FlechaDiagrama[] = [
     { de: 'sk', a: 'kong', etiqueta: '+30', color: COLOR.sk },
-    { de: 'kong', a: 'pi', etiqueta: 'vence', color: COLOR.kong },
-    { de: 'pi', a: 'si', etiqueta: '+20', color: COLOR.pirata },
+    { de: 'kong', a: 'pi', color: COLOR.kong },
+    { de: 'pi', a: 'si', etiqueta: '+20 c/u', color: COLOR.pirata },
     { de: 'si', a: 'sk', etiqueta: '+40', color: COLOR.sirena },
     { de: 'sk', a: 'pi', curva: 0.6, t: 0.2, etiqueta: '+30 c/u', color: COLOR.sk },
     { de: 'si', a: 'kong', curva: 0.6, t: 0.2, etiqueta: '+30', color: COLOR.sirena },
@@ -117,7 +117,6 @@ function Palos({ modo, onFicha }: { modo: ModoContenido; onFicha: OnFicha }) {
     de: cima.id,
     a: destino,
     color: cima.color,
-    ...(expansion && destino === 'v' ? { etiqueta: 'gana a los 14' } : {}),
   }));
   const idCarta: Record<string, [string, string]> = {
     n: ['palo_negro', 'Palo Negro'], m: ['monito15', 'Mono Comodín 15'],
@@ -166,9 +165,9 @@ function Monstruos({ modo, onFicha }: { modo: ModoContenido; onFicha: OnFicha })
     { id: 'ra', x: 83, y: 72, imgs: [img('raya_moteada')], nombre: 'Mantarraya', color: COLOR.monstruo },
   ];
   const flechas: FlechaDiagrama[] = [
-    { de: 'dj', a: 'kr' },
-    { de: 'dj', a: 'ba' },
-    { de: 'dj', a: 'ra' },
+    { de: 'dj', a: 'kr', t: 0.42, etiqueta: '+20 c/u', color: COLOR.davy },
+    { de: 'dj', a: 'ba', t: 0.72, etiqueta: '+20 c/u', color: COLOR.davy },
+    { de: 'dj', a: 'ra', t: 0.42, etiqueta: '+20 c/u', color: COLOR.davy },
     { de: 'kr', a: 'ba', doble: true, punteada: true },
     { de: 'ba', a: 'ra', doble: true, punteada: true },
   ];

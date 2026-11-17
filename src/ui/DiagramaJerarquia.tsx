@@ -46,8 +46,9 @@ function bordeRect(dx: number, dy: number, mw: number, mh: number): number {
 export function DiagramaJerarquia({ alto, nodos, flechas, onTocar }: Props) {
   const uid = useId().replace(/:/g, '');
   const porId = Object.fromEntries(nodos.map((n) => [n.id, n]));
-  const mw = W / 2 + 2.5;
   const mh = (H + ETIQUETA) / 2 + 2.5;
+  // Las miniaturas apiladas se abren hacia los costados: la flecha tiene que frenar fuera de toda la pila.
+  const mwDe = (n: NodoDiagrama) => W / 2 + 2 + (n.imgs.length > 1 ? ((n.imgs.length - 1) / 2) * 0.22 * W + 0.5 : 0);
   const colores = Array.from(new Set(flechas.map((f) => f.color ?? '#5a3d1e')));
   const marcador = (color: string) => `${uid}m${colores.indexOf(color)}`;
 
@@ -68,8 +69,8 @@ export function DiagramaJerarquia({ alto, nodos, flechas, onTocar }: Props) {
           const cy = (n: NodoDiagrama) => n.y;
           const dx = b.x - a.x;
           const dy = cy(b) - cy(a);
-          const ta = bordeRect(dx, dy, mw, mh);
-          const tb = bordeRect(dx, dy, mw, mh);
+          const ta = bordeRect(dx, dy, mwDe(a), mh);
+          const tb = bordeRect(dx, dy, mwDe(b), mh);
           const sx = a.x + dx * Math.min(ta, 0.45);
           const sy = cy(a) + dy * Math.min(ta, 0.45);
           const ex = b.x - dx * Math.min(tb, 0.45);
@@ -84,6 +85,20 @@ export function DiagramaJerarquia({ alto, nodos, flechas, onTocar }: Props) {
           const color = f.color ?? '#5a3d1e';
           const mx = (1 - t) * (1 - t) * sx + 2 * (1 - t) * t * qx + t * t * ex;
           const my = (1 - t) * (1 - t) * sy + 2 * (1 - t) * t * qy + t * t * ey;
+          // Rótulo al costado de la flecha (arriba o a la derecha), nunca encima de la línea.
+          const tx = 2 * (1 - t) * (qx - sx) + 2 * t * (ex - qx);
+          const ty = 2 * (1 - t) * (qy - sy) + 2 * t * (ey - qy);
+          const tl = Math.hypot(tx, ty) || 1;
+          let onx = -ty / tl;
+          let ony = tx / tl;
+          const casiVertical = Math.abs(ony) < 0.5;
+          if (casiVertical ? onx < 0 : ony > 0) {
+            onx = -onx;
+            ony = -ony;
+          }
+          const sepa = casiVertical ? 2.4 : 2.6;
+          const lx = mx + onx * sepa;
+          const ly = my + ony * sepa + (casiVertical ? 1.1 : 0);
           return (
             <g key={i}>
               <path
@@ -101,9 +116,9 @@ export function DiagramaJerarquia({ alto, nodos, flechas, onTocar }: Props) {
               )}
               {f.etiqueta && (
                 <text
-                  x={mx}
-                  y={my}
-                  textAnchor="middle"
+                  x={lx}
+                  y={ly - ((f.etiqueta.split('\n').length - 1) * 3.6) / 2}
+                  textAnchor={onx > 0.3 ? 'start' : onx < -0.3 ? 'end' : 'middle'}
                   fontSize={3.3}
                   fontWeight={800}
                   fill={color}
@@ -111,7 +126,11 @@ export function DiagramaJerarquia({ alto, nodos, flechas, onTocar }: Props) {
                   strokeWidth={1.2}
                   paintOrder="stroke"
                 >
-                  {f.etiqueta}
+                  {f.etiqueta.split('\n').map((linea, k) => (
+                    <tspan key={k} x={lx} dy={k === 0 ? 0 : 3.6}>
+                      {linea}
+                    </tspan>
+                  ))}
                 </text>
               )}
             </g>
