@@ -1,5 +1,5 @@
 import type { JugadorPermanente } from '../tipos';
-import type { NombreTono } from '../ui/tonos';
+import { COLOR_LINEA, type NombreTono } from '../ui/tonos';
 
 /** Colores que puede elegir un jugador (el negro queda para cosas del juego). */
 const PALETA_BASE: NombreTono[] = [
@@ -101,4 +101,17 @@ export function normalizarColores(
 /** Migración al cargar: asigna colores a quien no tiene y corrige repetidos. */
 export function completarColores(lista: JugadorPermanente[]) {
   return normalizarColores(lista);
+}
+
+/** Color de la línea de un jugador en los gráficos: el de su tarjeta (Barbagrís en gris). Sin tarjeta, devuelve undefined. */
+export function colorGraficoDe(
+  permanentes: JugadorPermanente[],
+  jugador: { permanenteId?: string; nombre: string; fantasma?: boolean }
+): string | undefined {
+  if (jugador.fantasma || jugador.permanenteId === 'barbagris') return COLOR_LINEA.pizarra;
+  const nombre = jugador.nombre.trim().toLowerCase();
+  const perm =
+    permanentes.find((p) => jugador.permanenteId !== undefined && p.id === jugador.permanenteId) ??
+    permanentes.find((p) => p.nombre.trim().toLowerCase() === nombre);
+  return perm ? COLOR_LINEA[colorTarjetaDe(perm.id, perm.colorTarjeta)] : undefined;
 }
