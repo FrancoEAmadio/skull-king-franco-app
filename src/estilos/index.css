@@ -31,6 +31,7 @@
 * { box-sizing: border-box; }
 
 html { background-color: #2f241a; }
+html.bloqueo-scroll, html.bloqueo-scroll body { overflow: hidden !important; }
 html, body {
   overscroll-behavior: none;
   touch-action: pan-x pan-y;
