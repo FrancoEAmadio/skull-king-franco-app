@@ -1,4 +1,5 @@
 import type { SeriesEvolucion } from '../dominio/comparativas';
+import { puestosConEmpate } from '../dominio/posiciones';
 import { COLORES_SERIES } from '../ui/GraficoEvolucion';
 
 const MEDALLAS = ['🥇', '🥈', '🥉'];
@@ -17,12 +18,19 @@ export interface DatosResultado {
 
 export type ResultadoCompartir = 'compartido' | 'copiado' | 'descargado' | 'cancelado' | 'error';
 
+/** Fecha de hoy (AAAA-MM-DD) en la hora del dispositivo, no en UTC. */
+function fechaLocalISO(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 const formatearPuntos = (valor: number) => valor.toLocaleString('es-AR');
 
 /** Resumen en texto plano, prolijo para WhatsApp, Telegram, notas, etc. */
 export function textoResultado(datos: DatosResultado): string {
+  const puestos = puestosConEmpate(datos.ranking.map((f) => f.puntos));
   const lineas = datos.ranking.map((fila, indice) => {
-    const medalla = MEDALLAS[indice] ?? `${indice + 1}.`;
+    const medalla = MEDALLAS[puestos[indice]! - 1] ?? `${puestos[indice]}.`;
     return `${medalla} ${fila.nombre} — ${formatearPuntos(fila.puntos)} pts`;
   });
   return [
@@ -110,7 +118,7 @@ function dibujarGrafico(
   if (cantidad < 2) return;
   const todos = series.series.flatMap((s) => s.puntos);
   const minimo = Math.min(0, ...todos);
-  const maximo = Math.max(100, ...todos);
+  const maximo = Math.max(20, ...todos);
   const rango = maximo - minimo || 1;
   const izq = 70;
   const aba = 34;
@@ -267,8 +275,9 @@ export async function crearTarjetaResultado(datos: DatosResultado): Promise<Blob
   );
 
   let y = cabecera;
+  const puestosFilas = puestosConEmpate(filas.map((f) => f.puntos));
   filas.forEach((fila, indice) => {
-    const primero = indice === 0;
+    const primero = puestosFilas[indice] === 1;
     ctx.fillStyle = primero ? 'rgba(233, 191, 66, 0.2)' : 'rgba(47, 36, 26, 0.7)';
     rectRedondeado(ctx, 70, y, ANCHO_TARJETA - 140, altoFila - 14, 22);
     ctx.fill();
@@ -280,7 +289,7 @@ export async function crearTarjetaResultado(datos: DatosResultado): Promise<Blob
     ctx.textAlign = 'left';
     ctx.font = '44px system-ui, sans-serif';
     ctx.fillStyle = '#fff8e7';
-    ctx.fillText(MEDALLAS[indice] ?? `${indice + 1}.`, 100, y + 56);
+    ctx.fillText(MEDALLAS[puestosFilas[indice]! - 1] ?? `${puestosFilas[indice]}.`, 100, y + 56);
     ctx.font = '700 38px system-ui, sans-serif';
     ctx.fillStyle = primero ? '#f9e29a' : '#fff8e7';
     ctx.fillText(recortarTexto(ctx, fila.nombre, 520), 190, y + 56);
@@ -329,7 +338,7 @@ export async function crearTarjetaResultado(datos: DatosResultado): Promise<Blob
 export async function compartirTarjetaResultado(datos: DatosResultado): Promise<ResultadoCompartir> {
   const blob = await crearTarjetaResultado(datos);
   if (!blob) return 'error';
-  const nombreArchivo = `skull-king-resultado-${new Date().toISOString().slice(0, 10)}.png`;
+  const nombreArchivo = `skull-king-resultado-${fechaLocalISO()}.png`;
   const archivo = new File([blob], nombreArchivo, { type: 'image/png' });
   try {
     if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [archivo] })) {

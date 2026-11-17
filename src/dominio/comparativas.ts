@@ -1,3 +1,4 @@
+import { puestosConEmpate } from './posiciones';
 import type {
   EntradaHistorialPartida,
   EntradaHistorialRonda,
@@ -107,6 +108,7 @@ export function calcularRendimientos(
   const mapa = new Map<string, Acumulador>();
 
   for (const partida of historial) {
+    const puestosPartida = puestosConEmpate(partida.ranking.map((f) => f.puntos));
     partida.ranking.forEach((fila, posicion) => {
       const idEfectivo = fila.permanenteId ?? idPorNombre.get(fila.nombre.trim().toLowerCase());
       const clave = claveJugador(idEfectivo, fila.nombre);
@@ -137,7 +139,7 @@ export function calcularRendimientos(
       }
 
       acc.partidas += 1;
-      if (posicion === 0) acc.victorias += 1;
+      if (puestosPartida[posicion] === 1) acc.victorias += 1;
       acc.sumaPuntos += fila.puntos;
       acc.mejorPartida = acc.mejorPartida === null ? fila.puntos : Math.max(acc.mejorPartida, fila.puntos);
 
