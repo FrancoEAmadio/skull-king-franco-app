@@ -117,7 +117,7 @@ function Palos({ modo, onFicha }: { modo: ModoContenido; onFicha: OnFicha }) {
     de: cima.id,
     a: destino,
     color: cima.color,
-    ...(expansion && destino === 'v' ? { etiqueta: 'gana a los 14' } : {}),
+    ...(expansion && destino === 'v' ? { etiqueta: 'gana a\nlos 14', t: 0.55 } : {}),
   }));
   const idCarta: Record<string, [string, string]> = {
     n: ['palo_negro', 'Palo Negro'], m: ['monito15', 'Mono Comodín 15'],
