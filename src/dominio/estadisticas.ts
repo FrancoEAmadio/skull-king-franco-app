@@ -1,3 +1,4 @@
+import { puestosConEmpate } from './posiciones';
 import { MAX_PARTIDAS_EVOLUCION } from '../constantes';
 import type {
   EntradaEvolucion,
@@ -153,7 +154,7 @@ export function recalcularEstadisticasDesdeHistorial(
       resultado = aplicarFinDePartida(resultado, {
         fecha: partida.fecha,
         puntos: fila.puntos,
-        posicion: indice + 1,
+        posicion: puestosConEmpate(partida.ranking.map((f) => f.puntos))[indice]!,
         apuestasAcertadas: acertadas,
         apuestasFalladas: falladas,
         capturasSkullKing: 0,
