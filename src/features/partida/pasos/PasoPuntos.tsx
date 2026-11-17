@@ -79,6 +79,9 @@ export function PasoPuntos() {
   const siguiente = jugadoresOrdenados[indiceVisualActual + 1]?.jugador;
   const acerto = Boolean(jugadorActual.fantasma) || jugadorActual.ganadas === jugadorActual.apuesta;
   const bazasSinAsignar = cartasPorJugadorEnRonda - totalGanadasAsignadas;
+  // Una baza solo puede quedar sin ganador con el Kraken o la Ballena (reglas avanzadas o expansión).
+  // En el juego base siempre hay ganador: si todas son Huidas, gana la primera que se jugó.
+  const puedeHaberBazaDestruida = configuracionMesa.modoContenido !== 'base' && bazasSinAsignar === 1;
 
   // Si el envite no se cumplió, los bonos no se cobran (salvo que la mesa tenga activada esa regla).
   const sinBazas = jugadorActual.ganadas === 0;
@@ -219,9 +222,9 @@ export function PasoPuntos() {
 
       <ModalConfirmacion
         abierto={confirmarBazas}
-        titulo={bazasSinAsignar === 1 ? 'Hay una baza sin ganador' : 'Faltan bazas por asignar'}
+        titulo={puedeHaberBazaDestruida ? 'Hay una baza sin ganador' : 'Faltan bazas por asignar'}
         descripcion={
-          bazasSinAsignar === 1 ? (
+          puedeHaberBazaDestruida ? (
             <div className="flex items-center gap-3">
               <img
                 src={`${import.meta.env.BASE_URL}archivos/cartas/kraken.webp`}
@@ -232,7 +235,7 @@ export function PasoPuntos() {
               <div>
                 En esta ronda se juegan {cartasPorJugadorEnRonda} baza{cartasPorJugadorEnRonda === 1 ? '' : 's'} y se asignaron {totalGanadasAsignadas}.
                 <span className="mt-2 block text-sm font-medium text-slate-600">
-                  Una baza queda sin ganador si el último monstruo jugado fue el Kraken, o si la Ballena Blanca o la Mantarraya quedaron sin ninguna carta numerada que ganar. ¿Pasó eso?
+                  Una baza queda sin ganador si el último monstruo jugado fue el Kraken, o si la Ballena Blanca o la Mantarraya quedaron sin ninguna carta que pueda ganar (si hay una Huida, la gana la primera Huida jugada). ¿Pasó eso?
                 </span>
               </div>
             </div>
@@ -240,12 +243,14 @@ export function PasoPuntos() {
             <>
               En esta ronda se juegan {cartasPorJugadorEnRonda} baza{cartasPorJugadorEnRonda === 1 ? '' : 's'} y se asignaron {totalGanadasAsignadas}: faltan {bazasSinAsignar}.
               <span className="mt-2 block text-sm font-medium text-slate-600">
-                Como máximo una baza puede quedar sin ganador, así que seguramente falta anotar alguna.
+                {configuracionMesa.modoContenido === 'base'
+                  ? 'En el juego base todas las bazas tienen ganador (si todas son Huidas, gana la primera que se jugó), así que seguramente falta anotar alguna.'
+                  : 'Como máximo una baza puede quedar sin ganador, así que seguramente falta anotar alguna.'}
               </span>
             </>
           )
         }
-        textoConfirmar={bazasSinAsignar === 1 ? 'Sí, el Kraken la destruyó' : 'Ver resumen igual'}
+        textoConfirmar={puedeHaberBazaDestruida ? 'Sí, el Kraken la destruyó' : 'Ver resumen igual'}
         textoCancelar="No, corregir bazas"
         onCancelar={() => setConfirmarBazas(false)}
         onConfirmar={() => {
