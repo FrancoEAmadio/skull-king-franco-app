@@ -9,7 +9,7 @@ import { AVATARES, avatarDe } from '../../datos/avatares';
 import { AvatarPirata } from '../../ui/AvatarPirata';
 import { SelectorAvatar } from '../../ui/SelectorAvatar';
 import { SelectorColor } from '../../ui/SelectorColor';
-import { colorAvatarDe, colorTarjetaDe, coloresParaNuevo } from '../../datos/coloresJugador';
+import { colorAvatarDe, colorGraficoDe, colorTarjetaDe, coloresParaNuevo } from '../../datos/coloresJugador';
 import type { NombreTono } from '../../ui/tonos';
 import type { JugadorPermanente } from '../../tipos';
 import { ModalConfirmarEliminacionJugador } from './ModalConfirmarEliminacionJugador';
@@ -359,9 +359,13 @@ function TablaComparativa() {
 function GraficoPartidaHistorial({
   jugadores,
 }: {
-  jugadores: { nombre: string; historial: import('../../tipos').EntradaHistorialRonda[] }[];
+  jugadores: { permanenteId?: string; nombre: string; historial: import('../../tipos').EntradaHistorialRonda[] }[];
 }) {
-  const evolucion = useMemo(() => construirSeriesEvolucion(jugadores), [jugadores]);
+  const { jugadoresPermanentes } = useApp();
+  const evolucion = useMemo(
+    () => construirSeriesEvolucion(jugadores.map((j) => ({ ...j, color: colorGraficoDe(jugadoresPermanentes, j) }))),
+    [jugadores, jugadoresPermanentes]
+  );
   return <GraficoEvolucion series={evolucion.series} etiquetas={evolucion.etiquetas} />;
 }
 
