@@ -138,10 +138,17 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
     ['pirata_por_sk', 'sk_por_sirena', 'kong_por_sk_sirena', 'monstruo_davy'].some((id) => (Number(ev[id]) || 0) > 0);
   const sinCartas = cartaPropiaUsada || (!hayCartaLibreHabilidad && !hayCartaLibreKong);
 
+  // Cada habilidad es un pirata jugado: un jugador no puede usar más habilidades que cartas tiene en la ronda
+  // (con una carta, solo una). Si ya registró una, esa se puede cambiar o quitar, pero no sumar otra.
+  const misHabilidades = registroHabilidadesRonda.filter((h) => h.jugadorIdx === jugadorSeleccionadoIdx);
+  const cartasUsadasPorEste = misHabilidades.length + (cartaPropiaUsada ? 1 : 0);
+  const sinCartasPropias = cartasUsadasPorEste >= cartasPorJugadorEnRonda;
+  const kongDeEste = misHabilidades.some((h) => h.tipo === 'Primer Oficial Kong');
+
   const habilitada: Record<HabId, boolean> = {
-    bribon_rotan: !bribonDeOtro && hayCartaLibreHabilidad,
-    harry_gigante: !harryUsado && hayCartaLibreHabilidad,
-    kong: kongActivo && kongHabilitado && hayCartaLibreKong,
+    bribon_rotan: !bribonDeOtro && hayCartaLibreHabilidad && (!sinCartasPropias || bribonDeEste),
+    harry_gigante: !harryUsado && hayCartaLibreHabilidad && (!sinCartasPropias || harryDeEste),
+    kong: kongActivo && kongHabilitado && hayCartaLibreKong && (!sinCartasPropias || kongDeEste),
   };
   const habilidadEfectiva: HabId | null = habilitada[habSeleccionada]
     ? habSeleccionada
@@ -237,6 +244,12 @@ export function PanelHabilidades({ numero, abierto, onToggle }: Props) {
               </Opcion>
             )}
           </div>
+
+          {sinCartasPropias && (
+            <p className="text-left text-sm font-semibold text-azul">
+              {nombre} ya usó {cartasPorJugadorEnRonda === 1 ? 'su única carta' : `sus ${cartasPorJugadorEnRonda} cartas`} de esta ronda: no puede registrar otra habilidad.
+            </p>
+          )}
 
           {habilidadEfectiva === 'bribon_rotan' && (
             <div className="flex flex-col gap-2 text-left">
