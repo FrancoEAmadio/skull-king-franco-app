@@ -1,25 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { normalizarColores, PALETA_JUGADOR } from './coloresJugador';
-import { crearJugadorPermanente } from '../dominio/estadisticas';
+import type { JugadorPermanente } from '../tipos';
+import { colorGraficoDe } from './coloresJugador';
+import { COLOR_LINEA } from '../ui/tonos';
+import { construirSeriesEvolucion } from '../dominio/comparativas';
 
-const jugadores = (n: number) => Array.from({ length: n }, (_, i) => crearJugadorPermanente(`J${i}`));
+const perm = (id: string, nombre: string, colorTarjeta: string): JugadorPermanente =>
+  ({ id, nombre, colorTarjeta, estadisticas: {}, evolucion: [] }) as unknown as JugadorPermanente;
 
-describe('colores de jugador', () => {
-  it('asigna colores de tarjeta distintos y el fondo nunca iguala a la tarjeta', () => {
-    const { lista } = normalizarColores(jugadores(9));
-    expect(new Set(lista.map((j) => j.colorTarjeta)).size).toBe(9);
-    expect(lista.every((j) => j.colorAvatar !== j.colorTarjeta)).toBe(true);
-    expect(PALETA_JUGADOR).toContain('pizarra');
+describe('colorGraficoDe', () => {
+  const lista = [perm('1', 'Franco', 'rojo'), perm('2', 'Lady', 'azul')];
+  it('usa el color de la tarjeta, por id o por nombre', () => {
+    expect(colorGraficoDe(lista, { permanenteId: '1', nombre: 'Franco' })).toBe(COLOR_LINEA.rojo);
+    expect(colorGraficoDe(lista, { nombre: ' lady ' })).toBe(COLOR_LINEA.azul);
   });
-
-  it('si otro jugador ya tenía el color elegido, ese otro cambia solo', () => {
-    const base = normalizarColores(jugadores(3)).lista;
-    const [a, b, c] = base;
-    const cambio = base.map((j) => (j.id === c!.id ? { ...j, colorTarjeta: a!.colorTarjeta } : j));
-    const { lista } = normalizarColores(cambio, c!.id);
-    expect(lista.find((j) => j.id === c!.id)!.colorTarjeta).toBe(a!.colorTarjeta);
-    expect(lista.find((j) => j.id === a!.id)!.colorTarjeta).not.toBe(a!.colorTarjeta);
-    expect(new Set(lista.map((j) => j.colorTarjeta)).size).toBe(3);
-    expect(lista.find((j) => j.id === b!.id)!.colorTarjeta).toBe(b!.colorTarjeta);
+  it('Barbagrís va en gris y un desconocido queda sin color propio', () => {
+    expect(colorGraficoDe(lista, { nombre: 'Barbagrís', fantasma: true })).toBe(COLOR_LINEA.pizarra);
+    expect(colorGraficoDe(lista, { nombre: 'Eguren' })).toBeUndefined();
+  });
+  it('el color viaja a las series del gráfico', () => {
+    const { series } = construirSeriesEvolucion([{ nombre: 'Franco', historial: [], color: COLOR_LINEA.rojo }]);
+    expect(series[0]?.color).toBe(COLOR_LINEA.rojo);
   });
 });

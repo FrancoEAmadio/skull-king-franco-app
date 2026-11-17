@@ -179,7 +179,7 @@ export function ModalAjustes() {
             <h4 className="tarjeta-titulo">Información de la app</h4>
             <ul className="mt-2 flex flex-col gap-1 text-sm text-slate-600">
               <li>Versión: <strong className="text-tinta">{VERSION_APP}</strong></li>
-              <li>Pantalla: <strong className="text-tinta">{window.innerWidth} px de ancho</strong> · densidad {window.devicePixelRatio}×</li>
+              <li>Pantalla: <strong className="text-tinta">{window.innerWidth} px de ancho</strong> · densidad {Math.round(window.devicePixelRatio * 100) / 100}×</li>
             </ul>
             <button type="button" onClick={() => void buscarNovedades()} className="btn-claro mt-3 w-full py-3 text-sm">
               🔄 Buscar actualizaciones

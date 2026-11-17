@@ -27,7 +27,7 @@ export function textoResultado(datos: DatosResultado): string {
   });
   return [
     '🏴‍☠️ SKULL KING — Resultado final',
-    `${datos.fecha} · ${datos.rondas} ronda${datos.rondas === 1 ? '' : 's'}`,
+    datos.rondas > 0 ? `${datos.fecha} · ${datos.rondas} ronda${datos.rondas === 1 ? '' : 's'}` : datos.fecha,
     '',
     ...lineas,
     '',
@@ -139,7 +139,7 @@ function dibujarGrafico(
     }
   }
   series.series.forEach((serie, indice) => {
-    ctx.strokeStyle = COLORES_SERIES[indice % COLORES_SERIES.length]!;
+    ctx.strokeStyle = serie.color ?? COLORES_SERIES[indice % COLORES_SERIES.length]!;
     ctx.lineWidth = 5;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
@@ -198,7 +198,7 @@ export async function crearTarjetaResultado(datos: DatosResultado): Promise<Blob
   ctx.fillStyle = '#94a3b8';
   ctx.font = '28px system-ui, sans-serif';
   ctx.fillText(
-    `${datos.fecha} · ${datos.rondas} ronda${datos.rondas === 1 ? '' : 's'}`,
+    datos.rondas > 0 ? `${datos.fecha} · ${datos.rondas} ronda${datos.rondas === 1 ? '' : 's'}` : datos.fecha,
     ANCHO_TARJETA / 2,
     296
   );
@@ -243,7 +243,7 @@ export async function crearTarjetaResultado(datos: DatosResultado): Promise<Blob
       const nombre = recortarTexto(ctx, serie.nombre, 150);
       const anchoItem = ctx.measureText(nombre).width + 46;
       if (xLeyenda + anchoItem > ANCHO_TARJETA - 80) return;
-      ctx.fillStyle = COLORES_SERIES[indice % COLORES_SERIES.length]!;
+      ctx.fillStyle = serie.color ?? COLORES_SERIES[indice % COLORES_SERIES.length]!;
       ctx.beginPath();
       ctx.arc(xLeyenda + 10, y + 12, 10, 0, Math.PI * 2);
       ctx.fill();

@@ -9,10 +9,12 @@ import type {
 export interface JugadorConHistorial {
   nombre: string;
   historial: EntradaHistorialRonda[];
+  /** Color de la línea (el de la tarjeta del jugador). Si falta, el gráfico usa su paleta. */
+  color?: string;
 }
 
 export interface SeriesEvolucion {
-  series: { nombre: string; puntos: number[] }[];
+  series: { nombre: string; puntos: number[]; color?: string }[];
   /** Etiquetas del eje X; posición 0 = "Inicio". */
   etiquetas: string[];
 }
@@ -38,7 +40,7 @@ export function construirSeriesEvolucion(jugadores: JugadorConHistorial[]): Seri
     }
     // Si el jugador tiene menos entradas (p. ej. sin bono final) se mantiene su último valor.
     while (puntos.length < etiquetas.length) puntos.push(acumulado);
-    return { nombre: jugador.nombre, puntos };
+    return { nombre: jugador.nombre, puntos, ...(jugador.color ? { color: jugador.color } : {}) };
   });
   return { series, etiquetas };
 }

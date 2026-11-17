@@ -4,6 +4,8 @@ export interface SerieGrafico {
   nombre: string;
   /** Puntaje acumulado: posición 0 = antes de la primera ronda. */
   puntos: number[];
+  /** Color de la línea; si falta, se usa la paleta por orden. */
+  color?: string;
 }
 
 interface Props {
@@ -80,8 +82,10 @@ export function GraficoEvolucion({ series: todasLasSeries, etiquetas, titulo = '
   const pasoEtiqueta = cantidadPuntos > 12 ? 2 : 1;
   const anchoColumna = anchoUtil / Math.max(cantidadPuntos - 1, 1);
 
-  const colorDe = (nombre: string) =>
-    COLORES_SERIES[Math.max(0, todasLasSeries.findIndex((serie) => serie.nombre === nombre)) % COLORES_SERIES.length]!;
+  const colorDe = (nombre: string) => {
+    const indice = Math.max(0, todasLasSeries.findIndex((serie) => serie.nombre === nombre));
+    return todasLasSeries[indice]?.color ?? COLORES_SERIES[indice % COLORES_SERIES.length]!;
+  };
 
   const detalle =
     indiceActivo === null
