@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { construirSeriesEvolucion } from '../../dominio/comparativas';
+import { colorGraficoDe } from '../../datos/coloresJugador';
 import { compartirTarjetaResultado, compartirTexto, textoResultado } from '../../infra/compartir';
 import type { DatosResultado, ResultadoCompartir } from '../../infra/compartir';
 import { GraficoEvolucion } from '../../ui/GraficoEvolucion';
@@ -16,14 +17,14 @@ const MENSAJES: Record<ResultadoCompartir, string | null> = {
 };
 
 export function ModalPodio() {
-  const { mostrarPodio, cerrarPodio, partida, verHistorialJugador } = useApp();
+  const { mostrarPodio, cerrarPodio, partida, verHistorialJugador, jugadoresPermanentes } = useApp();
   const { tablaGeneralOrdenada, partidaFinalizada, rondaActual, resumenRondaActual } = partida;
   const [aviso, setAviso] = useState<string | null>(null);
   const [trabajando, setTrabajando] = useState(false);
 
   const evolucion = useMemo(
-    () => construirSeriesEvolucion(tablaGeneralOrdenada),
-    [tablaGeneralOrdenada]
+    () => construirSeriesEvolucion(tablaGeneralOrdenada.map((j) => ({ ...j, color: colorGraficoDe(jugadoresPermanentes, j) }))),
+    [tablaGeneralOrdenada, jugadoresPermanentes]
   );
   const rondasJugadas = Math.max(0, ...tablaGeneralOrdenada.map((jugador) => jugador.historial.length));
 

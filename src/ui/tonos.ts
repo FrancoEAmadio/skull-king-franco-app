@@ -42,3 +42,10 @@ export const FONDO_AVATAR: Record<NombreTono, [string, string]> = {
   fucsia: ['#e879f9', '#a21caf'], lima: ['#a3e635', '#4d7c0f'], indigo: ['#818cf8', '#4338ca'],
   cian: ['#22d3ee', '#0e7490'], pizarra: ['#94a3b8', '#475569'],
 };
+
+/** Color de las líneas del gráfico de evolución por tono (el mismo que el punto de la tarjeta). */
+export const COLOR_LINEA: Record<NombreTono, string> = {
+  amarillo: '#fbbf24', violeta: '#8b5cf6', verde: '#10b981', rojo: '#ef4444', azul: '#3b82f6',
+  rosa: '#ec4899', negro: '#94a3b8', agua: '#14b8a6', naranja: '#f97316', fucsia: '#d946ef',
+  lima: '#84cc16', indigo: '#6366f1', cian: '#06b6d4', pizarra: '#94a3b8',
+};
