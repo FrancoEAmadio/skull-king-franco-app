@@ -147,7 +147,7 @@ export function PantallaNuevaPartida() {
           <TarjetaOpcion
             titulo="🃏 Comodines de bonificación"
             tono="fucsia"
-            detalle="Cartas blancas: +5 a +50 pts"
+            detalle="Regla propia (no oficial): cartas blancas +5 a +50"
             activo={configuracionMesa.usarComodinesBonificacion}
             onChange={(valor) => actualizarConfig('usarComodinesBonificacion', valor)}
           />

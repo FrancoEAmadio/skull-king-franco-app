@@ -132,13 +132,13 @@ export const CATEGORIAS_REGLAS_WIKI: CategoriaRegla[] = [
   },
   {
     id: 'comodines_bonificacion',
-    titulo: '4. Comodines de Bonificación',
+    titulo: '4. Regla propia: Cartas Blancas',
     categoria: 'Avanzado',
     items: [
       {
-        titulo: '🃏 Cartas Blancas (Bonificación Acumulativa)',
+        titulo: '🃏 Cartas Blancas (regla inventada por el autor de la app)',
         texto:
-          'Si al recibir tu mano inicial te toca una Carta Blanca, la apartás boca arriba y robás una nueva carta.\n\nLímite global de mesa: 4 en Juego Base, 8 con Expansión.\n\nAl final de la partida:\n• 1 carta = +5 pts\n• 2 cartas = +10 pts\n• 3 cartas = +20 pts\n• 4 o más = +50 pts (tope)',
+          '⚠️ Esta NO es una regla oficial. El juego trae Cartas Blancas como comodín libre: sirven para inventar reglas nuevas o para reponer una carta perdida, y cada mesa puede darles el uso que quiera. La bonificación de abajo es una habilidad inventada por el autor de esta app, y se puede activar o no al crear la partida.\n\nSi al recibir tu mano inicial te toca una Carta Blanca, la apartás boca arriba y robás una nueva carta.\n\nLímite global de mesa: 4 en Juego Base, 8 con Expansión.\n\nAl final de la partida:\n• 1 carta = +5 pts\n• 2 cartas = +10 pts\n• 3 cartas = +20 pts\n• 4 o más = +50 pts (tope)',
         abierta: false,
       },
     ],
