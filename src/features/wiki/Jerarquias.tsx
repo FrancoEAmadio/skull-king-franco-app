@@ -35,9 +35,9 @@ function EspecialesTriangulo({ onFicha }: { onFicha: OnFicha }) {
     { id: 'si', x: 20, y: 74, imgs: [img('sirena'), img('sirena')], nombre: 'Sirenas ×2', color: COLOR.sirena },
   ];
   const flechas: FlechaDiagrama[] = [
-    { de: 'sk', a: 'pi', etiqueta: 'vence · +30 c/u' },
-    { de: 'pi', a: 'si', etiqueta: 'vencen · +20' },
-    { de: 'si', a: 'sk', etiqueta: 'vencen · +40' },
+    { de: 'sk', a: 'pi', etiqueta: 'vence · +30 c/u', color: COLOR.sk },
+    { de: 'pi', a: 'si', etiqueta: 'vencen · +20', color: COLOR.pirata },
+    { de: 'si', a: 'sk', etiqueta: 'vencen · +40', color: COLOR.sirena },
   ];
   return (
     <Caja titulo="Cartas especiales" texto={`1 Skull King · ${piratas} Piratas · ${cantidad('sirena')} Sirenas`}>
@@ -59,12 +59,12 @@ function EspecialesCuadrado({ onFicha }: { onFicha: OnFicha }) {
     { id: 'pi', x: 78, y: 78, imgs: [...PIRATAS_BASE, 'mary_thorne'].map(img), nombre: 'Piratas ×7', color: COLOR.pirata },
   ];
   const flechas: FlechaDiagrama[] = [
-    { de: 'sk', a: 'kong', etiqueta: '+30' },
-    { de: 'kong', a: 'pi', etiqueta: 'vence' },
-    { de: 'pi', a: 'si', etiqueta: '+20' },
-    { de: 'si', a: 'sk', etiqueta: '+40' },
-    { de: 'sk', a: 'pi', curva: 0.6, t: 0.28, etiqueta: '+30 c/u' },
-    { de: 'si', a: 'kong', curva: 0.6, t: 0.28, etiqueta: '+30' },
+    { de: 'sk', a: 'kong', etiqueta: '+30', color: COLOR.sk },
+    { de: 'kong', a: 'pi', etiqueta: 'vence', color: COLOR.kong },
+    { de: 'pi', a: 'si', etiqueta: '+20', color: COLOR.pirata },
+    { de: 'si', a: 'sk', etiqueta: '+40', color: COLOR.sirena },
+    { de: 'sk', a: 'pi', curva: 0.6, t: 0.2, etiqueta: '+30 c/u', color: COLOR.sk },
+    { de: 'si', a: 'kong', curva: 0.6, t: 0.2, etiqueta: '+30', color: COLOR.sirena },
   ];
   return (
     <Caja titulo="Cartas especiales" texto="1 Skull King · 1 Kong · 7 Piratas · 2 Sirenas">
@@ -102,30 +102,41 @@ function Palos({ modo, onFicha }: { modo: ModoContenido; onFicha: OnFicha }) {
     </svg>
   );
   const archivo = (id: string) => img(id);
+  const expansion = modo === 'expansion';
+  // Una carta arriba y los tres palos en la misma fila, igual que en Monstruos: ninguno es mejor que otro.
+  const cima: NodoDiagrama = expansion
+    ? { id: 'm', x: 50, y: 18, imgs: [archivo('monito15')], nombre: 'Mono Comodín 15', color: '#b45309' }
+    : { id: 'n', x: 50, y: 18, imgs: [archivo('palo_negro')], nombre: 'Palo Negro (triunfo)', color: '#111827' };
+  const nodos: NodoDiagrama[] = [
+    cima,
+    { id: 'a', x: 17, y: 72, imgs: [archivo('palo_amarillo')], nombre: 'Amarillo', color: '#ca8a04' },
+    { id: 'v', x: 50, y: 72, imgs: [archivo('palo_violeta')], nombre: 'Violeta', color: '#7c3aed' },
+    { id: 'g', x: 83, y: 72, imgs: [archivo('palo_verde')], nombre: 'Verde', color: '#16a34a' },
+  ];
+  const flechas: FlechaDiagrama[] = ['a', 'v', 'g'].map((destino) => ({
+    de: cima.id,
+    a: destino,
+    color: cima.color,
+    ...(expansion && destino === 'v' ? { etiqueta: 'gana a los 14' } : {}),
+  }));
+  const idCarta: Record<string, [string, string]> = {
+    n: ['palo_negro', 'Palo Negro'], m: ['monito15', 'Mono Comodín 15'],
+    a: ['palo_amarillo', 'Amarillo'], v: ['palo_violeta', 'Violeta'], g: ['palo_verde', 'Verde'],
+  };
   return (
     <Caja titulo="Palos">
       <div className="flex flex-col items-stretch gap-1">
-        {fila([{ carta: 'palo_negro', id: 'n', nombre: 'Palo Negro (triunfo)', archivo: archivo('palo_negro'), color: '#111827' }])}
-        {flecha('gana a')}
-        {modo === 'expansion' && (
+        {expansion && (
           <>
-            {fila([{ carta: 'monito15', id: 'm', nombre: 'Mono Comodín 15', archivo: archivo('monito15'), color: '#b45309' }])}
-            {flecha('gana a los 14')}
+            {fila([{ carta: 'palo_negro', id: 'n', nombre: 'Palo Negro (triunfo)', archivo: archivo('palo_negro'), color: '#111827' }])}
+            {flecha('gana a')}
           </>
         )}
         <DiagramaJerarquia
-          alto={96}
-          nodos={[
-            { id: 'a', x: 50, y: 20, imgs: [archivo('palo_amarillo')], nombre: 'Amarillo', color: '#ca8a04' },
-            { id: 'v', x: 20, y: 74, imgs: [archivo('palo_violeta')], nombre: 'Violeta', color: '#7c3aed' },
-            { id: 'g', x: 80, y: 74, imgs: [archivo('palo_verde')], nombre: 'Verde', color: '#16a34a' },
-          ]}
-          flechas={[
-            { de: 'a', a: 'v', doble: true, punteada: true },
-            { de: 'a', a: 'g', doble: true, punteada: true },
-            { de: 'v', a: 'g', doble: true, punteada: true },
-          ]}
-          onTocar={(id) => onFicha([id === 'a' ? 'palo_amarillo' : id === 'v' ? 'palo_violeta' : 'palo_verde'], id === 'a' ? 'Amarillo' : id === 'v' ? 'Violeta' : 'Verde')}
+          alto={92}
+          nodos={nodos}
+          flechas={flechas}
+          onTocar={(id) => onFicha([idCarta[id]![0]], idCarta[id]![1])}
         />
         <p className="text-center text-xs font-semibold text-slate-500">Entre sí no hay uno mejor: gana el palo declarado, el de la primera carta de la baza.</p>
       </div>
