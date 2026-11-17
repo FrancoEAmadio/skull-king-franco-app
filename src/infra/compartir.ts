@@ -217,7 +217,7 @@ function cargarLogo(): Promise<HTMLImageElement | null> {
 /** Genera una imagen PNG con el podio y (si hay datos) el gráfico de evolución. */
 export async function crearTarjetaResultado(datos: DatosResultado): Promise<Blob | null> {
   const filas = datos.ranking.slice(0, 9);
-  const conGrafico = !!datos.series && datos.series.series.length > 0 && datos.series.etiquetas.length > 2;
+  const conGrafico = !!datos.series && datos.series.series.length > 0 && datos.series.etiquetas.length >= 2;
   const altoFila = 96;
   const altoGrafico = conGrafico ? 380 : 0;
   const logo = await cargarLogo();
