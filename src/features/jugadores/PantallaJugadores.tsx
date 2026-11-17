@@ -262,7 +262,7 @@ export function PantallaJugadores() {
                 <div className="min-w-0 flex-1">
                   <span className="block truncate text-base font-bold text-azul">{jug.nombre}</span>
                   <span className="text-xs font-semibold text-slate-500">
-                    {jug.estadisticas.partidasJugadas} jugadas · 🏆 {jug.estadisticas.victorias}
+                    {jug.estadisticas.partidasJugadas} {jug.estadisticas.partidasJugadas === 1 ? 'jugada' : 'jugadas'} · 🏆 {jug.estadisticas.victorias}
                     {jug.estadisticas.mejorPartida !== null ? ` · récord ${jug.estadisticas.mejorPartida}` : ''}
                   </span>
                 </div>

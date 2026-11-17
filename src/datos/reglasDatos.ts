@@ -21,7 +21,7 @@ export const CATEGORIAS_REGLAS_WIKI: CategoriaRegla[] = [
       {
         titulo: '🃏 Cartas Especiales: Huida, Piratas, Sirenas y Skull King',
         texto:
-          '🏳️ HUÍDA\nLa carta Huida no puede ganar una baza. Su única función es intentar evitar capturarla y dejar que otra carta determine el ganador.\n\n⚔️ PIRATAS, 🧜‍♀️ SIRENAS Y 👑 SKULL KING\nEstas tres cartas especiales tienen una jerarquía circular entre sí:\n\n• 🏴‍☠️ PIRATA derrota a 🧜‍♀️ SIRENA → +20 puntos\n• 🧜‍♀️ SIRENA derrota a 👑 SKULL KING → +40 puntos\n• 👑 SKULL KING derrota a 🏴‍☠️ PIRATA → +30 puntos\n\nLa relación funciona como un círculo: el Pirata pierde contra el Skull King, el Skull King pierde contra la Sirena y la Sirena pierde contra el Pirata.',
+          '🏳️ HUIDA\nLa carta Huida no puede ganar una baza. Su única función es intentar evitar capturarla y dejar que otra carta determine el ganador.\n\n⚔️ PIRATAS, 🧜‍♀️ SIRENAS Y 👑 SKULL KING\nEstas tres cartas especiales tienen una jerarquía circular entre sí:\n\n• 🏴‍☠️ PIRATA derrota a 🧜‍♀️ SIRENA → +20 puntos\n• 🧜‍♀️ SIRENA derrota a 👑 SKULL KING → +40 puntos\n• 👑 SKULL KING derrota a 🏴‍☠️ PIRATA → +30 puntos\n\nLa relación funciona como un círculo: el Pirata pierde contra el Skull King, el Skull King pierde contra la Sirena y la Sirena pierde contra el Pirata.',
         abierta: false,
       },
       {
