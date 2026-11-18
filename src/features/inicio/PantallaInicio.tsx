@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import { useInstalarPWA } from '../../ui/useInstalarPWA';
-import { Modal } from '../../ui/Modal';
+import { EncabezadoModal, Modal } from '../../ui/Modal';
 import { ModalConfirmacion } from '../../ui/ModalConfirmacion';
+import type { ModoContenido } from '../../tipos';
+
+const NOMBRE_MODO: Record<ModoContenido, string> = { base: 'Juego Base', avanzado: 'Avanzadas', expansion: 'Expansión' };
 
 function formatearFecha(iso: string): string {
   try {
-    return new Date(iso).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
+    return new Date(iso).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
   } catch {
     return '';
   }
@@ -74,43 +77,60 @@ export function PantallaInicio() {
         )}
       </div>
 
-      <Modal abierto={eligiendo} onCerrar={() => setEligiendo(false)} ancho="max-w-md" cerrarAlHacerClickAfuera>
-        <div className="flex max-h-[85dvh] flex-col gap-3 overflow-y-auto p-4 text-left">
-          <h2 className="font-display text-xl font-bold text-azul">Elegí qué partida continuar</h2>
-          {partida.partidasGuardadas.map((p) => (
-            <div key={p.id} className="opcion flex items-center gap-2 p-3">
-              <button
-                type="button"
-                className="min-w-0 flex-1 text-left"
-                onClick={() => { setEligiendo(false); partida.continuarPartida(p.id); }}
-              >
-                <span className="block truncate text-sm font-semibold text-tinta">
-                  {p.jugadores.map((j) => j.nombre).join(', ')}
-                </span>
-                <span className="block text-xs font-semibold text-slate-500">
-                  Ronda {p.rondaActual} de {p.cartasPorRondaActivas.length || 10} · {formatearFecha(p.actualizada)}
-                </span>
-              </button>
-              <button
-                type="button"
-                className="btn-peligro shrink-0 px-3 py-2 text-xs"
-                onClick={() => setADescartar(p.id)}
-              >
-                Borrar
-              </button>
-            </div>
-          ))}
-          <button type="button" onClick={() => setEligiendo(false)} className="btn-claro w-full py-3">
-            Cerrar
-          </button>
+      <Modal abierto={eligiendo} onCerrar={() => setEligiendo(false)} ancho="max-w-md" etiqueta="Partidas en curso" cerrarAlHacerClickAfuera>
+        <EncabezadoModal
+          titulo="Partidas en curso"
+          subtitulo={`${partida.partidasGuardadas.length} para continuar`}
+          onCerrar={() => setEligiendo(false)}
+        />
+        <div className="scroll-oculto flex max-h-[75dvh] flex-col gap-3 overflow-y-auto p-4 text-left">
+          {partida.partidasGuardadas.map((p) => {
+            const ranking = [...p.jugadores].sort((a, b) => b.puntos - a.puntos);
+            const totalRondas = p.cartasPorRondaActivas.length || 10;
+            return (
+              <article key={p.id} className="flex flex-col gap-2.5 rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
+                <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                  <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase text-amber-800">
+                    Ronda {p.rondaActual} de {totalRondas} · {NOMBRE_MODO[p.configuracionMesa.modoContenido] ?? 'Juego Base'}
+                  </span>
+                  <span className="text-[11px] font-bold text-slate-500">{formatearFecha(p.actualizada)}</span>
+                </header>
+
+                <ul className="flex flex-col gap-1">
+                  {ranking.map((jugador) => (
+                    <li key={jugador.permanenteId || jugador.nombre} className="flex items-center justify-between gap-3 rounded-lg bg-white px-2.5 py-1.5 text-sm">
+                      <span className="min-w-0 truncate font-bold text-tinta">{jugador.nombre}</span>
+                      <strong className={`shrink-0 tabular-nums ${jugador.puntos < 0 ? 'text-rojo-osc' : 'text-tinta'}`}>{jugador.puntos}</strong>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="grid grid-cols-[1fr_auto] gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEligiendo(false);
+                      partida.continuarPartida(p.id);
+                    }}
+                    className="btn-dorado py-3 text-sm"
+                  >
+                    Continuar
+                  </button>
+                  <button type="button" onClick={() => setADescartar(p.id)} aria-label="Descartar esta partida" className="btn-peligro px-4 py-3 text-sm">
+                    Descartar
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </Modal>
 
       <ModalConfirmacion
         abierto={aDescartar !== null}
-        titulo="¿Borrar esta partida?"
-        descripcion="Se descarta la partida sin guardarla en el historial."
-        textoConfirmar="Borrar"
+        titulo="¿Descartar esta partida?"
+        descripcion="Se pierde todo lo cargado y no queda en el historial ni en las estadísticas."
+        textoConfirmar="Descartar"
         onConfirmar={() => {
           if (aDescartar) partida.descartarPartidaPorId(aDescartar);
           setADescartar(null);
