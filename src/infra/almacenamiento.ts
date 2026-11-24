@@ -361,7 +361,23 @@ export interface ResultadoCombinacion {
 function marcaDeTiempo(fecha: string): number {
   const m = /(\d{1,2})\/(\d{1,2})\/(\d{4})\D*(\d{1,2})?:?(\d{2})?/.exec(fecha);
   if (!m) return Date.parse(fecha) || 0;
-  return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]), Number(m[4] ?? 0), Number(m[5] ?? 0)).getTime();
+  let hora = Number(m[4] ?? 0);
+  // Las copias viejas guardan "12:49 a. m." / "11:57 p. m.": sin esto la hora se lee como de 24 h y se ordena mal.
+  if (/p\.?\s?m\.?/i.test(fecha)) {
+    if (hora < 12) hora += 12;
+  } else if (/a\.?\s?m\.?/i.test(fecha) && hora === 12) {
+    hora = 0;
+  }
+  return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]), hora, Number(m[5] ?? 0)).getTime();
+}
+
+/** Nombre del .json exportado: dice qué es, cuántas partidas tiene y cuándo se exportó (hora local). */
+export function nombreArchivoCopia(cantidadPartidas: number, ahora: Date = new Date()): string {
+  const dos = (n: number) => String(n).padStart(2, '0');
+  const fecha = `${dos(ahora.getDate())}-${dos(ahora.getMonth() + 1)}-${ahora.getFullYear()}`;
+  const hora = `${dos(ahora.getHours())}h${dos(ahora.getMinutes())}`;
+  const partidas = `${cantidadPartidas} ${cantidadPartidas === 1 ? 'partida' : 'partidas'}`;
+  return `Skull King - ${partidas} - ${fecha} ${hora}.json`;
 }
 
 export function combinarCopiaSeguridad(

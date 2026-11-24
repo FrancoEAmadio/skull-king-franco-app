@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useApp } from '../../estado/AppProvider';
 import {
   combinarCopiaSeguridad,
+  nombreArchivoCopia,
   crearCopiaSeguridad,
   interpretarCopiaSeguridad,
 } from '../../infra/almacenamiento';
@@ -53,8 +54,7 @@ export function ModalAjustes() {
 
   const exportar = () => {
     const copia = crearCopiaSeguridad(jugadoresPermanentes, historialPartidas);
-    const fecha = new Date().toISOString().slice(0, 10);
-    descargarArchivo(`skull-king-copia-${fecha}.json`, JSON.stringify(copia, null, 2));
+    descargarArchivo(nombreArchivoCopia(historialPartidas.length), JSON.stringify(copia, null, 2));
     setAviso({
       titulo: 'Copia exportada',
       mensaje: `Se descargó un archivo con ${jugadoresPermanentes.length} jugador${
